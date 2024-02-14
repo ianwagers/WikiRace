@@ -15,12 +15,12 @@ class CustomWebEnginePage(QWebEnginePage):
         return super().acceptNavigationRequest(url, _type, isMainFrame)
 
 class SoloGamePage(QWidget):
-    def __init__(self, tabWidget, parent=None):
+    def __init__(self, parent=None):
         super(SoloGamePage, self).__init__(parent)
-        self.webView = QWebEngineView(self)
         self.initUI()
-        self.layout().addWidget(self.webView)  # Assuming you have a layout setup
-        self.webView.linkClicked.connect(self.handleLinkClicked)
+        self.layout.addWidget(self.webView)  # Assuming you have a layout setup
+        self.webView = QWebEngineView(self)
+        self.webView.urlChanged.connect(self.handleLinkClicked)
         
         
         # Initialize the stopwatch and links counter
@@ -62,7 +62,7 @@ class SoloGamePage(QWidget):
         self.setLayout(self.layout)
 
         # Call handleLinkClicked on links
-        self.webView.linkClicked.connect(self.handleLinkClicked)
+        self.webView.urlChanged.connect(self.handleLinkClicked)
 
     def updateStopwatch(self):
         self.startTime += 1
@@ -80,6 +80,6 @@ class SoloGamePage(QWidget):
         self.linksUsed += 1
         # Update any UI component that displays the link history, if applicable
         # For example, adding the url to a QListWidget or similar
-        self.linksHistoryWidget.addItem(url.toString())
+        self.previousLinksList.addItem(url.toString())
         # Ensure the web view navigates to the clicked link
         self.webView.setUrl(url)
