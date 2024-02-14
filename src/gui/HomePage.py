@@ -14,9 +14,10 @@ from PyQt5.QtWidgets import QBoxLayout, QVBoxLayout, QHBoxLayout
 
 
 class HomePage(QWidget):
-    def __init__(self, tabWidget):
+    def __init__(self, tabWidget, mainApplication):
         super().__init__()
         self.tabWidget = tabWidget
+        self.mainApplication = mainApplication
 
         # Check if tabWidget has a layout, if not, set a new layout
         if tabWidget.layout() is None:
@@ -163,26 +164,18 @@ class HomePage(QWidget):
         self.game_logic_instance = GameLogic()
 
     def onSoloGameClicked(self):
-        dialog = CustomGameDialog(self)
-        dialog.soloGameButton.clicked.connect(self.onSoloGameClicked)
-        if dialog.exec_():
-            # Retrieve the user's choices from the dialog
-            starting_page_choice = dialog.startPageCombo.currentText()
-            ending_page_choice = dialog.endPageCombo.currentText()
-            custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else None
-            custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else None
-            
-            #TODO: If both of the starting_page_choice variables are random, call startGame() from src.logic GameLogic.py
-            # These print statements can be ignored
-            print(f"Starting Page: {starting_page_choice}, Custom: {custom_starting_page}")
-            print(f"Ending Page: {ending_page_choice}, Custom: {custom_ending_page}")
-
-            # Assuming this is part of a method handling the start game event
-            if starting_page_choice == 'Random' and ending_page_choice == 'Random':
-                self.mainApplication.addSoloGameTab()
-                self.game_logic_instance.startGame()
-            else:
-                print("[ERROR] Custom start/end not implemented")
+            dialog = CustomGameDialog(self)
+            if dialog.exec_():
+                starting_page_choice = dialog.startPageCombo.currentText()
+                ending_page_choice = dialog.endPageCombo.currentText()
+                custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else None
+                custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else None
+                
+                if starting_page_choice == 'Random' and ending_page_choice == 'Random':
+                    self.mainApplication.addSoloGameTab()
+                    self.game_logic_instance.startGame()
+                else:
+                    print("[ERROR] Custom start/end not implemented")
 
     def onMultiplayerClicked(self):
         if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
@@ -204,8 +197,8 @@ class HomePage(QWidget):
         self.webView.load(qurl)
 
 class CustomGameDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, homePage):
+        super().__init__(homePage)
         self.setWindowTitle('Select Game Mode')
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(10, 10, 10, 10)  # Added padding around the dialog content
@@ -245,7 +238,7 @@ class CustomGameDialog(QDialog):
         # Start Game button
         self.startGameButton = QPushButton('Start Game')
         self.layout.addWidget(self.startGameButton)
-        self.startGameButton.clicked.connect(self.onSoloGameClicked)
+        self.startGameButton.clicked.connect(homePage.mainApplication.addSoloGameTab)
 
         # Set minimum dialog size for better UI experience
         self.setMinimumSize(275, 175)  # Example improvement for resizing

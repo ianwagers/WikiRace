@@ -23,7 +23,7 @@ class MainApplication(QMainWindow):
 
     def initUI(self):
         # Initialize landing page
-        self.homePage = HomePage(self.tabWidget)
+        self.homePage = HomePage(self.tabWidget, self)
 
         # Add home tab
         self.tabWidget.addTab(self.homePage, "Home")
@@ -32,6 +32,7 @@ class MainApplication(QMainWindow):
         if not hasattr(self, 'soloGamePage'):
             self.soloGamePage = SoloGamePage(self.tabWidget)
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
+            self.tabWidget.setCurrentWidget(self.soloGamePage)
 
     def addMultiplayerTab(self):
         # Adds the Multiplayer tab only if it doesn't exist
