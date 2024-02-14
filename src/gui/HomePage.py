@@ -164,18 +164,23 @@ class HomePage(QWidget):
         self.game_logic_instance = GameLogic()
 
     def onSoloGameClicked(self):
-            dialog = CustomGameDialog(self)
-            if dialog.exec_():
-                starting_page_choice = dialog.startPageCombo.currentText()
-                ending_page_choice = dialog.endPageCombo.currentText()
-                custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else None
-                custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else None
-                
-                if starting_page_choice == 'Random' and ending_page_choice == 'Random':
-                    self.mainApplication.addSoloGameTab()
-                    self.game_logic_instance.startGame()
-                else:
-                    print("[ERROR] Custom start/end not implemented")
+        dialog = CustomGameDialog(self)
+        if dialog.exec_():
+            starting_page_choice = dialog.startPageCombo.currentText()
+            ending_page_choice = dialog.endPageCombo.currentText()
+            custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else None
+            custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else None
+
+            if starting_page_choice == 'Random' and ending_page_choice == 'Random':
+                self.mainApplication.addSoloGameTab()
+                self.game_logic_instance.startGame()
+                self.accept()
+                #dialog.close()  # Close the CustomGameDialog
+            else:
+                print("[ERROR] Custom start/end not implemented")
+
+        dialog.close()  # Close the CustomGameDialog
+        
 
     def onMultiplayerClicked(self):
         if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
