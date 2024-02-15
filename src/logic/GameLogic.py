@@ -48,7 +48,7 @@ class GameLogic(QObject):
         # Notify the UI to open a new game tab with the start and end URLs
         self.openGameTab.emit(start_url, end_url)
 
-    def stopGame(self):
+    def endGame(self):
         # This method will stop the game and perform any cleanup necessary
         pass  # Placeholder for actual stop game logic
 

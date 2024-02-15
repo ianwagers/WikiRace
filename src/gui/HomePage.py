@@ -174,13 +174,14 @@ class HomePage(QWidget):
             if starting_page_choice == 'Random' and ending_page_choice == 'Random':
                 self.mainApplication.addSoloGameTab()
                 self.game_logic_instance.startGame()
-                self.accept()
-                #dialog.close()  # Close the CustomGameDialog
+                dialog.accept()
+                
             else:
                 print("[ERROR] Custom start/end not implemented")
+                dialog.reject()
 
-        dialog.close()  # Close the CustomGameDialog
-        
+            dialog.accept()
+
 
     def onMultiplayerClicked(self):
         if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
@@ -243,10 +244,12 @@ class CustomGameDialog(QDialog):
         # Start Game button
         self.startGameButton = QPushButton('Start Game')
         self.layout.addWidget(self.startGameButton)
+        # FIX ISSUE WITH TAB/GAME START AND PUT THIS IN THE CORRECT SPOT!
         self.startGameButton.clicked.connect(homePage.mainApplication.addSoloGameTab)
 
         # Set minimum dialog size for better UI experience
         self.setMinimumSize(275, 175)  # Example improvement for resizing
+
 
     def toggleCustomEntry(self):
         self.customStartPageEdit.setEnabled(self.startPageCombo.currentText() == 'Custom')
