@@ -173,6 +173,7 @@ class HomePage(QWidget):
                 if starting_page_choice == 'Random' and ending_page_choice == 'Random':
                     self.mainApplication.addSoloGameTab()
                     self.game_logic_instance.startGame()
+                    self.close()
                 else:
                     print("[ERROR] Custom start/end not implemented")
 
@@ -198,6 +199,7 @@ class HomePage(QWidget):
 class CustomGameDialog(QDialog):
     def __init__(self, homePage):
         super().__init__(homePage)
+        self.homePage = homePage
         self.setWindowTitle('Select Game Mode')
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(10, 10, 10, 10)  # Added padding around the dialog content
@@ -237,10 +239,15 @@ class CustomGameDialog(QDialog):
         # Start Game button
         self.startGameButton = QPushButton('Start Game')
         self.layout.addWidget(self.startGameButton)
-        self.startGameButton.clicked.connect(homePage.mainApplication.addSoloGameTab)
+        self.startGameButton.clicked.connect(self.startGameAndClose)
 
         # Set minimum dialog size for better UI experience
         self.setMinimumSize(275, 175)  # Example improvement for resizing
+        
+    def startGameAndClose(self):
+        # Here you can add any logic you need before closing the dialog
+        self.startGameButton.clicked.connect(lambda: self.startGameAndClose(self.homePage))  # Assuming homePage is accessible. If not, adjust accordingly.
+        self.accept()  # This will close the dialog
 
     def toggleCustomEntry(self):
         self.customStartPageEdit.setEnabled(self.startPageCombo.currentText() == 'Custom')
