@@ -37,10 +37,15 @@ class GameLogic(QObject):
 
     def startGame(self, start_url=None, end_url=None):
         # Check if start_url or end_url is None and fetch a random link
-        if start_url is None:
-            start_url = self.getRandomWikiLink()
-        if end_url is None:
-            end_url = self.getRandomWikiLink()
+        if start_url is not None:
+            end_url = self.findWikiPage(start_url)
+        else:    
+            start_url = self.findWikiPage(start_url)
+        
+        if end_url is not None:
+            end_url = self.findWikiPage(end_url)
+        else:   
+            end_url = self.findWikiPage(end_url)       
 
         # Setup game logic here (e.g., resetting counters, starting timers)
 
@@ -59,3 +64,47 @@ class GameLogic(QObject):
     def getLinksUsed(self):
         # This method will return the number of links clicked
         return self.links_used
+    
+    import requests
+
+    import requests
+
+    def findWikiPage(self, search_text):
+        # URL to Wikipedia's API for searching
+        api_url = "https://en.wikipedia.org/w/api.php"
+
+        # Parameters for the API request
+        params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": search_text,
+            "format": "json",
+            "srlimit": 1  # Limit the search to the top result
+        }
+
+        try:
+            # Send the request to Wikipedia's API
+            response = requests.get(api_url, params=params)
+            response.raise_for_status()  # Raises an exception for HTTP errors
+
+            # Parse the JSON response
+            data = response.json()
+
+            # Check if there are any search results
+            if data["query"]["search"]:
+                # Extract the page ID of the top search result
+                page_id = data["query"]["search"][0]["pageid"]
+
+                # Construct the URL to the Wikipedia page
+                wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
+
+                return wiki_url
+            else:
+                # Handle the case where no search results are found
+                print(f"No results found for '{search_text}'")
+                return None
+        except Exception as e:
+            print(f"Error finding Wikipedia page: {e}")
+            return None
+
+

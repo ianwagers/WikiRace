@@ -81,6 +81,7 @@ class SoloGamePage(QWidget):
         
         # Initialize and configure the web view first
         self.webView = QWebEngineView()
+        #TODO This should be passed the starting page from GameLogic 
         self.webView.load(QUrl("https://en.wikipedia.org"))
         self.webView.urlChanged.connect(self.handleLinkClicked)
 

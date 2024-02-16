@@ -167,15 +167,16 @@ class HomePage(QWidget):
             if dialog.exec_():
                 starting_page_choice = dialog.startPageCombo.currentText()
                 ending_page_choice = dialog.endPageCombo.currentText()
-                custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else None
-                custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else None
-                
-                if starting_page_choice == 'Random' and ending_page_choice == 'Random':
-                    self.mainApplication.addSoloGameTab()
-                    self.game_logic_instance.startGame()
-                    self.close()
-                else:
-                    print("[ERROR] Custom start/end not implemented")
+                #custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else None
+                #custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else None
+
+                if starting_page_choice == 'Random':
+                    starting_page_choice = None
+                if ending_page_choice == 'Random':
+                    ending_page_choice = None
+
+                self.game_logic_instance.startGame(starting_page_choice, ending_page_choice)
+                print("[ERROR] Custom start/end not implemented")
 
     def onMultiplayerClicked(self):
         if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
@@ -208,7 +209,7 @@ class CustomGameDialog(QDialog):
         startingPageLayout = QHBoxLayout()
         startingPageLabel = QLabel('Starting Page:')
         self.startPageCombo = QComboBox()
-        self.startPageCombo.addItems(['Random', 'Custom [Coming Soon]'])
+        self.startPageCombo.addItems(['Random', 'Custom'])
         self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         startingPageLayout.addWidget(startingPageLabel)
         startingPageLayout.addWidget(self.startPageCombo)
@@ -224,7 +225,7 @@ class CustomGameDialog(QDialog):
         endingPageLayout = QHBoxLayout()
         endingPageLabel = QLabel('Ending Page:')
         self.endPageCombo = QComboBox()
-        self.endPageCombo.addItems(['Random', 'Custom [Coming Soon]'])
+        self.endPageCombo.addItems(['Random', 'Custom'])
         self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         endingPageLayout.addWidget(endingPageLabel)
         endingPageLayout.addWidget(self.endPageCombo)
@@ -239,6 +240,10 @@ class CustomGameDialog(QDialog):
         # Start Game button
         self.startGameButton = QPushButton('Start Game')
         self.layout.addWidget(self.startGameButton)
+        
+        # Connect signals
+        self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
+        self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         self.startGameButton.clicked.connect(self.startGameAndClose)
 
         # Set minimum dialog size for better UI experience
