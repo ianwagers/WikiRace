@@ -1,4 +1,3 @@
-
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, QListWidget
 from PyQt5.QtCore import Qt, QTimer, QUrl
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
