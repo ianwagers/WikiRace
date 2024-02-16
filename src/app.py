@@ -5,6 +5,7 @@ from src.gui.HomePage import HomePage
 from src.gui.SoloGamePage import SoloGamePage
 from src.gui.MultiplayerPage import MultiplayerPage
 from src.gui.SettingsPage import SettingsPage
+from src.logic.GameLogic import GameLogic
 
 class MainApplication(QMainWindow):
     def __init__(self):
@@ -18,7 +19,11 @@ class MainApplication(QMainWindow):
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.setCentralWidget(self.tabWidget)
+        
+        # Initialize game logic with MainApplication instance
+        self.GameLogic = GameLogic(self)
 
+        # Initialize UI
         self.initUI()
 
     def initUI(self):

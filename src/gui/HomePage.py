@@ -9,6 +9,7 @@ import sys
 sys.path.append('C:\Project_Workspace\WikiRace')
 from src import app
 from src.logic.GameLogic import GameLogic
+from src.logic.GameLogic import CustomGameDialog
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QBoxLayout, QVBoxLayout, QHBoxLayout
 
@@ -23,61 +24,8 @@ class HomePage(QWidget):
         if tabWidget.layout() is None:
             tabWidget.setLayout(QVBoxLayout())  # Or any other layout
 
-        self.setStyleSheet("""
-        QWidget {
-            background-color: #D6EAF8; /* General background */
-            color: #154360; /* General text color */
-        }
-
-        QPushButton {
-            background-color: #D3D3D3; /* Light grey for buttons */
-            border: 1px solid #9FC3E8;
-            padding: 5px;
-            border-radius: 5px;
-        }
-
-        QPushButton:hover {
-            background-color: #85C1E9; /* Hover state */
-        }
-
-        QPushButton:pressed {
-            background-color: #5499C7; /* Pressed state */
-        }
-
-        QLabel {
-            font-size: 14px;
-        }
-
-        QMainWindow {
-            background-color: #D3D3D3; /* Light grey for main window background */
-        }
-        """)
-
-        # Light Blue Theme with QTabWidget, adjusted for light grey in specific areas
-        self.tabWidget.setStyleSheet("""
-        QTabWidget::pane { /* The tab widget frame */
-            border-top: 2px solid #7DA2CE;
-        }
-
-        QTabBar::tab {
-            background: #D3D3D3; /* Light grey for unselected tabs */
-            color: #154360;
-            padding: 5px;
-            border: 1px solid #9FC3E8;
-            border-bottom-color: #D3D3D3; /* Light grey to match the tab background */
-        }
-
-        QTabBar::tab:selected, QTabBar::tab:hover {
-            background: #D6EAF8; /* Original light blue for selected/hovered tab */
-            color: #154360;
-        }
-
-        QWidget {
-            background-color: #D6EAF8; /* Keeping original light blue for general widgets */
-            color: #154360;
-        }
-        """)
-
+        # Initialize layout coloring
+        self.initUX()
 
         # Now it's safe to get and modify the layout
         self.layout = tabWidget.layout()
@@ -161,7 +109,7 @@ class HomePage(QWidget):
         self.settingsButton.clicked.connect(self.onSettingsClicked)
 
         # Create an instance of GameLogic before calling startGame()
-        self.game_logic_instance = GameLogic()
+        self.game_logic_instance = GameLogic(self.mainApplication)
 
     def onSoloGameClicked(self):
         dialog = CustomGameDialog(self)
@@ -202,56 +150,58 @@ class HomePage(QWidget):
         qurl = QUrl(url)
         self.webView.load(qurl)
 
-class CustomGameDialog(QDialog):
-    def __init__(self, homePage):
-        super().__init__(homePage)
-        self.setWindowTitle('Select Game Mode')
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(10, 10, 10, 10)  # Added padding around the dialog content
+    def initUX(self):
+        self.setStyleSheet("""
+        QWidget {
+            background-color: #D6EAF8; /* General background */
+            color: #154360; /* General text color */
+        }
 
-        # Layout for starting page selection
-        startingPageLayout = QHBoxLayout()
-        startingPageLabel = QLabel('Starting Page:')
-        self.startPageCombo = QComboBox()
-        self.startPageCombo.addItems(['Random', 'Custom [Coming Soon]'])
-        self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
-        startingPageLayout.addWidget(startingPageLabel)
-        startingPageLayout.addWidget(self.startPageCombo)
-        self.layout.addLayout(startingPageLayout)
+        QPushButton {
+            background-color: #D3D3D3; /* Light grey for buttons */
+            border: 1px solid #9FC3E8;
+            padding: 5px;
+            border-radius: 5px;
+        }
 
-        # Line edit for custom starting page
-        self.customStartPageEdit = QLineEdit()
-        self.customStartPageEdit.setPlaceholderText('Enter custom starting page')
-        self.customStartPageEdit.setEnabled(False)
-        self.layout.addWidget(self.customStartPageEdit)
+        QPushButton:hover {
+            background-color: #85C1E9; /* Hover state */
+        }
 
-        # Layout for ending page selection
-        endingPageLayout = QHBoxLayout()
-        endingPageLabel = QLabel('Ending Page:')
-        self.endPageCombo = QComboBox()
-        self.endPageCombo.addItems(['Random', 'Custom [Coming Soon]'])
-        self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
-        endingPageLayout.addWidget(endingPageLabel)
-        endingPageLayout.addWidget(self.endPageCombo)
-        self.layout.addLayout(endingPageLayout)
+        QPushButton:pressed {
+            background-color: #5499C7; /* Pressed state */
+        }
 
-        # Line edit for custom ending page
-        self.customEndPageEdit = QLineEdit()
-        self.customEndPageEdit.setPlaceholderText('Enter custom ending page')
-        self.customEndPageEdit.setEnabled(False)
-        self.layout.addWidget(self.customEndPageEdit)
+        QLabel {
+            font-size: 14px;
+        }
 
-        # Start Game button
-        self.startGameButton = QPushButton('Start Game')
-        self.layout.addWidget(self.startGameButton)
-        # FIX ISSUE WITH TAB/GAME START AND PUT THIS IN THE CORRECT SPOT!
-        self.startGameButton.clicked.connect(homePage.mainApplication.addSoloGameTab)
+        QMainWindow {
+            background-color: #D3D3D3; /* Light grey for main window background */
+        }
+        """)
 
-        # Set minimum dialog size for better UI experience
-        self.setMinimumSize(275, 175)  # Example improvement for resizing
+        # Light Blue Theme with QTabWidget, adjusted for light grey in specific areas
+        self.tabWidget.setStyleSheet("""
+        QTabWidget::pane { /* The tab widget frame */
+            border-top: 2px solid #7DA2CE;
+        }
 
+        QTabBar::tab {
+            background: #D3D3D3; /* Light grey for unselected tabs */
+            color: #154360;
+            padding: 5px;
+            border: 1px solid #9FC3E8;
+            border-bottom-color: #D3D3D3; /* Light grey to match the tab background */
+        }
 
-    def toggleCustomEntry(self):
-        self.customStartPageEdit.setEnabled(self.startPageCombo.currentText() == 'Custom')
-        self.customEndPageEdit.setEnabled(self.endPageCombo.currentText() == 'Custom')
+        QTabBar::tab:selected, QTabBar::tab:hover {
+            background: #D6EAF8; /* Original light blue for selected/hovered tab */
+            color: #154360;
+        }
 
+        QWidget {
+            background-color: #D6EAF8; /* Keeping original light blue for general widgets */
+            color: #154360;
+        }
+        """)
