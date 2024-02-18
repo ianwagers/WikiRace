@@ -118,11 +118,10 @@ class SoloGamePage(QWidget):
     def handleLinkClicked(self, url):
         self.linksUsed += 1
         # Convert the QUrl object to a string
-        urlString = url.toString()
-        # Remove the specified prefix from the URL string
-        displayString = urlString.replace("https://en.wikipedia.org/wiki/", "")
-        # Add the modified string to the previousLinksList
-        self.previousLinksList.addItem(displayString)
+        titleString = self.getTitleFromUrl(url.toString())
+        # Add the title to previous links if it's not already there
+        if titleString not in [self.previousLinksList.item(i).text() for i in range(self.previousLinksList.count())]:
+            self.previousLinksList.addItem(titleString)
         # Navigate the webView to the clicked URL
         self.webView.setUrl(url)
 

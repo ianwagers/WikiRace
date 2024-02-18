@@ -4,7 +4,6 @@ sys.path.append('C:\Project_Workspace\WikiRace')
 
 class GameLogic(QObject):
     linkClicked = pyqtSignal(str)
-    startSoloGameTab = pyqtSignal(str, str)
 
     def __init__(self):
         super().__init__()
@@ -59,14 +58,6 @@ class GameLogic(QObject):
         # This method will stop the game and perform any cleanup necessary
         pass  # Placeholder for actual stop game logic
 
-    def linkClicked(self, url):
-        # This method will be called when a link is clicked
-        self.links_used += 1
-        self.linkClicked.emit(url)
-
-    def getLinksUsed(self):
-        # This method will return the number of links clicked
-        return self.links_used
 
     def findWikiPage(self, search_text):
         # URL to Wikipedia's API for searching
