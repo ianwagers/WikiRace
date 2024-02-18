@@ -15,7 +15,7 @@ class MainApplication(QMainWindow):
 
         
         self.setWindowTitle("Wikipedia Race")
-        self.setGeometry(100, 100, 960, 780)  # Adjust size as needed
+        self.setGeometry(100, 100, 1000, 900)  # Adjust size as needed
 
         # Initialize tab widget and add tabs
         self.tabWidget = QTabWidget()

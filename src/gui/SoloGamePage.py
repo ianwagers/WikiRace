@@ -10,7 +10,8 @@ class SoloGamePage(QWidget):
         self.tabWidget = tabWidget  # Assuming you need to use tabWidget as well
         self.start_url = start_url
         self.end_url = end_url
-        print(self.start_url)
+        self.startTime = 0
+        self.linksUsed = -1  # Start at -1 to account for the initial page
         self.initUI()  # Initialize the UI components
 
         
@@ -33,7 +34,7 @@ class SoloGamePage(QWidget):
         self.stopwatchLabel.setStyleSheet("font-size: 20px")
         self.sidebarLayout.addWidget(self.stopwatchLabel)
 
-        self.linksUsedLabel = QLabel("Links Used: 0")
+        self.linksUsedLabel = QLabel("Links Used: " + str(self.linksUsed))
         self.sidebarLayout.addWidget(self.linksUsedLabel)
 
         self.previousLinksList = QListWidget()
@@ -71,8 +72,6 @@ class SoloGamePage(QWidget):
         self.setLayout(self.layout)
 
         # Initialize the stopwatch and links counter
-        self.startTime = 0
-        self.linksUsed = 0
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateStopwatch)
         self.timer.start(1000)  # Update every second
@@ -80,14 +79,6 @@ class SoloGamePage(QWidget):
 
         # Set the layout for the widget
         self.setLayout(self.layout)
-
-        # Initialize the stopwatch and links counter
-        self.startTime = 0
-        self.linksUsed = 0
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.updateStopwatch)
-        self.timer.start(1000)  # Update every second
-
 
     def getTitleFromUrl(self, url):
         # Fetch the content of the page
@@ -104,7 +95,6 @@ class SoloGamePage(QWidget):
 
         return pageTitle
 
-
     def updateStopwatch(self):
         self.startTime += 1
         self.stopwatchLabel.setText(self.formatTime(self.startTime))
@@ -117,6 +107,7 @@ class SoloGamePage(QWidget):
 
     def handleLinkClicked(self, url):
         self.linksUsed += 1
+        self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
         # Convert the QUrl object to a string
         titleString = self.getTitleFromUrl(url.toString())
         # Add the title to previous links if it's not already there
@@ -124,4 +115,3 @@ class SoloGamePage(QWidget):
             self.previousLinksList.addItem(titleString)
         # Navigate the webView to the clicked URL
         self.webView.setUrl(url)
-
