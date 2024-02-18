@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, QListWidget
 from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
-from urllib.parse import unquote
+from bs4 import BeautifulSoup
 import requests
 
 class SoloGamePage(QWidget):
@@ -90,32 +90,19 @@ class SoloGamePage(QWidget):
 
 
     def getTitleFromUrl(self, url):
-        # Extract the page title from the URL
-        title = url.split('/wiki/')[-1]
+        # Fetch the content of the page
+        response = requests.get(url)
+        if response.status_code != 200:
+            return "Unable to fetch the page"
 
-        # Wikipedia API endpoint
-        api_url = "https://en.wikipedia.org/w/api.php"
+        # Parse the HTML content of the page
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-        # Parameters for the API request
-        params = {
-            'action': 'query',
-            'prop': 'info',
-            'titles': title,
-            'inprop': 'url',
-            'format': 'json'
-        }
+        # Extract the title from the <title> tag and clean it up
+        # Wikipedia titles end with " - Wikipedia", which we remove
+        pageTitle = soup.title.string.split(" - Wikipedia")[0]
 
-        # Send a request to the Wikipedia API
-        response = requests.get(api_url, params=params)
-        data = response.json()
-
-        # Extract the page title from the response
-        # Note: The API might return multiple pages if the title is ambiguous. Handle accordingly.
-        page = next(iter(data['query']['pages'].values()))
-        if 'title' in page:
-            return page['title']
-        else:
-            return "Title not found"
+        return pageTitle
 
 
     def updateStopwatch(self):
