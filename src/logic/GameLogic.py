@@ -4,7 +4,7 @@ sys.path.append('C:\Project_Workspace\WikiRace')
 
 class GameLogic(QObject):
     linkClicked = pyqtSignal(str)
-    openGameTab = pyqtSignal(str, str)
+    startSoloGameTab = pyqtSignal(str, str)
 
     def __init__(self):
         super().__init__()
@@ -52,7 +52,8 @@ class GameLogic(QObject):
         # Setup game logic here (e.g., resetting counters, starting timers)
 
         # Notify the UI to open a new game tab with the start and end URLs
-        self.homePage.mainApplication.addSoloGameTab.emit(start_url, end_url)
+        return start_url, end_url
+
 
     def stopGame(self):
         # This method will stop the game and perform any cleanup necessary

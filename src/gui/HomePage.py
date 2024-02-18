@@ -175,11 +175,15 @@ class HomePage(QWidget):
                 if ending_page_choice == 'Random':
                     ending_page_choice = None
 
-                self.game_logic_instance.startGame(self, custom_starting_page, custom_ending_page)
+                self.start_url, self.end_url = self.game_logic_instance.startGame(self, custom_starting_page, custom_ending_page)
+                self.addSoloGameTab(self.start_url, self.end_url)
+
 
     def addSoloGameTab(self, start_url, end_url):
         if not hasattr(self.mainApplication, 'soloGamePage'):
             self.mainApplication.addSoloGameTab(start_url, end_url)
+            index = self.tabWidget.indexOf(self.mainApplication.soloGamePage)
+            self.tabWidget.setCurrentIndex(index)
         else:
             index = self.tabWidget.indexOf(self.mainApplication.soloGamePage)
             self.tabWidget.setCurrentIndex(index)

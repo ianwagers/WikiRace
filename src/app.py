@@ -1,6 +1,9 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSlot
+
 import sys
-sys.path.append('C:/Project_Workspace/')
+sys.path.append('C:/Project_Workspace/WikiRace')
 from src.gui.HomePage import HomePage
 from src.gui.SoloGamePage import SoloGamePage
 from src.gui.MultiplayerPage import MultiplayerPage
@@ -34,7 +37,6 @@ class MainApplication(QMainWindow):
         if not hasattr(self, 'soloGamePage'):
             self.soloGamePage = SoloGamePage(self.tabWidget, start_url, end_url)
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
-            self.tabWidget.setCurrentWidget(self.soloGamePage)
 
     def addMultiplayerTab(self):
         # Adds the Multiplayer tab only if it doesn't exist

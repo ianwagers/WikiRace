@@ -1,28 +1,33 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, QListWidget
 from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
+from urllib.parse import unquote
+import requests
 
 class SoloGamePage(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, tabWidget, start_url, end_url, parent=None):
         super(SoloGamePage, self).__init__(parent)
+        self.tabWidget = tabWidget  # Assuming you need to use tabWidget as well
+        self.start_url = start_url
+        self.end_url = end_url
+        print(self.start_url)
         self.initUI()  # Initialize the UI components
+
         
         # Now that self.webView is properly initialized in initUI, you don't need to add it to the layout again here.
         # Just proceed with any additional configuration if needed.
 
     def initUI(self):
         # Main layout
-        self.layout = QHBoxLayout(self)
+        self.layout = QVBoxLayout(self)  # Main widget's layout
+
+        # Container for sidebar and main content
+        self.contentContainer = QWidget()  # Container widget
+        self.contentLayout = QHBoxLayout(self.contentContainer)  # Layout for the container
 
         # Sidebar layout (25% width)
         self.sidebarLayout = QVBoxLayout()
         
-        # Initialize and configure the web view first
-        self.webView = QWebEngineView()
-        #TODO This should be passed the starting page from GameLogic 
-        self.webView.load(QUrl("https://en.wikipedia.org"))
-        self.webView.urlChanged.connect(self.handleLinkClicked)
-
         # Stopwatch label, links used counter, and previous links list setup
         self.stopwatchLabel = QLabel("00:00:00")
         self.stopwatchLabel.setStyleSheet("font-size: 20px")
@@ -34,11 +39,33 @@ class SoloGamePage(QWidget):
         self.previousLinksList = QListWidget()
         self.sidebarLayout.addWidget(self.previousLinksList)
 
-        # Adding sidebar to the main layout
-        self.layout.addLayout(self.sidebarLayout, 1)
+        # Sidebar container widget
+        self.sidebarContainer = QWidget()
+        self.sidebarContainer.setLayout(self.sidebarLayout)
+        self.contentLayout.addWidget(self.sidebarContainer, 1)
 
-        # Add the web view to the layout after it's been initialized
-        self.layout.addWidget(self.webView, 3)
+        # Main content area layout
+        self.mainContentLayout = QVBoxLayout()
+        
+        # Top-bar section
+        destinationTitle = self.getTitleFromUrl(self.end_url)
+        self.topBarLabel = QLabel("Destination page: " + destinationTitle)
+        self.topBarLabel.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px;")
+        self.mainContentLayout.addWidget(self.topBarLabel)
+
+        # Initialize and configure the web view
+        self.webView = QWebEngineView()
+        self.webView.load(QUrl(self.start_url))
+        self.webView.urlChanged.connect(self.handleLinkClicked)
+        self.mainContentLayout.addWidget(self.webView, 3)
+
+        # Main content area container widget
+        self.mainContentContainer = QWidget()
+        self.mainContentContainer.setLayout(self.mainContentLayout)
+        self.contentLayout.addWidget(self.mainContentContainer, 3)
+
+        # Add the content container to the main layout
+        self.layout.addWidget(self.contentContainer)
 
         # Set the layout for the widget
         self.setLayout(self.layout)
@@ -49,6 +76,47 @@ class SoloGamePage(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateStopwatch)
         self.timer.start(1000)  # Update every second
+
+
+        # Set the layout for the widget
+        self.setLayout(self.layout)
+
+        # Initialize the stopwatch and links counter
+        self.startTime = 0
+        self.linksUsed = 0
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.updateStopwatch)
+        self.timer.start(1000)  # Update every second
+
+
+    def getTitleFromUrl(self, url):
+        # Extract the page title from the URL
+        title = url.split('/wiki/')[-1]
+
+        # Wikipedia API endpoint
+        api_url = "https://en.wikipedia.org/w/api.php"
+
+        # Parameters for the API request
+        params = {
+            'action': 'query',
+            'prop': 'info',
+            'titles': title,
+            'inprop': 'url',
+            'format': 'json'
+        }
+
+        # Send a request to the Wikipedia API
+        response = requests.get(api_url, params=params)
+        data = response.json()
+
+        # Extract the page title from the response
+        # Note: The API might return multiple pages if the title is ambiguous. Handle accordingly.
+        page = next(iter(data['query']['pages'].values()))
+        if 'title' in page:
+            return page['title']
+        else:
+            return "Title not found"
+
 
     def updateStopwatch(self):
         self.startTime += 1
