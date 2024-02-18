@@ -39,17 +39,19 @@ class GameLogic(QObject):
 
         # Check if start_url or end_url is None and fetch a random link
         if start_url is not None:
-            end_url = self.findWikiPage(start_url)
+            start_url = self.findWikiPage(start_url)
+            print(f"Start URL: {start_url}")
         else:    
             start_url = self.getRandomWikiLink()
+            print(f"Start URL: {start_url}")
         
         if end_url is not None:
             end_url = self.findWikiPage(end_url)
+            print(f"End URL: {end_url}")
         else:   
-            end_url = self.getRandomWikiLink()       
-
-        # Setup game logic here (e.g., resetting counters, starting timers)
-
+            end_url = self.getRandomWikiLink()
+            print(f"End URL: {end_url}")
+        
         # Notify the UI to open a new game tab with the start and end URLs
         return start_url, end_url
 
@@ -57,7 +59,6 @@ class GameLogic(QObject):
     def stopGame(self):
         # This method will stop the game and perform any cleanup necessary
         pass  # Placeholder for actual stop game logic
-
 
     def findWikiPage(self, search_text):
         # URL to Wikipedia's API for searching
@@ -72,29 +73,24 @@ class GameLogic(QObject):
             "srlimit": 1  # Limit the search to the top result
         }
 
-        try:
-            # Send the request to Wikipedia's API
-            response = requests.get(api_url, params=params)
-            response.raise_for_status()  # Raises an exception for HTTP errors
+        # Send the request to Wikipedia's API
+        response = requests.get(api_url, params=params)
+        response.raise_for_status()  # Raises an exception for HTTP errors
 
-            # Parse the JSON response
-            data = response.json()
+        # Parse the JSON response
+        data = response.json()
 
-            # Check if there are any search results
-            if data["query"]["search"]:
-                # Extract the page ID of the top search result
-                page_id = data["query"]["search"][0]["pageid"]
+        # Check if search results are present
+        if data["query"]["search"]:
+            # Extract the page ID of the top search result
+            page_id = data["query"]["search"][0]["pageid"]
 
-                # Construct the URL to the Wikipedia page
-                wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
+            # Construct the URL to the Wikipedia page
+            wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
 
-                return wiki_url
-            else:
-                # Handle the case where no search results are found
-                print(f"No results found for '{search_text}'")
-                return None
-        except Exception as e:
-            print(f"Error finding Wikipedia page: {e}")
-            return None
-
-
+            print(f"Found Wikipedia page: {wiki_url}")
+            return wiki_url
+        else:
+            # Handle the case where no results are found
+            print("No results found for the given search text.")
+            return wiki_url

@@ -170,11 +170,6 @@ class HomePage(QWidget):
                 custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else None
                 custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else None
 
-                if starting_page_choice == 'Random':
-                    starting_page_choice = None
-                if ending_page_choice == 'Random':
-                    ending_page_choice = None
-
                 self.start_url, self.end_url = self.game_logic_instance.startGame(self, custom_starting_page, custom_ending_page)
                 self.addSoloGameTab(self.start_url, self.end_url)
 

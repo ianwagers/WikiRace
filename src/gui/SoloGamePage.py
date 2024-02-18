@@ -1,8 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, QListWidget
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, QListWidget, QPushButton, QDialog
 from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal
 from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
 from bs4 import BeautifulSoup
 import requests
+import time
 
 class SoloGamePage(QWidget):
     def __init__(self, tabWidget, start_url, end_url, parent=None):
@@ -115,3 +116,58 @@ class SoloGamePage(QWidget):
             self.previousLinksList.addItem(titleString)
         # Navigate the webView to the clicked URL
         self.webView.setUrl(url)
+
+        # Check if the URL matches the destination URL
+        self.checkEndGame(url)
+
+    # Adjust the checkEndGame method in SoloGamePage to include the tabWidget and homePageIndex
+    def checkEndGame(self, newUrl):
+        currentPage = self.getTitleFromUrl(newUrl.toString())
+        destinationPage = self.getTitleFromUrl(self.end_url)
+        if currentPage == destinationPage:
+            self.timer.stop()
+            # Assume homePageIndex is known or determined elsewhere
+            homePageIndex = 0  # Example index for HomePage
+            dialog = EndGameDialog(self, self.tabWidget, homePageIndex)
+            dialog.exec_()
+
+
+class EndGameDialog(QDialog):
+    def __init__(self, gamePage, tabWidget, homePageIndex, parent=None):
+        super(EndGameDialog, self).__init__(parent)
+        self.gamePage = gamePage
+        self.tabWidget = tabWidget
+        self.homePageIndex = homePageIndex
+        self.setWindowTitle("Game Over")
+        self.setStyleSheet("background-color: lightblue;")
+        self.setFixedSize(300, 180)  # Adjust size as needed
+        self.initUI()
+
+    def initUI(self):
+        layout = QVBoxLayout(self)
+
+        messageLabel = QLabel("Congratulations!")
+        messageLabel.setStyleSheet("font-size: 20px; font-weight: bold; padding: 10px;")
+        messageLabel.setAlignment(Qt.AlignCenter)
+        layout.addWidget(messageLabel)
+        messageSubscript = QLabel("You finished the race!")
+        messageSubscript.setAlignment(Qt.AlignCenter)
+        messageSubscript.setStyleSheet("font-size: 14px; padding: 6px;") 
+        layout.addWidget(messageSubscript)
+
+        totalTimeLabel = QLabel("Total time: " + self.gamePage.formatTime(self.gamePage.startTime))
+        totalTimeLabel.setAlignment(Qt.AlignLeft)
+        layout.addWidget(totalTimeLabel)
+
+        totalLinksLabel = QLabel("Total Links: " + str(self.gamePage.linksUsed))
+        totalLinksLabel.setAlignment(Qt.AlignLeft)
+        layout.addWidget(totalLinksLabel)
+
+        closeButton = QPushButton("Close")
+        closeButton.clicked.connect(self.returnToHomePage)
+        layout.addWidget(closeButton)
+
+    def returnToHomePage(self):
+        self.tabWidget.setCurrentIndex(self.homePageIndex)
+        self.close()
+
