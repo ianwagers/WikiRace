@@ -35,22 +35,24 @@ class GameLogic(QObject):
             print(f"Request failed: {e}")
             return None
 
-    def startGame(self, start_url=None, end_url=None):
+    def startGame(self, homePage, start_url=None, end_url=None):
+        self.homePage = homePage
+
         # Check if start_url or end_url is None and fetch a random link
         if start_url is not None:
             end_url = self.findWikiPage(start_url)
         else:    
-            start_url = self.findWikiPage(start_url)
+            start_url = self.getRandomWikiLink()
         
         if end_url is not None:
             end_url = self.findWikiPage(end_url)
         else:   
-            end_url = self.findWikiPage(end_url)       
+            end_url = self.getRandomWikiLink()       
 
         # Setup game logic here (e.g., resetting counters, starting timers)
 
         # Notify the UI to open a new game tab with the start and end URLs
-        self.openGameTab.emit(start_url, end_url)
+        self.homePage.mainApplication.addSoloGameTab.emit(start_url, end_url)
 
     def stopGame(self):
         # This method will stop the game and perform any cleanup necessary
@@ -64,10 +66,6 @@ class GameLogic(QObject):
     def getLinksUsed(self):
         # This method will return the number of links clicked
         return self.links_used
-    
-    import requests
-
-    import requests
 
     def findWikiPage(self, search_text):
         # URL to Wikipedia's API for searching

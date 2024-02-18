@@ -9,6 +9,7 @@ from src.gui.SettingsPage import SettingsPage
 class MainApplication(QMainWindow):
     def __init__(self):
         super().__init__()
+
         
         self.setWindowTitle("Wikipedia Race")
         self.setGeometry(100, 100, 960, 780)  # Adjust size as needed
@@ -28,9 +29,10 @@ class MainApplication(QMainWindow):
         # Add home tab
         self.tabWidget.addTab(self.homePage, "Home")
 
-    def addSoloGameTab(self):
+    def addSoloGameTab(self, start_url, end_url):
+        # Adds the Solo Game tab only if it doesn't exist
         if not hasattr(self, 'soloGamePage'):
-            self.soloGamePage = SoloGamePage(self.tabWidget)
+            self.soloGamePage = SoloGamePage(self.tabWidget, start_url, end_url)
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
             self.tabWidget.setCurrentWidget(self.soloGamePage)
 
