@@ -181,6 +181,8 @@ class HomePage(QWidget):
             self.tabWidget.setCurrentIndex(index)
         else:
             index = self.tabWidget.indexOf(self.mainApplication.soloGamePage)
+            self.mainApplication.closeTab(index)
+            self.mainApplication.addSoloGameTab(start_url, end_url)
             self.tabWidget.setCurrentIndex(index)
 
     def onMultiplayerClicked(self):
