@@ -143,18 +143,25 @@ class HomePage(QWidget):
             self.tabWidget.setCurrentIndex(index)
 
     def onMultiplayerClicked(self):
+        dialog = UnderConstructionDialog(self)
+        dialog.exec_()
+        ''' # Placeholder for multiplayer game
         if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
             self.mainApplication.addMultiplayerTab()
         else:
             index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
             self.tabWidget.setCurrentIndex(index)
-
+        '''
     def onSettingsClicked(self):
+        dialog = UnderConstructionDialog(self)
+        dialog.exec_()
+        ''' # Placeholder for settings page
         if not hasattr(self.mainApplication, 'settingsPage') or self.tabWidget.indexOf(self.mainApplication.settingsPage) == -1:
             self.mainApplication.addSettingsTab()
         else:
             index = self.tabWidget.indexOf(self.mainApplication.settingsPage)
             self.tabWidget.setCurrentIndex(index)
+        '''
 
     def openLinkInWebView(self, url):
         # Convert string URL to QUrl object
@@ -295,3 +302,28 @@ class CustomGameDialog(QDialog):
         else:
             # Set to the default or original background color
             self.customEndPageEdit.setStyleSheet("QLineEdit { background-color: #f0f0f0; }")  # Example color
+
+class UnderConstructionDialog(QDialog):
+    def __init__(self, parent=None):
+        super(UnderConstructionDialog, self).__init__(parent)
+        self.setWindowTitle("L")
+        self.setStyleSheet("background-color: #D6EAF8")
+        self.setFixedSize(300, 180)  # Adjust size as needed
+        self.initUI()
+
+    def initUI(self):
+        layout = QVBoxLayout(self)
+
+        messageLabel = QLabel("Page Broken")
+        messageLabel.setStyleSheet("font-size: 20px; font-weight: bold; padding: 10px;")
+        messageLabel.setAlignment(Qt.AlignCenter)
+        layout.addWidget(messageLabel)
+        messageSubscript = QLabel("L")
+        messageSubscript.setAlignment(Qt.AlignCenter)
+        messageSubscript.setStyleSheet("font-size: 40px; padding: 6px;") 
+        layout.addWidget(messageSubscript)
+
+        closeButton = QPushButton("Close")
+        closeButton.setStyleSheet("background-color: #D3D3D3")
+        closeButton.clicked.connect(self.close)
+        layout.addWidget(closeButton)
