@@ -139,7 +139,7 @@ class EndGameDialog(QDialog):
         self.tabWidget = tabWidget
         self.homePageIndex = homePageIndex
         self.setWindowTitle("Game Over")
-        self.setStyleSheet("background-color: lightblue;")
+        self.setStyleSheet("background-color: #D6EAF8")
         self.setFixedSize(300, 180)  # Adjust size as needed
         self.initUI()
 
@@ -155,7 +155,7 @@ class EndGameDialog(QDialog):
         messageSubscript.setStyleSheet("font-size: 14px; padding: 6px;") 
         layout.addWidget(messageSubscript)
 
-        totalTimeLabel = QLabel("Total time: " + self.gamePage.formatTime(self.gamePage.startTime))
+        totalTimeLabel = QLabel("Total time (hh:mm:ss): " + self.gamePage.formatTime(self.gamePage.startTime))
         totalTimeLabel.setAlignment(Qt.AlignLeft)
         layout.addWidget(totalTimeLabel)
 
