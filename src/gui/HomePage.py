@@ -5,7 +5,6 @@ from PyQt5.QtCore import Qt, QSize, QUrl
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 import sys
-sys.path.append('C:\Project_Workspace\WikiRace')
 from src import app
 from src.logic.GameLogic import GameLogic
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -17,7 +16,6 @@ class HomePage(QWidget):
         super().__init__()
         self.tabWidget = tabWidget
         self.mainApplication = mainApplication
-        self.projectPath = "C://Project_Workspace/WikiRace/src/"  # Placeholder path
 
         # Check if tabWidget has a layout, if not, set a new layout
         if tabWidget.layout() is None:
@@ -33,7 +31,7 @@ class HomePage(QWidget):
          # Top bar layout
         self.topBarLayout = QHBoxLayout()
         self.settingsButton = QPushButton()
-        self.settingsButton.setIcon(QIcon(self.projectPath + "resources/icons/settings_icon.png"))  # Placeholder path
+        self.settingsButton.setIcon(QIcon(mainApplication.projectPath + "resources/icons/settings_icon.png"))  # Placeholder path
         self.settingsButton.setIconSize(QSize(40, 40))
         self.settingsButton.setFlat(True)
         self.settingsButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
@@ -47,21 +45,22 @@ class HomePage(QWidget):
         self.layout.addLayout(self.topBarLayout)
 
         # Title above the buttons
-        self.titleLabel = QLabel('<a href="https://en.wikipedia.org/wiki/Wikiracing">Wikipedia Race</a>')
-        self.titleLabel.setStyleSheet("font-size: 24px; font-weight: bold;")
+        self.titleLabel = QLabel('<a href="https://en.wikipedia.org/wiki/Wikiracing" style="text-decoration: none; color: #3366cc;">Wikipedia Race</a>')
+        self.titleLabel.setStyleSheet("QLabel { font: sans-serif; font-size: 24px; } a { text-decoration: none; color: #3366cc; }")
+
         self.titleLabel.setAlignment(Qt.AlignCenter)
         self.titleLabel.linkActivated.connect(self.openLinkInWebView)
         self.layout.addWidget(self.titleLabel)
 
         # Title subscript
-        self.titleSubscript = QLabel("Version 1.2 [BETA]")
-        self.titleSubscript.setStyleSheet("font-size: 14px;")
+        self.titleSubscript = QLabel("Version 1.3 [BETA]")
+        self.titleSubscript.setStyleSheet("font-size: 12px;")
         self.titleSubscript.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.titleSubscript)
 
         # Title Image
         self.titleImage = QLabel()
-        self.titleImage.setPixmap(QPixmap(self.projectPath + "resources/TitlePageHeader.png"))  # Placeholder path
+        self.titleImage.setPixmap(QPixmap(mainApplication.projectPath + "resources/TitlePageHeader.png"))  # Placeholder path
         # The image is too large, so we need to adjust the size
         self.titleImage.setScaledContents(True)
         self.titleImage.setMinimumSize(400, 100)
@@ -240,13 +239,14 @@ class CustomGameDialog(QDialog):
     def __init__(self, homePage):
         super().__init__(homePage)
         self.homePage = homePage
-        self.setWindowTitle('Select Game Mode')
+        self.setWindowTitle('Race Setup')
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(10, 10, 10, 10)  # Added padding around the dialog content
 
         # Layout for starting page selection
         startingPageLayout = QHBoxLayout()
         startingPageLabel = QLabel('Starting Page:')
+        startingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #3366cc; } ") 
         self.startPageCombo = QComboBox()
         self.startPageCombo.addItems(['Random', 'Custom'])
         self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
@@ -264,6 +264,7 @@ class CustomGameDialog(QDialog):
         # Layout for ending page selection
         endingPageLayout = QHBoxLayout()
         endingPageLabel = QLabel('Ending Page:')
+        endingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #3366cc; } ") 
         self.endPageCombo = QComboBox()
         self.endPageCombo.addItems(['Random', 'Custom'])
         self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)

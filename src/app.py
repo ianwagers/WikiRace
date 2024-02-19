@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QIcon
 
 import sys
 sys.path.append('C:/Project_Workspace/WikiRace')
@@ -12,8 +11,9 @@ from src.gui.SettingsPage import SettingsPage
 class MainApplication(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.projectPath = 'C:/Project_Workspace/WikiRace/src/'
 
-        
+        self.setWindowIcon(QIcon(self.projectPath + 'resources/icons/game_icon.ico'))
         self.setWindowTitle("Wikipedia Race")
         self.setGeometry(100, 100, 1000, 900)  # Adjust size as needed
 
