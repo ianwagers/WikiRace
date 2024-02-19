@@ -32,10 +32,11 @@ class SoloGamePage(QWidget):
         
         # Stopwatch label, links used counter, and previous links list setup
         self.stopwatchLabel = QLabel("00:00:00")
-        self.stopwatchLabel.setStyleSheet("font-size: 20px")
+        self.stopwatchLabel.setStyleSheet("font-size: 26px")
         self.sidebarLayout.addWidget(self.stopwatchLabel)
 
         self.linksUsedLabel = QLabel("Links Used: " + str(self.linksUsed))
+        self.linksUsedLabel.setStyleSheet("font-size: 16px")
         self.sidebarLayout.addWidget(self.linksUsedLabel)
 
         self.previousLinksList = QListWidget()

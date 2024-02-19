@@ -107,7 +107,7 @@ class HomePage(QWidget):
         self.layout.addWidget(self.titleLabel)
 
         # Title subscript
-        self.titleSubscript = QLabel("Version 1.1 [Alpha Asf]")
+        self.titleSubscript = QLabel("Version 1.2 [BETA]")
         self.titleSubscript.setStyleSheet("font-size: 14px;")
         self.titleSubscript.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.titleSubscript)
