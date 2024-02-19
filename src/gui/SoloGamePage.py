@@ -53,7 +53,7 @@ class SoloGamePage(QWidget):
         # Top-bar section
         destinationTitle = self.getTitleFromUrl(self.end_url)
         self.topBarLabel = QLabel("Destination page: " + destinationTitle)
-        self.topBarLabel.setStyleSheet("font-size: 16px; font-weight: bold; padding: 10px;")
+        self.topBarLabel.setStyleSheet("font-size: 20px; font-weight: bold; padding: 10px;")
         self.mainContentLayout.addWidget(self.topBarLabel)
 
         # Initialize and configure the web view

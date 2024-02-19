@@ -135,15 +135,15 @@ class HomePage(QWidget):
 
         # Adjusting spacing to reduce excess whitespace
         self.buttonsLayout.addStretch(1)
-        
-
-        # Web view
-        #self.layout = QVBoxLayout(self)  # Initialize the layout
         self.layout.addWidget(self.buttonsFrame)
+
+        # Web view        
         self.webView = QWebEngineView()
         self.webView.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.webView.load(QUrl("https://en.wikipedia.org/wiki/Main_Page"))
         self.layout.addWidget(self.webView)
+
+        self.webView.page().loadFinished.connect(self.injectCSS)
 
         # Sytling the web view
         # Light Gray Theme - Fixed for Main Window Background
@@ -161,6 +161,26 @@ class HomePage(QWidget):
 
         # Create an instance of GameLogic before calling startGame()
         self.game_logic_instance = GameLogic()
+
+    def injectCSS(self):
+        # CSS to hide the entire VectorHeaderContainer and its contents
+        css = """
+        .vector-header-container {display: none !important;}
+        """
+        # JavaScript to inject CSS
+        js = f"""
+        var css = `{css}`;
+        var style = document.createElement('style');
+        if (style.styleSheet) {{
+            style.styleSheet.cssText = css;
+        }} else {{
+            style.appendChild(document.createTextNode(css));
+        }}
+        document.head.appendChild(style);
+        """
+        self.webView.page().runJavaScript(js)
+
+
 
     def onSoloGameClicked(self):
             dialog = CustomGameDialog(self)
