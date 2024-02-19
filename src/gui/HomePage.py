@@ -17,6 +17,7 @@ class HomePage(QWidget):
         super().__init__()
         self.tabWidget = tabWidget
         self.mainApplication = mainApplication
+        self.projectPath = "C://Project_Workspace/WikiRace/src/"  # Placeholder path
 
         # Check if tabWidget has a layout, if not, set a new layout
         if tabWidget.layout() is None:
@@ -32,7 +33,7 @@ class HomePage(QWidget):
          # Top bar layout
         self.topBarLayout = QHBoxLayout()
         self.settingsButton = QPushButton()
-        self.settingsButton.setIcon(QIcon("C://Project_Workspace/WikiRace/src/resources/icons/settings_icon.png"))  # Placeholder path
+        self.settingsButton.setIcon(QIcon(self.projectPath + "resources/icons/settings_icon.png"))  # Placeholder path
         self.settingsButton.setIconSize(QSize(40, 40))
         self.settingsButton.setFlat(True)
         self.settingsButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
@@ -57,6 +58,16 @@ class HomePage(QWidget):
         self.titleSubscript.setStyleSheet("font-size: 14px;")
         self.titleSubscript.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.titleSubscript)
+
+        # Title Image
+        self.titleImage = QLabel()
+        self.titleImage.setPixmap(QPixmap(self.projectPath + "resources/TitlePageHeader.png"))  # Placeholder path
+        # The image is too large, so we need to adjust the size
+        self.titleImage.setScaledContents(True)
+        self.titleImage.setMinimumSize(400, 100)
+        self.titleImage.setMaximumHeight(300)
+        self.titleImage.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.titleImage)
         
 
         # Frame for the buttons
@@ -152,6 +163,7 @@ class HomePage(QWidget):
             index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
             self.tabWidget.setCurrentIndex(index)
         '''
+    
     def onSettingsClicked(self):
         dialog = UnderConstructionDialog(self)
         dialog.exec_()
@@ -171,7 +183,7 @@ class HomePage(QWidget):
     def setStyles(self):
         self.setStyleSheet("""
         QWidget {
-            background-color: #D6EAF8; /* General background */
+            background-color: #FFFFFF; /* General background */
             color: #154360; /* General text color */
         }
 
@@ -202,7 +214,7 @@ class HomePage(QWidget):
         # Light Blue Theme with QTabWidget, adjusted for light grey in specific areas
         self.tabWidget.setStyleSheet("""
         QTabWidget::pane { /* The tab widget frame */
-            border-top: 2px solid #7DA2CE;
+            border-top: 2px solid #DADCDF; /* Light grey to match the tab bar */
         }
 
         QTabBar::tab {
@@ -219,7 +231,7 @@ class HomePage(QWidget):
         }
 
         QWidget {
-            background-color: #D6EAF8; /* Keeping original light blue for general widgets */
+            background-color: #FFFFFF; /* Keeping original light blue for general widgets */
             color: #154360;
         }
         """)
@@ -307,7 +319,7 @@ class UnderConstructionDialog(QDialog):
     def __init__(self, parent=None):
         super(UnderConstructionDialog, self).__init__(parent)
         self.setWindowTitle("L")
-        self.setStyleSheet("background-color: #D6EAF8")
+        self.setStyleSheet("background-color: #FFFFFF")
         self.setFixedSize(300, 180)  # Adjust size as needed
         self.initUI()
 
