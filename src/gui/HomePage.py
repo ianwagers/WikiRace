@@ -145,12 +145,6 @@ class HomePage(QWidget):
 
         self.webView.page().loadFinished.connect(self.injectCSS)
 
-        # Sytling the web view
-        # Light Gray Theme - Fixed for Main Window Background
-        # Dark Gray Theme - Fixed for Main Window Background
-
-
-
         # Set the layout for the widget
         self.setLayout(self.layout)
 
@@ -180,8 +174,6 @@ class HomePage(QWidget):
         """
         self.webView.page().runJavaScript(js)
 
-
-
     def onSoloGameClicked(self):
             dialog = CustomGameDialog(self)
             if dialog.exec_():
@@ -192,7 +184,6 @@ class HomePage(QWidget):
 
                 self.start_url, self.end_url = self.game_logic_instance.startGame(self, custom_starting_page, custom_ending_page)
                 self.addSoloGameTab(self.start_url, self.end_url)
-
 
     def addSoloGameTab(self, start_url, end_url):
         if not hasattr(self.mainApplication, 'soloGamePage'):

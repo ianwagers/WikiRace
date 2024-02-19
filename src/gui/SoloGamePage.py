@@ -15,9 +15,6 @@ class SoloGamePage(QWidget):
         self.linksUsed = -1  # Start at -1 to account for the initial page
         self.initUI()  # Initialize the UI components
 
-        
-        # Now that self.webView is properly initialized in initUI, you don't need to add it to the layout again here.
-        # Just proceed with any additional configuration if needed.
 
     def initUI(self):
         # Main layout
@@ -59,9 +56,13 @@ class SoloGamePage(QWidget):
         # Initialize and configure the web view
         self.webView = QWebEngineView()
         self.webView.load(QUrl(self.start_url))
+        
         self.webView.urlChanged.connect(self.handleLinkClicked)
+        # Inject CSS to hide the topbar
+        self.webView.page().loadFinished.connect(self.injectCSS)
+        
         self.mainContentLayout.addWidget(self.webView, 3)
-
+        
         # Main content area container widget
         self.mainContentContainer = QWidget()
         self.mainContentContainer.setLayout(self.mainContentLayout)
@@ -69,6 +70,8 @@ class SoloGamePage(QWidget):
 
         # Add the content container to the main layout
         self.layout.addWidget(self.contentContainer)
+
+        
 
         # Set the layout for the widget
         self.setLayout(self.layout)
@@ -78,9 +81,24 @@ class SoloGamePage(QWidget):
         self.timer.timeout.connect(self.updateStopwatch)
         self.timer.start(1000)  # Update every second
 
-
-        # Set the layout for the widget
-        self.setLayout(self.layout)
+    
+    def injectCSS(self):
+        css = """
+        .vector-header-container {display: none !important;}
+        """
+        js = f"""
+        document.addEventListener('DOMContentLoaded', (event) => {{
+            var css = `{css}`;
+            var style = document.createElement('style');
+            if (style.styleSheet) {{
+                style.styleSheet.cssText = css;
+            }} else {{
+                style.appendChild(document.createTextNode(css));
+            }}
+            document.head.appendChild(style);
+        }});
+        """
+        self.webView.page().runJavaScript(js)
 
     def getTitleFromUrl(self, url):
         # Fetch the content of the page
@@ -110,11 +128,13 @@ class SoloGamePage(QWidget):
     def handleLinkClicked(self, url):
         self.linksUsed += 1
         self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
+
         # Convert the QUrl object to a string
         titleString = self.getTitleFromUrl(url.toString())
         # Add the title to previous links if it's not already there
         if titleString not in [self.previousLinksList.item(i).text() for i in range(self.previousLinksList.count())]:
             self.previousLinksList.addItem(titleString)
+            
         # Navigate the webView to the clicked URL
         self.webView.setUrl(url)
 
