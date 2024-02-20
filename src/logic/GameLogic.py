@@ -1,4 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSignal
+from random import random
 import requests, sys
 sys.path.append('C:\Project_Workspace\WikiRace')
 
@@ -8,6 +9,7 @@ class GameLogic(QObject):
     def __init__(self):
         super().__init__()
         self.links_used = 0
+        self.initGameDatabase()
 
     def getRandomWikiLink(self):
         try:
@@ -37,21 +39,23 @@ class GameLogic(QObject):
     def startGame(self, homePage, start_url=None, end_url=None):
         self.homePage = homePage
 
-        # Check if start_url or end_url is None and fetch a random link
-        if start_url is not None:
-            start_url = self.findWikiPage(start_url)
-            print(f"Start URL: {start_url}")
-        else:    
-            start_url = self.getRandomWikiLink()
-            print(f"Start URL: {start_url}")
-        
-        if end_url is not None:
-            end_url = self.findWikiPage(end_url)
-            print(f"End URL: {end_url}")
-        else:   
-            end_url = self.getRandomWikiLink()
-            print(f"End URL: {end_url}")
-        
+        match start_url:
+            case 'Random': # Start a game with random Wikipedia pages
+                start_url = self.getRandomWikiLink()
+            case 'Custom': # Start a game with custom Wikipedia pages
+                start_url = self.findWikiPage(start_url)
+            case 'Buildings': # Start a game with a specific category of Wikipedia pages
+                start_url = self.getFromCategory('Buildings')
+
+        match end_url:
+            case 'Random': # End a game with random Wikipedia pages
+                end_url = self.getRandomWikiLink()
+            case 'Custom':
+                end_url = self.findWikiPage(end_url)
+            case 'Buildings':
+                end_url = self.getLinkFromCategory('Buildings')
+            
+            
         # Notify the UI to open a new game tab with the start and end URLs
         return start_url, end_url
 
@@ -59,6 +63,12 @@ class GameLogic(QObject):
     def stopGame(self):
         # This method will stop the game and perform any cleanup necessary
         pass  # Placeholder for actual stop game logic
+
+    def getLinkFromCategory(self, category):
+        match category:
+            case 'Buildings':
+                i = random(0, len(self.Buildings) - 1)
+
 
     def findWikiPage(self, search_text):
         # URL to Wikipedia's API for searching
@@ -94,3 +104,14 @@ class GameLogic(QObject):
             # Handle the case where no results are found
             print("No results found for the given search text.")
             return wiki_url
+        
+    def initGameDatabase(self):
+        self.Buildings = [
+            "https://en.wikipedia.org/wiki/Empire_State_Building",
+            "https://en.wikipedia.org/wiki/Burj_Khalifa",
+            "https://en.wikipedia.org/wiki/One_World_Trade_Center",
+            "https://en.wikipedia.org/wiki/Shanghai_Tower",
+            "https://en.wikipedia.org/wiki/Taipei_101", 
+            "https://en.wikipedia.org/wiki/Space_Needle", 
+            "https://en.wikipedia.org/wiki/Eiffel_Tower",
+        ]

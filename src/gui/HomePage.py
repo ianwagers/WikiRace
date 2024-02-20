@@ -45,28 +45,28 @@ class HomePage(QWidget):
         self.layout.addLayout(self.topBarLayout)
 
         # Title above the buttons
-        self.titleLabel = QLabel('<a href="https://en.wikipedia.org/wiki/Wikiracing" style="text-decoration: none; color: #3366cc;">Wikipedia Race</a>')
-        self.titleLabel.setStyleSheet("QLabel { font: sans-serif; font-size: 24px; } a { text-decoration: none; color: #3366cc; }")
+        #self.titleLabel = QLabel('<a href="https://en.wikipedia.org/wiki/Wikiracing" style="text-decoration: none; color: #3366cc;">Wikipedia Race</a>')
+        #self.titleLabel.setStyleSheet("QLabel { font: sans-serif; font-size: 24px; } a { text-decoration: none; color: #3366cc; }")
 
-        self.titleLabel.setAlignment(Qt.AlignCenter)
-        self.titleLabel.linkActivated.connect(self.openLinkInWebView)
-        self.layout.addWidget(self.titleLabel)
+        #self.titleLabel.setAlignment(Qt.AlignCenter)
+        #self.titleLabel.linkActivated.connect(self.openLinkInWebView)
+        #self.layout.addWidget(self.titleLabel)
+
+        # Title Image  # Placeholder for title image
+        self.titleImage = QLabel()
+        self.titleImage.setPixmap(QPixmap(mainApplication.projectPath + "resources/TitlePageHeader.png"))  # Placeholder path
+        # The image is too large, so we need to adjust the size
+        self.titleImage.setScaledContents(True)
+        self.titleImage.setMinimumSize(400, 400)
+        #self.titleImage.setMaximumHeight(300)
+        self.titleImage.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.titleImage)
 
         # Title subscript
         self.titleSubscript = QLabel("Version 1.3 [BETA]")
         self.titleSubscript.setStyleSheet("font-size: 12px;")
         self.titleSubscript.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.titleSubscript)
-
-        # Title Image
-        self.titleImage = QLabel()
-        self.titleImage.setPixmap(QPixmap(mainApplication.projectPath + "resources/TitlePageHeader.png"))  # Placeholder path
-        # The image is too large, so we need to adjust the size
-        self.titleImage.setScaledContents(True)
-        self.titleImage.setMinimumSize(400, 100)
-        self.titleImage.setMaximumHeight(300)
-        self.titleImage.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(self.titleImage)
         
 
         # Frame for the buttons
@@ -135,8 +135,8 @@ class HomePage(QWidget):
             if dialog.exec_():
                 starting_page_choice = dialog.startPageCombo.currentText()
                 ending_page_choice = dialog.endPageCombo.currentText()
-                custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else None
-                custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else None
+                custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else starting_page_choice
+                custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else ending_page_choice
 
                 self.start_url, self.end_url = self.game_logic_instance.startGame(self, custom_starting_page, custom_ending_page)
                 self.addSoloGameTab(self.start_url, self.end_url)
@@ -248,8 +248,9 @@ class CustomGameDialog(QDialog):
         startingPageLabel = QLabel('Starting Page:')
         startingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #3366cc; } ") 
         self.startPageCombo = QComboBox()
-        self.startPageCombo.addItems(['Random', 'Custom'])
-        self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
+        self.startPageCombo.addItems(['Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Random', 'Custom'])
+        if self.startPageCombo.currentText() == 'Custom':
+            self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         startingPageLayout.addWidget(startingPageLabel)
         startingPageLayout.addWidget(self.startPageCombo)
         self.layout.addLayout(startingPageLayout)
@@ -266,8 +267,9 @@ class CustomGameDialog(QDialog):
         endingPageLabel = QLabel('Ending Page:')
         endingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #3366cc; } ") 
         self.endPageCombo = QComboBox()
-        self.endPageCombo.addItems(['Random', 'Custom'])
-        self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
+        self.endPageCombo.addItems(['Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Random', 'Custom'])
+        if self.endPageCombo.currentText() == 'Custom':
+            self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         endingPageLayout.addWidget(endingPageLabel)
         endingPageLayout.addWidget(self.endPageCombo)
         self.layout.addLayout(endingPageLayout)

@@ -15,7 +15,6 @@ class SoloGamePage(QWidget):
         self.linksUsed = -1  # Start at -1 to account for the initial page
         self.initUI()  # Initialize the UI components
 
-
     def initUI(self):
         # Main layout
         self.layout = QVBoxLayout(self)  # Main widget's layout
@@ -81,7 +80,6 @@ class SoloGamePage(QWidget):
         self.timer.timeout.connect(self.updateStopwatch)
         self.timer.start(1000)  # Update every second
 
-    
     def injectCSS(self):
         css = """
         .vector-header-container {display: none !important;}
