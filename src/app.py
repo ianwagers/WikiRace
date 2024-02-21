@@ -15,7 +15,7 @@ class MainApplication(QMainWindow):
 
         self.setWindowIcon(QIcon(self.projectPath + 'resources/icons/game_icon.ico'))
         self.setWindowTitle("Wikipedia Race")
-        self.setGeometry(100, 100, 1000, 900)  # Adjust size as needed
+        self.setGeometry(100, 100, 1000, 1100)  # Adjust size as needed
 
         # Initialize tab widget and add tabs
         self.tabWidget = QTabWidget()

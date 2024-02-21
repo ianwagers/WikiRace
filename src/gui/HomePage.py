@@ -28,26 +28,17 @@ class HomePage(QWidget):
         self.layout.setContentsMargins(10, 10, 10, 10)
         self.layout.setSpacing(10)
         
-         # Top bar layout
-        self.topBarLayout = QHBoxLayout()
-        self.settingsButton = QPushButton()
-        self.settingsButton.setIcon(QIcon(mainApplication.projectPath + "resources/icons/settings_icon.png"))  # Placeholder path
-        self.settingsButton.setIconSize(QSize(40, 40))
-        self.settingsButton.setFlat(True)
-        self.settingsButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
-        
+
+
         # Spacer to push settings to the right
-        self.spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        self.topBarLayout.addItem(self.spacer)
-        self.topBarLayout.addWidget(self.settingsButton)
-
+        # self.spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        # self.topBarLayout.addItem(self.spacer)
+        # self.topBarLayout.addWidget(self.settingsButton)
         # Adding top bar layout to main layout
-        self.layout.addLayout(self.topBarLayout)
-
-        # Title above the buttons
+        # self.layout.addLayout(self.topBarLayout)
+        # Uncomment for title label
         #self.titleLabel = QLabel('<a href="https://en.wikipedia.org/wiki/Wikiracing" style="text-decoration: none; color: #3366cc;">Wikipedia Race</a>')
         #self.titleLabel.setStyleSheet("QLabel { font: sans-serif; font-size: 24px; } a { text-decoration: none; color: #3366cc; }")
-
         #self.titleLabel.setAlignment(Qt.AlignCenter)
         #self.titleLabel.linkActivated.connect(self.openLinkInWebView)
         #self.layout.addWidget(self.titleLabel)
@@ -55,12 +46,15 @@ class HomePage(QWidget):
         # Title Image  # Placeholder for title image
         self.titleImage = QLabel()
         self.titleImage.setPixmap(QPixmap(mainApplication.projectPath + "resources/TitlePageHeader.png"))  # Placeholder path
-        # The image is too large, so we need to adjust the size
         self.titleImage.setScaledContents(True)
-        self.titleImage.setMinimumSize(400, 400)
-        #self.titleImage.setMaximumHeight(300)
+        self.titleImage.setMaximumSize(350, 325)
         self.titleImage.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(self.titleImage)
+
+                # Top bar layout
+        # self.topBarLayout = QHBoxLayout()
+        # self.topBarLayout.addWidget(self.titleImage, alignment=Qt.AlignCenter)
+        
+        self.layout.addWidget(self.titleImage, alignment=Qt.AlignCenter)
 
         # Title subscript
         self.titleSubscript = QLabel("Version 1.3 [BETA]")
@@ -76,18 +70,30 @@ class HomePage(QWidget):
 
         # Buttons
         self.soloGameButton = QPushButton("Solo Game")
-        self.soloGameButton.setMinimumHeight(50)
-        self.soloGameButton.setMaximumWidth(300)
+        self.soloGameButton.setMinimumHeight(40)
+        self.soloGameButton.setMaximumWidth(500)
+        self.soloGameButton.setMinimumWidth(200)
         self.soloGameButton.setStyleSheet("font-size: 16px;")
+
         self.multiplayerButton = QPushButton("Multiplayer")
-        self.multiplayerButton.setMinimumHeight(50)
-        self.multiplayerButton.setMaximumWidth(300)
+        self.multiplayerButton.setMinimumHeight(40)
+        self.multiplayerButton.setMinimumWidth(200)
+        self.multiplayerButton.setMaximumWidth(500)
         self.multiplayerButton.setStyleSheet("font-size: 16px;")
 
         self.soloGameButton.setCheckable(True)
         self.multiplayerButton.setCheckable(True)
+        
+        self.settingsButton = QPushButton()
+        self.settingsButton.setIcon(QIcon(mainApplication.projectPath + "resources/icons/settings_icon.png"))  # Placeholder path
+        self.settingsButton.setIconSize(QSize(28, 28))
+        self.settingsButton.setFlat(True)
+        self.settingsButton.setSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+
+        # Adding buttons to the layout
         self.buttonsLayout.addWidget(self.soloGameButton)
         self.buttonsLayout.addWidget(self.multiplayerButton)
+        self.buttonsLayout.addWidget(self.settingsButton)
 
         # Adjusting spacing to reduce excess whitespace
         self.buttonsLayout.addStretch(1)
