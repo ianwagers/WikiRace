@@ -203,7 +203,7 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Argentina",
         ]
 
-        self.Presidents = [
+        self.USPresidents = [
             "https://en.wikipedia.org/wiki/George_Washington",
             "https://en.wikipedia.org/wiki/Thomas_Jefferson",
             "https://en.wikipedia.org/wiki/Abraham_Lincoln",
