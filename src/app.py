@@ -37,6 +37,10 @@ class MainApplication(QMainWindow):
         if not hasattr(self, 'soloGamePage'):
             self.soloGamePage = SoloGamePage(self.tabWidget, start_url, end_url)
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
+        else:
+            self.closeTab(self.tabWidget.indexOf(self.soloGamePage))
+            self.soloGamePage = SoloGamePage(self.tabWidget, start_url, end_url)
+            self.tabWidget.addTab(self.soloGamePage, "Solo Game")
 
     def addMultiplayerTab(self):
         # Adds the Multiplayer tab only if it doesn't exist

@@ -254,7 +254,7 @@ class CustomGameDialog(QDialog):
         startingPageLabel = QLabel('Starting Page:')
         startingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #3366cc; } ") 
         self.startPageCombo = QComboBox()
-        self.startPageCombo.addItems(['Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Random', 'Custom'])
+        self.startPageCombo.addItems(['Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Gaming', 'Random', 'Custom'])
         if self.startPageCombo.currentText() == 'Custom':
             self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         startingPageLayout.addWidget(startingPageLabel)
@@ -273,7 +273,7 @@ class CustomGameDialog(QDialog):
         endingPageLabel = QLabel('Ending Page:')
         endingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #3366cc; } ") 
         self.endPageCombo = QComboBox()
-        self.endPageCombo.addItems(['Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Random', 'Custom'])
+        self.endPageCombo.addItems(['Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Gaming', 'Random', 'Custom'])
         if self.endPageCombo.currentText() == 'Custom':
             self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         endingPageLayout.addWidget(endingPageLabel)

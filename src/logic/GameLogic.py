@@ -35,7 +35,9 @@ class GameLogic(QObject):
             # Handle request exception
             print(f"Request failed: {e}")
             return None
-
+        
+    # Currently supported categories:
+    # 'Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Gaming', 'Random', 'Custom'
     def startGame(self, homePage, start_url=None, end_url=None):
         self.homePage = homePage
 
@@ -45,7 +47,19 @@ class GameLogic(QObject):
             case 'Custom': # Start a game with custom Wikipedia pages
                 start_url = self.findWikiPage(start_url)
             case 'Buildings': # Start a game with a specific category of Wikipedia pages
-                start_url = self.getFromCategory('Buildings')
+                start_url = self.getLinkFromCategory('Buildings')
+            case 'Celebrities':
+                start_url = self.getLinkFromCategory('Celebrities')
+            case 'Countries':
+                start_url = self.getLinkFromCategory('Countries')
+            case 'Most Popular':
+                start_url = self.getLinkFromCategory('Most Popular')
+            case 'US Presidents':
+                start_url = self.getLinkFromCategory('US Presidents')
+            case 'Gaming':
+                start_url = self.getLinkFromCategory('Gaming')
+            case _:
+                start_url = self.findWikiPage("Segmentation Fault (software bug)")
 
         match end_url:
             case 'Random': # End a game with random Wikipedia pages
@@ -54,6 +68,18 @@ class GameLogic(QObject):
                 end_url = self.findWikiPage(end_url)
             case 'Buildings':
                 end_url = self.getLinkFromCategory('Buildings')
+            case 'Celebrities':
+                end_url = self.getLinkFromCategory('Celebrities')
+            case 'Countries':
+                end_url = self.getLinkFromCategory('Countries')
+            case 'Most Popular':
+                end_url = self.getLinkFromCategory('Most Popular')
+            case 'US Presidents':
+                end_url = self.getLinkFromCategory('US Presidents')
+            case 'Gaming':
+                end_url = self.getLinkFromCategory('Gaming')
+            case _:
+                end_url = self.findWikiPage("Segmentation Fault (software bug)")
             
             
         # Notify the UI to open a new game tab with the start and end URLs
@@ -67,7 +93,25 @@ class GameLogic(QObject):
     def getLinkFromCategory(self, category):
         match category:
             case 'Buildings':
-                i = random(0, len(self.Buildings) - 1)
+                i = int(random() * len(self.Buildings))
+                return self.Buildings[i]
+            case 'Celebrities':
+                i = int(random() * len(self.Celebrities))
+                return self.Celebrities[i]
+            case 'Countries':
+                i = int(random() * len(self.Countries))
+                return self.Countries[i]
+            case 'Most Popular':
+                i - int(random() * len(self.MostPopular))
+                return self.MostPopular[i]
+            case 'US Presidents':
+                i = int(random() * len(self.USPresidents))
+                return self.USPresidents[i]
+            case 'Gaming':
+                i = int(random() * len(self.Gaming))
+                return self.Gaming[i]
+            case _:
+                return self.findWikiPage("God's Plan (song)")
 
 
     def findWikiPage(self, search_text):
@@ -105,6 +149,7 @@ class GameLogic(QObject):
             print("No results found for the given search text.")
             return wiki_url
         
+    # In the future this will be saved in some kind of external doc/database
     def initGameDatabase(self):
         self.Buildings = [
             "https://en.wikipedia.org/wiki/Empire_State_Building",
@@ -114,4 +159,74 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Taipei_101", 
             "https://en.wikipedia.org/wiki/Space_Needle", 
             "https://en.wikipedia.org/wiki/Eiffel_Tower",
+            "https://en.wikipedia.org/wiki/Leaning_Tower_of_Pisa",
+            "https://en.wikipedia.org/wiki/Big_Ben",
+            "https://en.wikipedia.org/wiki/Sydney_Opera_House",
         ]
+
+        self.Celebrities = [
+            "https://en.wikipedia.org/wiki/Elon_Musk",
+            "https://en.wikipedia.org/wiki/Bill_Gates",
+            "https://en.wikipedia.org/wiki/Jeff_Bezos",
+            "https://en.wikipedia.org/wiki/Mark_Zuckerberg",
+            "https://en.wikipedia.org/wiki/Drake_(musician)",
+            "https://en.wikipedia.org/wiki/Dwayne_Johnson",
+            "https://en.wikipedia.org/wiki/Eminem",
+            "https://en.wikipedia.org/wiki/Will_Smith",
+            "https://en.wikipedia.org/wiki/Leonardo_DiCaprio",
+            "https://en.wikipedia.org/wiki/Brad_Pitt",
+        ]
+
+        self.Gaming = [
+            "https://en.wikipedia.org/wiki/League_of_Legends",
+            "https://en.wikipedia.org/wiki/World_of_Warcraft",
+            "https://en.wikipedia.org/wiki/Counter-Strike:_Global_Offensive",
+            "https://en.wikipedia.org/wiki/Fortnite",
+            "https://en.wikipedia.org/wiki/Minecraft",
+            "https://en.wikipedia.org/wiki/Grand_Theft_Auto_V",
+            "https://en.wikipedia.org/wiki/Call_of_Duty:_Warzone",
+            "https://en.wikipedia.org/wiki/Overwatch_(video_game)",
+            "https://en.wikipedia.org/wiki/Valorant",
+            "https://en.wikipedia.org/wiki/Among_Us",
+        ]
+
+        self.Countries = [
+            "https://en.wikipedia.org/wiki/United_States",
+            "https://en.wikipedia.org/wiki/China",
+            "https://en.wikipedia.org/wiki/India",
+            "https://en.wikipedia.org/wiki/Brazil",
+            "https://en.wikipedia.org/wiki/Russia",
+            "https://en.wikipedia.org/wiki/Australia",
+            "https://en.wikipedia.org/wiki/Canada",
+            "https://en.wikipedia.org/wiki/South_Africa",
+            "https://en.wikipedia.org/wiki/Nigeria",
+            "https://en.wikipedia.org/wiki/Argentina",
+        ]
+
+        self.Presidents = [
+            "https://en.wikipedia.org/wiki/George_Washington",
+            "https://en.wikipedia.org/wiki/Thomas_Jefferson",
+            "https://en.wikipedia.org/wiki/Abraham_Lincoln",
+            "https://en.wikipedia.org/wiki/Theodore_Roosevelt",
+            "https://en.wikipedia.org/wiki/Franklin_D._Roosevelt",
+            "https://en.wikipedia.org/wiki/John_F._Kennedy",
+            "https://en.wikipedia.org/wiki/Ronald_Reagan",
+            "https://en.wikipedia.org/wiki/Barack_Obama",
+            "https://en.wikipedia.org/wiki/Donald_Trump",
+            "https://en.wikipedia.org/wiki/Joe_Biden",
+            "https://en.wikipedia.org/wiki/George_H._W._Bush",
+            "https://en.wikipedia.org/wiki/Bill_Clinton",
+        ]
+
+        self.MostPopular = [
+            "https://en.wikipedia.org/wiki/Main_Page",
+            "https://en.wikipedia.org/wiki/Sex",
+            "https://en.wikipedia.org/wiki/United States",
+            "https://en.wikipedia.org/wiki/India",
+            "https://en.wikipedia.org/wiki/Lady_Gaga",
+            "https://en.wikipedia.org/wiki/Barack_Obama",
+            "https://en.wikipedia.org/wiki/Donald_Trump",
+            "https://en.wikipedia.org/wiki/COVID-19_pandemic",
+            "https://en.wikipedia.org/wiki/World_War_II",
+        ]
+
