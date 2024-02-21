@@ -158,7 +158,7 @@ class EndGameDialog(QDialog):
         self.tabWidget = tabWidget
         self.homePageIndex = homePageIndex
         self.setWindowTitle("Game Over")
-        self.setStyleSheet("background-color: #D6EAF8")
+        self.setStyleSheet("background-color: #FFFFFF")
         self.setFixedSize(300, 180)  # Adjust size as needed
         self.initUI()
 
@@ -166,7 +166,7 @@ class EndGameDialog(QDialog):
         layout = QVBoxLayout(self)
 
         messageLabel = QLabel("Congratulations!")
-        messageLabel.setStyleSheet("font-size: 20px; font-weight: bold; padding: 10px;")
+        messageLabel.setStyleSheet("font-size: 24px; color: #3366cc; padding: 10px;")
         messageLabel.setAlignment(Qt.AlignCenter)
         layout.addWidget(messageLabel)
         messageSubscript = QLabel("You finished the race!")
@@ -183,6 +183,7 @@ class EndGameDialog(QDialog):
         layout.addWidget(totalLinksLabel)
 
         closeButton = QPushButton("Close")
+        closeButton.setStyleSheet("background-color: #D3D3D3")
         closeButton.clicked.connect(self.returnToHomePage)
         layout.addWidget(closeButton)
 

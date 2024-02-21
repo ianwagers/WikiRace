@@ -44,8 +44,6 @@ class GameLogic(QObject):
         match start_url:
             case 'Random': # Start a game with random Wikipedia pages
                 start_url = self.getRandomWikiLink()
-            case 'Custom': # Start a game with custom Wikipedia pages
-                start_url = self.findWikiPage(start_url)
             case 'Buildings': # Start a game with a specific category of Wikipedia pages
                 start_url = self.getLinkFromCategory('Buildings')
             case 'Celebrities':
@@ -58,14 +56,12 @@ class GameLogic(QObject):
                 start_url = self.getLinkFromCategory('US Presidents')
             case 'Gaming':
                 start_url = self.getLinkFromCategory('Gaming')
-            case _:
-                start_url = self.findWikiPage("Segmentation Fault (software bug)")
+            case _: # Start a game with a custom Wikipedia page
+                start_url = self.findWikiPage(start_url)
 
         match end_url:
             case 'Random': # End a game with random Wikipedia pages
                 end_url = self.getRandomWikiLink()
-            case 'Custom':
-                end_url = self.findWikiPage(end_url)
             case 'Buildings':
                 end_url = self.getLinkFromCategory('Buildings')
             case 'Celebrities':
@@ -79,7 +75,7 @@ class GameLogic(QObject):
             case 'Gaming':
                 end_url = self.getLinkFromCategory('Gaming')
             case _:
-                end_url = self.findWikiPage("Segmentation Fault (software bug)")
+                end_url = self.findWikiPage(end_url)
             
             
         # Notify the UI to open a new game tab with the start and end URLs
@@ -102,7 +98,7 @@ class GameLogic(QObject):
                 i = int(random() * len(self.Countries))
                 return self.Countries[i]
             case 'Most Popular':
-                i - int(random() * len(self.MostPopular))
+                i = int(random() * len(self.MostPopular))
                 return self.MostPopular[i]
             case 'US Presidents':
                 i = int(random() * len(self.USPresidents))
