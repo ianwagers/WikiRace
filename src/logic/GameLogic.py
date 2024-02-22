@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 from random import random
 import requests, sys
-sys.path.append('C:\Project_Workspace\WikiRace')
+sys.path.append('C:\Program Files\WikiRace')
 
 class GameLogic(QObject):
     linkClicked = pyqtSignal(str)
@@ -37,21 +37,31 @@ class GameLogic(QObject):
             return None
         
     # Currently supported categories:
-    # 'Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Gaming', 'Random', 'Custom'
+    # 'Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Random', 'Custom'
     def startGame(self, homePage, start_url=None, end_url=None):
         self.homePage = homePage
 
         match start_url:
             case 'Random': # Start a game with random Wikipedia pages
                 start_url = self.getRandomWikiLink()
+            case 'Animals':
+                start_url = self.getLinkFromCategory('Animals')
             case 'Buildings': # Start a game with a specific category of Wikipedia pages
                 start_url = self.getLinkFromCategory('Buildings')
             case 'Celebrities':
                 start_url = self.getLinkFromCategory('Celebrities')
             case 'Countries':
                 start_url = self.getLinkFromCategory('Countries')
-            case 'Most Popular':
-                start_url = self.getLinkFromCategory('Most Popular')
+            case 'Literature':
+                start_url = self.getLinkFromCategory('Literature')
+            case 'Music':
+                start_url = self.getLinkFromCategory('Music')
+            case 'STEM':
+                start_url = self.getLinkFromCategory('STEM')
+            case 'Historical Events':
+                start_url = self.getLinkFromCategory('Historical Events')
+            case 'Most Linked':
+                start_url = self.getLinkFromCategory('Most Linked')
             case 'US Presidents':
                 start_url = self.getLinkFromCategory('US Presidents')
             case 'Gaming':
@@ -62,32 +72,39 @@ class GameLogic(QObject):
         match end_url:
             case 'Random': # End a game with random Wikipedia pages
                 end_url = self.getRandomWikiLink()
+            case 'Animals':
+                end_url = self.getLinkFromCategory('Animals')
             case 'Buildings':
                 end_url = self.getLinkFromCategory('Buildings')
             case 'Celebrities':
                 end_url = self.getLinkFromCategory('Celebrities')
+            case 'Literature':
+                end_url = self.getLinkFromCategory('Literature')
+            case 'Music':
+                end_url = self.getLinkFromCategory('Music')
+            case 'STEM':
+                end_url = self.getLinkFromCategory('STEM')
+            case 'Historical Events':
+                end_url = self.getLinkFromCategory('Historical Events')
+            case 'Most Linked':
+                end_url = self.getLinkFromCategory('Most Linked')
             case 'Countries':
                 end_url = self.getLinkFromCategory('Countries')
-            case 'Most Popular':
-                end_url = self.getLinkFromCategory('Most Popular')
             case 'US Presidents':
                 end_url = self.getLinkFromCategory('US Presidents')
             case 'Gaming':
                 end_url = self.getLinkFromCategory('Gaming')
             case _:
                 end_url = self.findWikiPage(end_url)
-            
-            
+               
         # Notify the UI to open a new game tab with the start and end URLs
         return start_url, end_url
 
-
-    def stopGame(self):
-        # This method will stop the game and perform any cleanup necessary
-        pass  # Placeholder for actual stop game logic
-
     def getLinkFromCategory(self, category):
         match category:
+            case 'Animals':
+                i = int(random() * len(self.Animals))
+                return self.Animals[i]
             case 'Buildings':
                 i = int(random() * len(self.Buildings))
                 return self.Buildings[i]
@@ -97,9 +114,21 @@ class GameLogic(QObject):
             case 'Countries':
                 i = int(random() * len(self.Countries))
                 return self.Countries[i]
-            case 'Most Popular':
-                i = int(random() * len(self.MostPopular))
-                return self.MostPopular[i]
+            case 'Literature':
+                i = int(random() * len(self.Literature))
+                return self.Literature[i]
+            case 'Music':
+                i = int(random() * len(self.Music))
+                return self.Music[i]
+            case 'STEM':
+                i = int(random() * len(self.STEM))
+                return self.STEM[i]
+            case 'Historical Events':
+                i = int(random() * len(self.HistoricalEvents))
+                return self.HistoricalEvents[i]
+            case 'Most Linked':
+                i = int(random() * len(self.MostLinked))
+                return self.MostLinked[i]
             case 'US Presidents':
                 i = int(random() * len(self.USPresidents))
                 return self.USPresidents[i]
@@ -108,7 +137,6 @@ class GameLogic(QObject):
                 return self.Gaming[i]
             case _:
                 return self.findWikiPage("God's Plan (song)")
-
 
     def findWikiPage(self, search_text):
         # URL to Wikipedia's API for searching
@@ -147,6 +175,24 @@ class GameLogic(QObject):
         
     # In the future this will be saved in some kind of external doc/database
     def initGameDatabase(self):
+        
+        self.Animals = [
+            "https://en.wikipedia.org/wiki/Lion",
+            "https://en.wikipedia.org/wiki/Tiger",
+            "https://en.wikipedia.org/wiki/Elephant",
+            "https://en.wikipedia.org/wiki/Giraffe",
+            "https://en.wikipedia.org/wiki/Zebra",
+            "https://en.wikipedia.org/wiki/Cougar",
+            "https://en.wikipedia.org/wiki/Grizzly_bear",
+            "https://en.wikipedia.org/wiki/Brown_bear",
+            "https://en.wikipedia.org/wiki/Black_bear"
+            "https://en.wikipedia.org/wiki/Polar_bear",
+            "https://en.wikipedia.org/wiki/Panda",
+            "https://en.wikipedia.org/wiki/Koala",
+            "https://en.wikipedia.org/wiki/Kangaroo",
+            "https://en.wikipedia.org/wiki/Platypus"
+        ]
+
         self.Buildings = [
             "https://en.wikipedia.org/wiki/Empire_State_Building",
             "https://en.wikipedia.org/wiki/Burj_Khalifa",
@@ -186,6 +232,102 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Among_Us",
         ]
 
+        self.HistoricalEvents = [
+            "https://en.wikipedia.org/wiki/World_War_II",
+            "https://en.wikipedia.org/wiki/World_War_I",
+            "https://en.wikipedia.org/wiki/American_Revolution",
+            "https://en.wikipedia.org/wiki/French_Revolution",
+            "https://en.wikipedia.org/wiki/Industrial_Revolution",
+            "https://en.wikipedia.org/wiki/October_Revolution",
+            "https://en.wikipedia.org/wiki/Triangle_Shirtwaist_Factory_fire",
+            "https://en.wikipedia.org/wiki/List_of_sieges_of_Constantinople",
+            "https://en.wikipedia.org/wiki/Battle_of_Antietam",
+            "https://en.wikipedia.org/wiki/Emu_War",
+            "https://en.wikipedia.org/wiki/Chernobyl_disaster"
+        ]
+
+        self.Literature = [
+            "https://en.wikipedia.org/wiki/To_Kill_a_Mockingbird",
+            "https://en.wikipedia.org/wiki/The_Great_Gatsby",
+            "https://en.wikipedia.org/wiki/1984_(novel)",
+            "https://en.wikipedia.org/wiki/Brave_New_World",
+            "https://en.wikipedia.org/wiki/Fahrenheit_451",
+            "https://en.wikipedia.org/wiki/The_Catcher_in_the_Rye",
+            "https://en.wikipedia.org/wiki/Shakespeare%27s_sonnets",
+            "https://en.wikipedia.org/wiki/The_Odyssey",
+            "https://en.wikipedia.org/wiki/Infinite_Jest"
+            "https://en.wikipedia.org/wiki/Simulacra_and_Simulation"
+            "https://en.wikipedia.org/wiki/Thus_Spoke_Zarathustra"
+
+        ]
+
+        self.Music = [
+            "https://en.wikipedia.org/wiki/Bohemian_Rhapsody",
+            "https://en.wikipedia.org/wiki/Hey_Jude",
+            "https://en.wikipedia.org/wiki/Smells_Like_Teen_Spirit",
+            "https://en.wikipedia.org/wiki/Hotel_California",
+            "https://en.wikipedia.org/wiki/Imagine_(John_Lennon_song)",
+            "https://en.wikipedia.org/wiki/One_(Metallica_song)",
+            "https://en.wikipedia.org/wiki/Thriller_(song)",
+            "https://en.wikipedia.org/wiki/My_Way",
+            "https://en.wikipedia.org/wiki/Despacito",
+            "https://en.wikipedia.org/wiki/Shape_of_You",
+            "https://en.wikipedia.org/wiki/Drake_(musician)",
+            "https://en.wikipedia.org/wiki/Drake_discography",
+            "https://en.wikipedia.org/wiki/Drake_(musician)#Studio_albums",
+            "https://en.wikipedia.org/wiki/Drake_(musician)#Singles",
+            "https://en.wikipedia.org/wiki/Drake_(musician)#Tours",
+            "https://en.wikipedia.org/wiki/Drake_(musician)#Filmography",
+            "https://en.wikipedia.org/wiki/Drake_(musician)#Awards_and_nominations",
+            "https://en.wikipedia.org/wiki/God%27s_Plan_(song)",
+            "https://en.wikipedia.org/wiki/Rich_Baby_Daddy",
+            "https://en.wikipedia.org/wiki/Daft_Punk",
+            "https://en.wikipedia.org/wiki/Glass_Animals"
+        ]
+
+        self.STEM = [
+            "https://en.wikipedia.org/wiki/Albert_Einstein",
+            "https://en.wikipedia.org/wiki/Isaac_Newton",
+            "https://en.wikipedia.org/wiki/Nikola_Tesla",
+            "https://en.wikipedia.org/wiki/Thomas_Edison",
+            "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
+            "https://en.wikipedia.org/wiki/Stephen_Hawking",
+            "https://en.wikipedia.org/wiki/Charles_Darwin",
+            "https://en.wikipedia.org/wiki/Marie_Curie",
+            "https://en.wikipedia.org/wiki/Ada_Lovelace",
+            "https://en.wikipedia.org/wiki/Alan_Turing",
+            "https://en.wikipedia.org/wiki/Physics",
+            "https://en.wikipedia.org/wiki/Chemistry",
+            "https://en.wikipedia.org/wiki/Biology",
+            "https://en.wikipedia.org/wiki/Mathematics",
+            "https://en.wikipedia.org/wiki/Statistics",
+            "https://en.wikipedia.org/wiki/Geology",
+            "https://en.wikipedia.org/wiki/Astronomy",
+            "https://en.wikipedia.org/wiki/Geography",
+            "https://en.wikipedia.org/wiki/Environmental_science",
+            "https://en.wikipedia.org/wiki/Computer_science",
+            "https://en.wikipedia.org/wiki/Software_engineering",
+            "https://en.wikipedia.org/wiki/Artificial_intelligence",
+            "https://en.wikipedia.org/wiki/Machine_learning",
+            "https://en.wikipedia.org/wiki/Quantum_computing",
+            "https://en.wikipedia.org/wiki/Operating_system",
+            "https://en.wikipedia.org/wiki/Computer_network",
+            "https://en.wikipedia.org/wiki/Computer_security",
+            "https://en.wikipedia.org/wiki/Computer_vision",
+            "https://en.wikipedia.org/wiki/Robotics",
+            "https://en.wikipedia.org/wiki/Computer_graphics",
+            "https://en.wikipedia.org/wiki/Computer_simulation",
+            "https://en.wikipedia.org/wiki/Computer_animation",
+            "https://en.wikipedia.org/wiki/Computer_music",
+            "https://en.wikipedia.org/wiki/Computer_architecture",
+            "https://en.wikipedia.org/wiki/Computer_hardware",
+            "https://en.wikipedia.org/wiki/Computer_software",
+            "https://en.wikipedia.org/wiki/Computer_programming",
+            "https://en.wikipedia.org/wiki/Computer_algorithm",
+            "https://en.wikipedia.org/wiki/Computer_data"
+
+        ]
+
         self.Countries = [
             "https://en.wikipedia.org/wiki/United_States",
             "https://en.wikipedia.org/wiki/China",
@@ -197,6 +339,17 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/South_Africa",
             "https://en.wikipedia.org/wiki/Nigeria",
             "https://en.wikipedia.org/wiki/Argentina",
+            "https://en.wikipedia.org/wiki/United_Kingdom",
+            "https://en.wikipedia.org/wiki/France",
+            "https://en.wikipedia.org/wiki/Germany",
+            "https://en.wikipedia.org/wiki/Italy",
+            "https://en.wikipedia.org/wiki/Spain",
+            "https://en.wikipedia.org/wiki/Poland",
+            "https://en.wikipedia.org/wiki/Netherlands",
+            "https://en.wikipedia.org/wiki/Belgium",
+            "https://en.wikipedia.org/wiki/Sweden",
+            "https://en.wikipedia.org/wiki/Norway",
+            "https://en.wikipedia.org/wiki/Denmark"
         ]
 
         self.USPresidents = [
@@ -212,9 +365,16 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Joe_Biden",
             "https://en.wikipedia.org/wiki/George_H._W._Bush",
             "https://en.wikipedia.org/wiki/Bill_Clinton",
+            "https://en.wikipedia.org/wiki/George_W._Bush",
+            "https://en.wikipedia.org/wiki/Jimmy_Carter",
+            "https://en.wikipedia.org/wiki/Gerald_Ford",
+            "https://en.wikipedia.org/wiki/Richard_Nixon",
+            "https://en.wikipedia.org/wiki/Lyndon_B._Johnson",
+            "https://en.wikipedia.org/wiki/Dwight_D._Eisenhower",
+            "https://en.wikipedia.org/wiki/Harry_S._Truman",
         ]
 
-        self.MostPopular = [
+        self.MostLinked = [
             "https://en.wikipedia.org/wiki/Main_Page",
             "https://en.wikipedia.org/wiki/Sex",
             "https://en.wikipedia.org/wiki/United States",
@@ -224,5 +384,9 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Donald_Trump",
             "https://en.wikipedia.org/wiki/COVID-19_pandemic",
             "https://en.wikipedia.org/wiki/World_War_II",
+            "https://en.wikipedia.org/wiki/Chernobyl_disaster"
+            "https://en.wikipedia.org/wiki/Star_Wars"
+            "https://en.wikipedia.org/wiki/Facebook"
+
         ]
 

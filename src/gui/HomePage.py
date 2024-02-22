@@ -1,14 +1,11 @@
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSizePolicy, QSpacerItem, QFrame, QTabWidget, QDialog, QComboBox, QLineEdit
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSizePolicy, QFrame, QDialog, QComboBox, QLineEdit
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt, QSize, QUrl
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-
-import sys
-from src import app
 from src.logic.GameLogic import GameLogic
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtWidgets import QBoxLayout, QVBoxLayout, QHBoxLayout
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout
 
 
 class HomePage(QWidget):
@@ -27,21 +24,6 @@ class HomePage(QWidget):
         self.layout = tabWidget.layout()
         self.layout.setContentsMargins(10, 10, 10, 10)
         self.layout.setSpacing(10)
-        
-
-
-        # Spacer to push settings to the right
-        # self.spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        # self.topBarLayout.addItem(self.spacer)
-        # self.topBarLayout.addWidget(self.settingsButton)
-        # Adding top bar layout to main layout
-        # self.layout.addLayout(self.topBarLayout)
-        # Uncomment for title label
-        #self.titleLabel = QLabel('<a href="https://en.wikipedia.org/wiki/Wikiracing" style="text-decoration: none; color: #3366cc;">Wikipedia Race</a>')
-        #self.titleLabel.setStyleSheet("QLabel { font: sans-serif; font-size: 24px; } a { text-decoration: none; color: #3366cc; }")
-        #self.titleLabel.setAlignment(Qt.AlignCenter)
-        #self.titleLabel.linkActivated.connect(self.openLinkInWebView)
-        #self.layout.addWidget(self.titleLabel)
 
         # Title Image  # Placeholder for title image
         self.titleImage = QLabel()
@@ -57,7 +39,7 @@ class HomePage(QWidget):
         self.layout.addWidget(self.titleImage, alignment=Qt.AlignCenter)
 
         # Title subscript
-        self.titleSubscript = QLabel("Version 1.3 [BETA]")
+        self.titleSubscript = QLabel("Version 1.4 [BETA]")
         self.titleSubscript.setStyleSheet("font-size: 12px;")
         self.titleSubscript.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.titleSubscript)
@@ -69,7 +51,7 @@ class HomePage(QWidget):
         self.buttonsLayout.setContentsMargins(10, 0, 10, 0) # Reduced bottom margin to decrease whitespace
 
         # Buttons
-        self.soloGameButton = QPushButton("Solo Game")
+        self.soloGameButton = QPushButton("Solo Race")
         self.soloGameButton.setMinimumHeight(40)
         self.soloGameButton.setMaximumWidth(500)
         self.soloGameButton.setMinimumWidth(200)
@@ -254,7 +236,7 @@ class CustomGameDialog(QDialog):
         startingPageLabel = QLabel('Starting Page:')
         startingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #3366cc; } ") 
         self.startPageCombo = QComboBox()
-        self.startPageCombo.addItems(['Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Gaming', 'Random', 'Custom'])
+        self.startPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Random', 'Custom'])
         if self.startPageCombo.currentText() == 'Custom':
             self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         startingPageLayout.addWidget(startingPageLabel)
@@ -273,7 +255,7 @@ class CustomGameDialog(QDialog):
         endingPageLabel = QLabel('Ending Page:')
         endingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #3366cc; } ") 
         self.endPageCombo = QComboBox()
-        self.endPageCombo.addItems(['Buildings', 'Celebrities', 'Countries', 'Most Popular', 'US Presidents', 'Gaming', 'Random', 'Custom'])
+        self.endPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Random', 'Custom'])
         if self.endPageCombo.currentText() == 'Custom':
             self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         endingPageLayout.addWidget(endingPageLabel)
@@ -288,7 +270,7 @@ class CustomGameDialog(QDialog):
         self.layout.addWidget(self.customEndPageEdit)
 
         # Start Game button
-        self.startGameButton = QPushButton('Start Game')
+        self.startGameButton = QPushButton('Start Race!')
         self.layout.addWidget(self.startGameButton)
         
         # Connect signals
@@ -335,7 +317,7 @@ class UnderConstructionDialog(QDialog):
     def initUI(self):
         layout = QVBoxLayout(self)
 
-        messageLabel = QLabel("Page Broken")
+        messageLabel = QLabel("i'll work on this..")
         messageLabel.setStyleSheet("font-size: 20px; font-weight: bold; padding: 10px;")
         messageLabel.setAlignment(Qt.AlignCenter)
         layout.addWidget(messageLabel)

@@ -1,9 +1,9 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QGridLayout, QListWidget, QPushButton, QDialog
-from PyQt5.QtCore import Qt, QTimer, QUrl, pyqtSignal
-from PyQt5.QtWebEngineWidgets import QWebEnginePage, QWebEngineView
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QListWidget, QPushButton, QDialog
+from PyQt5.QtCore import Qt, QTimer, QUrl
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEnginePage
+from PyQt5.QtGui import QIcon
 from bs4 import BeautifulSoup
 import requests
-import time
 
 class SoloGamePage(QWidget):
     def __init__(self, tabWidget, start_url, end_url, parent=None):
@@ -158,6 +158,8 @@ class EndGameDialog(QDialog):
         self.tabWidget = tabWidget
         self.homePageIndex = homePageIndex
         self.setWindowTitle("Game Over")
+        self.setWindowIcon(QIcon('C:/Project_Workspace/WikiRace/src/resources/icons/game_icon.ico'))
+        # self.setWindowIcon(QIcon(self.projectPath + 'resources/icons/game_icon.ico'))
         self.setStyleSheet("background-color: #FFFFFF")
         self.setFixedSize(300, 180)  # Adjust size as needed
         self.initUI()
