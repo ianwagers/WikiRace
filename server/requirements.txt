@@ -1,0 +1,26 @@
+# WikiRace Multiplayer Server Dependencies
+
+# FastAPI and ASGI server
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# Socket.IO for real-time communication
+python-socketio>=5.8.0
+websocket-client>=1.6.0
+
+# Redis for session storage
+redis>=5.0.0
+aioredis>=2.0.0
+
+# Configuration and validation
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+python-dotenv>=1.0.0
+
+# HTTP client for Wikipedia API integration
+httpx>=0.25.0
+requests>=2.32.0
+
+# Development and testing
+pytest>=8.0.0
+pytest-asyncio>=0.21.0

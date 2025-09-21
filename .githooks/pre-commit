@@ -1,0 +1,42 @@
+#!/bin/bash
+# WikiRace Pre-commit Hook
+# Automatically updates documentation before commits
+
+echo "🔄 WikiRace Pre-commit Hook: Checking documentation..."
+
+# Check if Python is available
+if ! command -v python &> /dev/null; then
+    echo "⚠️  Python not found, skipping documentation update"
+    exit 0
+fi
+
+# Check if the update script exists
+if [ ! -f "scripts/update_context.py" ]; then
+    echo "⚠️  Update script not found, skipping documentation update"
+    exit 0
+fi
+
+# Check if context needs updating
+python scripts/update_context.py --check
+UPDATE_NEEDED=$?
+
+if [ $UPDATE_NEEDED -eq 1 ]; then
+    echo "📋 Updating project context..."
+    python scripts/update_context.py
+    
+    if [ $? -eq 0 ]; then
+        echo "✅ Context updated successfully"
+        # Add the updated file to the commit
+        git add .cursorrules
+        echo "📝 Added updated .cursorrules to commit"
+    else
+        echo "❌ Failed to update context"
+        echo "💡 You can manually run: python scripts/update_context.py"
+        # Don't fail the commit, just warn
+    fi
+else
+    echo "✅ Context is up to date"
+fi
+
+echo "🚀 Pre-commit checks complete"
+exit 0

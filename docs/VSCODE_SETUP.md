@@ -44,7 +44,18 @@ Before running the project, make sure you've set up the environment:
    ```
 3. **Run the application**:
    ```cmd
-   python src/app.py
+   python bin/main.py
+   ```
+
+#### Method 4: Running the Multiplayer Server
+1. **Open integrated terminal** (Ctrl+`)
+2. **Activate virtual environment**:
+   ```cmd
+   venv\Scripts\activate
+   ```
+3. **Start the server**:
+   ```cmd
+   python server/start_server.py
    ```
 
 ## 🔧 Debug Configurations
@@ -53,21 +64,27 @@ I've set up several debug configurations for you:
 
 ### 1. **WikiRace - Main Application**
 - **Purpose**: Run the main WikiRace game
-- **File**: `src/app.py`
+- **File**: `bin/main.py`
 - **Python**: Uses your local Python 3.13
 - **Features**: Full debugging support
 
-### 2. **WikiRace - Test Setup**
+### 2. **WikiRace - Multiplayer Server**
+- **Purpose**: Run the multiplayer server for real-time gaming
+- **File**: `server/start_server.py`
+- **Python**: Uses your local Python 3.13
+- **Features**: FastAPI server with Socket.IO support
+
+### 3. **WikiRace - Test Setup**
 - **Purpose**: Test your Python 3.13 setup
 - **File**: `test_python313.py`
 - **Use**: Verify everything is working correctly
 
-### 3. **WikiRace - Setup Environment**
+### 4. **WikiRace - Setup Environment**
 - **Purpose**: Run the setup script
 - **File**: `setup_environment.py`
 - **Use**: Set up dependencies and virtual environment
 
-### 4. **Python Debugger: Current File**
+### 5. **Python Debugger: Current File**
 - **Purpose**: Run any Python file you have open
 - **Use**: For testing individual components
 

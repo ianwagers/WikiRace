@@ -267,15 +267,12 @@ class HomePage(QWidget):
             self.tabWidget.setCurrentIndex(index)
 
     def onMultiplayerClicked(self):
-        dialog = UnderConstructionDialog(self)
-        dialog.exec()
-        ''' # Placeholder for multiplayer game
+        # Open the multiplayer tab
         if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
             self.mainApplication.addMultiplayerTab()
         else:
             index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
             self.tabWidget.setCurrentIndex(index)
-        '''
     
     def onSettingsClicked(self):
         if not hasattr(self.mainApplication, 'settingsPage') or self.tabWidget.indexOf(self.mainApplication.settingsPage) == -1:

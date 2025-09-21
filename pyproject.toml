@@ -28,6 +28,10 @@ dependencies = [
     "requests>=2.32.0",
     "beautifulsoup4>=4.12.0",
     "lxml>=5.0.0",
+    # Multiplayer dependencies
+    "python-socketio[client]>=5.8.0",
+    "websocket-client>=1.6.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.urls]

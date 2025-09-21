@@ -1,0 +1,9 @@
+2025-09-21 17:07:51,595 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-21 17:07:54,320 - __main__ - ERROR - Server error: attempted relative import with no known parent package
+2025-09-21 17:08:17,658 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-21 17:08:20,112 - __main__ - ERROR - Server error: attempted relative import with no known parent package
+2025-09-21 17:14:27,570 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-21 17:14:27,860 - __main__ - INFO - Server will start on 0.0.0.0:8000
+2025-09-21 17:14:27,860 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-21 17:14:34,934 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-21 17:14:34,934 - room_manager - WARNING - Redis connection failed, using in-memory storage only

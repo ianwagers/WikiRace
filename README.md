@@ -16,9 +16,13 @@ WikiRace is a fun and educational game that challenges you to navigate from one 
 
 ## Features
 
-- **Solo Game Mode**: Race against the clock to reach the target page as quickly as possible.
-- **Multiplayer Mode**: Compete with friends to see who can find the fastest path.
-- **Modern GUI**: Built with PyQt6 for a smooth and responsive user experience.
+- **Solo Game Mode**: Race against the clock to reach the target page as quickly as possible
+- **Real-time Multiplayer**: Compete with up to 10 friends in live Wikipedia races
+- **Room-based Gaming**: Create or join game rooms with 4-letter codes
+- **Live Progress Tracking**: See other players' current pages and progress in real-time
+- **Modern GUI**: Built with PyQt6 for a smooth and responsive user experience
+- **Flexible Page Selection**: Choose from categories or set custom start/end pages
+- **Comprehensive Results**: View detailed race results and navigation paths
 
 ## Screenshots
 
@@ -44,6 +48,16 @@ WikiRace is a fun and educational game that challenges you to navigate from one 
 4. **Race Against Time**: Try to reach the target page in as few clicks as possible
 5. **Track Your Progress**: Monitor your path and time as you navigate
 
+### Multiplayer Mode
+
+1. **Start the Server**: Run the multiplayer server using `python server/start_server.py`
+2. **Host a Game**: Enter your name and click "Create Room" to generate a 4-letter room code
+3. **Invite Friends**: Share the room code with friends who can join using "Join Room"
+4. **Configure Game**: As host, select page categories or set custom start/end pages
+5. **Start Racing**: Begin the race - all players start simultaneously with identical conditions
+6. **Track Progress**: See other players' current pages and link counts in real-time
+7. **View Results**: When someone reaches the target, see complete rankings and paths
+
 ### Game Tips
 
 - **Think Strategically**: Look for pages that might be conceptually related to your target
@@ -52,18 +66,48 @@ WikiRace is a fun and educational game that challenges you to navigate from one 
 - **Learn as You Play**: Each game teaches you about new topics and connections
 
 
-## Current Status
+## Current Status (v1.6.0 Beta)
 
-- ✅ The main homepage has been setup
-- ✅ Solo games are functional and playable
-- 🔄 Multiplayer mode is in development
+- ✅ Solo games fully functional and polished
+- ✅ Multiplayer server infrastructure complete
+- ✅ Real-time room management and player communication
+- ✅ Room creation/joining with 4-letter codes
+- 🔄 Multiplayer game flow implementation in progress
 - 🔄 Dark/Light Mode Settings (Work in Progress)
-- 🔄 Additional features and improvements ongoing
+- 🔄 UI polish and comprehensive testing ongoing
 
 ## Technical Details
 
-- **Framework**: PyQt6 for the GUI
-- **Python Version**: 3.13
-- **Dependencies**: See `pyproject.toml` for full requirements
+### Client Application
+- **Framework**: PyQt6 for the GUI with PyQt6-WebEngine for Wikipedia display
+- **Python Version**: 3.13 (strict requirement)
 - **Architecture**: Modular design with separate logic and GUI components
+- **Networking**: Socket.IO client for real-time multiplayer communication
+
+### Multiplayer Server
+- **Framework**: FastAPI with Socket.IO for real-time events
+- **Data Models**: Pydantic for validation and serialization
+- **Storage**: In-memory with Redis planned for persistence
+- **Deployment**: Self-hosted server (Docker support planned)
+
+### Dependencies
+See `pyproject.toml` for complete requirements including:
+- PyQt6 6.7.0+ (GUI framework)
+- PyQt6-WebEngine 6.7.0+ (Wikipedia display)
+- python-socketio[client] 5.8.0+ (real-time communication)
+- requests 2.32.0+ (HTTP API calls)
+- beautifulsoup4 4.12.0+ (HTML parsing)
+
+### Project Structure
+- `src/` - Main application code (GUI and logic)
+- `server/` - Multiplayer server infrastructure
+- `docs/` - Comprehensive documentation
+- `scripts/` - Utility scripts and automation tools
+- `tests/` - Test files and validation scripts
+
+### Documentation Automation
+This project includes automated documentation updates:
+- **Global Context**: `.cursorrules` file provides comprehensive project context for Cursor AI
+- **Auto-Updates**: Git hooks automatically update documentation when changes are committed
+- **Manual Updates**: Run `python scripts/update_context.py` to manually refresh documentation
 

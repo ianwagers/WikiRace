@@ -53,21 +53,47 @@ pip install -e .[dev]
 
 ```bash
 # Method 1: Direct execution
-python src/app.py
+python bin/main.py
 
 # Method 2: Using the installed command
 wikirace
 ```
 
+### 4. Multiplayer Server Setup (Optional)
+
+For multiplayer functionality, you'll need to run the server:
+
+```bash
+# Start the multiplayer server
+python server/start_server.py
+
+# Or run the server directly
+python server/main.py
+```
+
+The server will start on `http://localhost:8000` by default.
+
 ## What's New in This Setup
 
 ### Updated Dependencies
 
+#### Client Application
 - **PyQt6** (instead of PyQt5) - Modern Qt framework with better Python 3.13 support
 - **PyQt6-WebEngine** - For web content display
 - **requests** 2.32.0+ - For HTTP requests to Wikipedia API
 - **beautifulsoup4** 4.12.0+ - For HTML parsing
 - **lxml** 5.0.0+ - Fast XML/HTML parser
+
+#### Multiplayer Support (New!)
+- **python-socketio[client]** 5.8.0+ - Real-time communication with server
+- **websocket-client** 1.6.0+ - WebSocket support
+- **python-dotenv** 1.0.0+ - Environment configuration
+
+#### Server Dependencies
+- **FastAPI** - Modern web framework for the multiplayer server
+- **python-socketio** - Server-side Socket.IO implementation
+- **pydantic** - Data validation and serialization
+- **uvicorn** - ASGI server for FastAPI
 
 ### Python 3.13 Features
 
@@ -126,11 +152,24 @@ WikiRace/
 ├── pyproject.toml          # Project configuration
 ├── setup_environment.py    # Setup script
 ├── setup.bat              # Windows setup script
-├── src/                   # Source code
+├── bin/                   # Entry points
+│   └── main.py           # Application launcher
+├── src/                   # Client application source code
 │   ├── app.py            # Main application
 │   ├── gui/              # GUI components
 │   ├── logic/            # Game logic
 │   └── resources/        # Images and icons
+├── server/                # Multiplayer server (NEW!)
+│   ├── main.py           # FastAPI server
+│   ├── start_server.py   # Server startup script
+│   ├── models.py         # Data models
+│   ├── room_manager.py   # Room management
+│   ├── socket_handlers.py # Socket.IO events
+│   └── config.py         # Server configuration
+├── docs/                  # Documentation
+│   ├── SETUP_INSTRUCTIONS.md
+│   ├── MULTIPLAYER_SPEC.md
+│   └── ...
 └── venv/                 # Virtual environment (created during setup)
 ```
 
