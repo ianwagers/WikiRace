@@ -71,7 +71,7 @@ class HomePage(QWidget):
         </head>
         <body>
         <div class="wikirace-logo">
-            <span class="large-w">W</span>IKI<span class="race-text">RACE</span>
+            <span class="large-w">W</span>IKIRACE</span>
         </div>
         </body>
         </html>
@@ -94,7 +94,7 @@ class HomePage(QWidget):
         self.layout.addWidget(self.logoContainer, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Title subscript with modern styling - positioned right edge with low opacity
-        self.titleSubscript = QLabel("v1.4 [BETA]")
+        self.titleSubscript = QLabel("v1.6 [BETA]")
         self.titleSubscript.setStyleSheet("""
             QLabel {
                 font-size: 10px;
@@ -152,7 +152,20 @@ class HomePage(QWidget):
                 border-color: #8A2BE2;
             }
             QPushButton:focus {
-                outline: 2px solid #7dd3fc;
+                outline: none;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:focus-visible {
+                outline: none;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:checked {
+                background-color: #2D2D2D;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:selected {
+                background-color: #2D2D2D;
+                border: 1px solid #3a3a3a;
             }
         """)
 
@@ -181,7 +194,20 @@ class HomePage(QWidget):
                 border-color: #8A2BE2;
             }
             QPushButton:focus {
-                outline: 2px solid #7dd3fc;
+                outline: none;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:focus-visible {
+                outline: none;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:checked {
+                background-color: #2D2D2D;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:selected {
+                background-color: #2D2D2D;
+                border: 1px solid #3a3a3a;
             }
         """)
 
@@ -213,7 +239,20 @@ class HomePage(QWidget):
                 border-color: #8A2BE2;
             }
             QPushButton:focus {
-                outline: 2px solid #7dd3fc;
+                outline: none;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:focus-visible {
+                outline: none;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:checked {
+                background-color: #2D2D2D;
+                border: 1px solid #3a3a3a;
+            }
+            QPushButton:selected {
+                background-color: #2D2D2D;
+                border: 1px solid #3a3a3a;
             }
         """)
 

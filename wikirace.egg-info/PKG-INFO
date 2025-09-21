@@ -1,12 +1,12 @@
 Metadata-Version: 2.4
 Name: wikirace
-Version: 1.4.0
+Version: 1.6.0
 Summary: A Wikipedia race game built with PyQt
 Author-email: Ian Wagers <wagersian@gmail.com>
 License: MIT
-Project-URL: Homepage, https://github.com/yourusername/wikirace
-Project-URL: Repository, https://github.com/yourusername/wikirace
-Project-URL: Issues, https://github.com/yourusername/wikirace/issues
+Project-URL: Homepage, https://github.com/ianwagers/wikirace
+Project-URL: Repository, https://github.com/ianwagers/wikirace
+Project-URL: Issues, https://github.com/ianwagers/wikirace/issues
 Keywords: wikipedia,game,race,pyqt,desktop
 Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: End Users/Desktop

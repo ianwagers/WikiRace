@@ -20,18 +20,20 @@ def run_command(command, description):
         return False
 
 def install_pyqt6():
-    """Install PyQt6 and dependencies using local Python 3.13."""
+    """Install PyQt6 and dependencies using available Python."""
     print("🚀 Installing PyQt6 and dependencies...")
     
-    # Get the path to local Python 3.13
-    python313_path = Path(__file__).parent / "Python313" / "python.exe"
+    # First try local Python 3.13, then fall back to system Python
+    python313_path = Path(__file__).parent.parent / "Python313" / "python.exe"
+    python_executable = None
     
-    if not python313_path.exists():
-        print(f"❌ Python 3.13 not found at: {python313_path}")
-        print("💡 Make sure Python313 directory exists in your project folder")
-        return False
-    
-    print(f"🔍 Using Python 3.13 at: {python313_path}")
+    if python313_path.exists():
+        python_executable = str(python313_path)
+        print(f"🔍 Using local Python 3.13 at: {python_executable}")
+    else:
+        python_executable = sys.executable
+        print(f"🔍 Using system Python at: {python_executable}")
+        print("💡 Note: Local Python313 not found, using system Python")
     
     # Install PyQt6 and dependencies
     dependencies = [
@@ -43,12 +45,12 @@ def install_pyqt6():
     ]
     
     for dep in dependencies:
-        if not run_command(f'"{python313_path}" -m pip install {dep}', f"Installing {dep}"):
+        if not run_command(f'"{python_executable}" -m pip install {dep}', f"Installing {dep}"):
             print(f"⚠️  Failed to install {dep}, but continuing...")
     
     # Also try installing the project in development mode
     print("\n🔄 Installing project in development mode...")
-    if not run_command(f'"{python313_path}" -m pip install -e .', "Installing project"):
+    if not run_command(f'"{python_executable}" -m pip install -e .', "Installing project"):
         print("⚠️  Project installation failed, but PyQt6 should be installed")
     
     print("\n🎉 PyQt6 installation completed!")

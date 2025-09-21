@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "wikirace"
-version = "1.4.0"
+version = "1.6.0"
 description = "A Wikipedia race game built with PyQt"
 authors = [
     {name = "Ian Wagers", email = "wagersian@gmail.com"}
@@ -31,9 +31,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/wikirace"
-Repository = "https://github.com/yourusername/wikirace"
-Issues = "https://github.com/yourusername/wikirace/issues"
+Homepage = "https://github.com/ianwagers/wikirace"
+Repository = "https://github.com/ianwagers/wikirace"
+Issues = "https://github.com/ianwagers/wikirace/issues"
 
 [project.scripts]
 wikirace = "src.app:main"

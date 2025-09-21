@@ -3,18 +3,17 @@ echo 🔧 Installing PyQt6 and dependencies...
 echo ========================================
 
 REM Set the path to your local Python 3.13 installation
-set PYTHON313_PATH=%~dp0Python313\python.exe
+set PYTHON313_PATH=%~dp0..\Python313\python.exe
 
-REM Check if local Python 3.13 is available
+REM Check if local Python 3.13 is available, otherwise use system Python
 echo 🔍 Checking for local Python 3.13...
 if not exist "%PYTHON313_PATH%" (
-    echo ❌ Local Python 3.13 not found at: %PYTHON313_PATH%
-    echo 💡 Make sure Python313 directory exists in your project folder
-    pause
-    exit /b 1
+    echo ⚠️  Local Python 3.13 not found at: %PYTHON313_PATH%
+    echo 💡 Using system Python instead
+    set PYTHON313_PATH=python
+) else (
+    echo ✅ Found local Python 3.13 at: %PYTHON313_PATH%
 )
-
-echo ✅ Found Python 3.13 at: %PYTHON313_PATH%
 
 REM Install PyQt6 and dependencies
 echo 🔄 Installing PyQt6...

@@ -2,7 +2,13 @@ from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget
 from PyQt6.QtGui import QIcon
 
 import sys
-sys.path.append('C:/Project_Workspace/WikiRace')
+import os
+from pathlib import Path
+
+# Add the project root to the Python path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
 from src.gui.HomePage import HomePage
 from src.gui.SoloGamePage import SoloGamePage
 from src.gui.MultiplayerPage import MultiplayerPage
@@ -11,9 +17,13 @@ from src.gui.SettingsPage import SettingsPage
 class MainApplication(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.projectPath = 'C:/Project_Workspace/WikiRace/src/'
+        # Use relative path instead of hardcoded path
+        self.projectPath = str(project_root / 'src')
 
-        self.setWindowIcon(QIcon(self.projectPath + 'resources/icons/game_icon.ico'))
+        # Set window icon if it exists
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'game_icon.ico'
+        if icon_path.exists():
+            self.setWindowIcon(QIcon(str(icon_path)))
         self.setWindowTitle("Wikipedia Race")
         self.setGeometry(100, 100, 1000, 1100)  # Adjust size as needed
 
@@ -70,8 +80,12 @@ class MainApplication(QMainWindow):
             elif widgetType == 'SettingsPage':
                 delattr(self, 'settingsPage')
 
-if __name__ == "__main__":
+def main():
+    """Main entry point for the application."""
     app = QApplication(sys.argv)
     mainApp = MainApplication()
     mainApp.show()
-    sys.exit(app.exec())
+    return app.exec()
+
+if __name__ == "__main__":
+    sys.exit(main())

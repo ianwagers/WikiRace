@@ -12,7 +12,7 @@ def test_wikipedia_api():
     
     # Headers to avoid 403 errors
     headers = {
-        'User-Agent': 'WikiRace Game/1.0 (https://github.com/yourusername/wikirace)'
+        'User-Agent': 'WikiRace Game/1.0 (https://github.com/ianwagers/wikirace)'
     }
     
     # Test search API

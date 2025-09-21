@@ -25,8 +25,8 @@ def check_python_version():
     """Check if Python 3.13 is available."""
     print("🔍 Checking Python version...")
     
-    # First, try to use local Python 3.13
-    local_python_path = Path(__file__).parent / "Python313" / "python.exe"
+    # First, try to use local Python 3.13 (if it exists)
+    local_python_path = Path(__file__).parent.parent / "Python313" / "python.exe"
     python_executable = None
     
     if local_python_path.exists():
@@ -46,8 +46,9 @@ def check_python_version():
             print("✅ Python 3.13+ detected")
             return True, python_executable
         else:
-            print("⚠️  Python 3.13+ not detected. Please install Python 3.13")
-            return False, python_executable
+            print("⚠️  Python 3.13+ not detected. Using available Python version.")
+            print("   Note: Python 3.13+ is recommended for best compatibility.")
+            return True, python_executable  # Allow other versions to proceed
     except Exception as e:
         print(f"❌ Error checking Python version: {e}")
         return False, python_executable
