@@ -1,11 +1,16 @@
+import time
 from PyQt6.QtGui import QIcon, QFont, QLinearGradient, QPainter, QPen
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSizePolicy, QFrame, QDialog, QComboBox, QLineEdit
 from PyQt6.QtCore import Qt, QSize, QUrl, QRect
+from PyQt6.QtWebEngineCore import QWebEngineProfile
 from src.logic.GameLogic import GameLogic
 from src.gui.components.WikipediaTheme import WikipediaTheme
 from src.gui.components.ConfettiEffect import ConfettiWidget
 from src.logic.ThemeManager import theme_manager
+
+# Import the URL interceptor
+from src.gui.components.UrlInterceptor import WikipediaUrlInterceptor
 
 
 class HomePage(QWidget):
@@ -116,8 +121,18 @@ class HomePage(QWidget):
         self.webView = QWebEngineView()
         self.webView.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         
-        # Set up Wikipedia theme using the official mwclientpreferences cookie
-        WikipediaTheme.setupTheme(self.webView, theme_manager.get_theme())
+        # OPTIMIZED: Set up persistent profile with disk cache for better performance
+        profile = QWebEngineProfile.defaultProfile()
+        profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
+        profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
+        profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
+        
+        # Set up URL interceptor to handle useskin=vector-2022 before navigation
+        self.url_interceptor = WikipediaUrlInterceptor()
+        profile.setUrlRequestInterceptor(self.url_interceptor)
+        
+        # OPTIMIZED: Set up Wikipedia theme with navigation hiding in one go
+        WikipediaTheme.setupThemeWithNavigation(self.webView, theme_manager.get_theme())
         
         # Hide the webview initially to prevent flash of light content
         self.webView.setVisible(False)
@@ -136,9 +151,8 @@ class HomePage(QWidget):
         
         self.layout.addWidget(self.contentFrame)
         
-        # Show the webview after a brief delay to ensure dark theme is applied
-        from PyQt6.QtCore import QTimer
-        QTimer.singleShot(100, self.showWebView)
+        # OPTIMIZED: No delay needed - theme is applied instantly at DocumentCreation
+        self.webView.setVisible(True)
         
         # Apply initial styling after all widgets are created
         self.updateButtonStyling()
@@ -187,23 +201,20 @@ class HomePage(QWidget):
             print(f"🔧 WikiRace: HomePage - Attempting to force {current_theme} theme as fallback...")
             WikipediaTheme.forceTheme(self.webView, current_theme)
             
-            # Hide Wikipedia navigation elements to show only main content
-            print("🔧 WikiRace: HomePage - Hiding Wikipedia navigation elements...")
-            WikipediaTheme.hideNavigationElements(self.webView)
+            # OPTIMIZED: Navigation elements are hidden automatically by DOMContentLoaded script
+            print(f"✅ WikiRace: [{time.time():.3f}] HomePage - Navigation elements handled by automatic script")
             
             self.darkModeApplied = True
         else:
             print("❌ WikiRace: HomePage - Page load failed")
 
     def onUrlChanged(self, url):
-        """Handle URL changes - ensure Vector 2022 skin is used"""
-        # Ensure the new URL uses Vector 2022 skin for theme support
+        """Handle URL changes - URL interceptor handles useskin parameter automatically"""
         url_str = url.toString()
-        if "wikipedia.org" in url_str and "useskin=vector-2022" not in url_str:
-            new_url = WikipediaTheme.ensureVector2022Skin(url_str)
-            if new_url != url_str:
-                self.webView.load(QUrl(new_url))
-                return
+        print(f"🔄 WikiRace: HomePage - URL changed to: {url_str}")
+        
+        # OPTIMIZED: URL interceptor handles useskin=vector-2022 automatically
+        # No need to reload - prevents redirect loops and double loading
         self.darkModeApplied = False  # Reset flag for new page
         
         # Schedule hiding navigation elements after a brief delay to ensure page is loaded
@@ -235,18 +246,24 @@ class HomePage(QWidget):
                 custom_starting_page = dialog.customStartPageEdit.text() if starting_page_choice == 'Custom' else starting_page_choice
                 custom_ending_page = dialog.customEndPageEdit.text() if ending_page_choice == 'Custom' else ending_page_choice
 
-                self.start_url, self.end_url = self.game_logic_instance.startGame(self, custom_starting_page, custom_ending_page)
-                self.addSoloGameTab(self.start_url, self.end_url)
+                result = self.game_logic_instance.startGame(self, custom_starting_page, custom_ending_page)
+                if len(result) == 4:
+                    self.start_url, self.end_url, self.start_title, self.end_title = result
+                else:
+                    # Backward compatibility
+                    self.start_url, self.end_url = result
+                    self.start_title, self.end_title = None, None
+                self.addSoloGameTab(self.start_url, self.end_url, self.start_title, self.end_title)
 
-    def addSoloGameTab(self, start_url, end_url):
+    def addSoloGameTab(self, start_url, end_url, start_title=None, end_title=None):
         if not hasattr(self.mainApplication, 'soloGamePage'):
-            self.mainApplication.addSoloGameTab(start_url, end_url)
+            self.mainApplication.addSoloGameTab(start_url, end_url, start_title, end_title)
             index = self.tabWidget.indexOf(self.mainApplication.soloGamePage)
             self.tabWidget.setCurrentIndex(index)
         else:
             index = self.tabWidget.indexOf(self.mainApplication.soloGamePage)
             self.mainApplication.closeTab(index)
-            self.mainApplication.addSoloGameTab(start_url, end_url)
+            self.mainApplication.addSoloGameTab(start_url, end_url, start_title, end_title)
             self.tabWidget.setCurrentIndex(index)
 
     def onMultiplayerClicked(self):
@@ -402,8 +419,8 @@ class HomePage(QWidget):
             current_url = self.webView.url().toString()
             if current_url and "wikipedia.org" in current_url:
                 print(f"🔄 WikiRace: Refreshing Wikipedia page to apply {theme_manager.get_theme()} theme")
-                # Re-setup theme for the webview
-                WikipediaTheme.setupTheme(self.webView, theme_manager.get_theme())
+                # OPTIMIZED: Re-setup theme with navigation hiding in one go
+                WikipediaTheme.setupThemeWithNavigation(self.webView, theme_manager.get_theme())
                 # Reload the page
                 self.webView.reload()
     
@@ -586,9 +603,87 @@ class CustomGameDialog(QDialog):
         """)
         
     def startGameAndClose(self):
-        # Here you can add any logic you need before closing the dialog
-        self.startGameButton.clicked.connect(lambda: self.startGameAndClose(self.homePage))  # Assuming homePage is accessible. If not, adjust accordingly.
-        self.accept()  # This will close the dialog
+        """Validate custom pages and start the game"""
+        # Get the selected options
+        starting_page_choice = self.startPageCombo.currentText()
+        ending_page_choice = self.endPageCombo.currentText()
+        
+        # Check if custom pages need validation
+        if starting_page_choice == 'Custom':
+            custom_start = self.customStartPageEdit.text().strip()
+            if not custom_start:
+                self.showWarning("Please enter a starting page name.")
+                return
+            
+            # Validate starting page exists
+            url, title = self.homePage.game_logic_instance.findWikiPageWithTitle(custom_start)
+            if url is None:
+                self.showWarning(f'No page named "{custom_start}" exists. Please try something else.')
+                return
+        
+        if ending_page_choice == 'Custom':
+            custom_end = self.customEndPageEdit.text().strip()
+            if not custom_end:
+                self.showWarning("Please enter a destination page name.")
+                return
+            
+            # Validate ending page exists
+            url, title = self.homePage.game_logic_instance.findWikiPageWithTitle(custom_end)
+            if url is None:
+                self.showWarning(f'No page named "{custom_end}" exists. Please try something else.')
+                return
+        
+        # If we get here, validation passed
+        self.accept()  # Close the dialog
+    
+    def showWarning(self, message):
+        """Show a warning dialog to the user"""
+        from PyQt6.QtWidgets import QMessageBox
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Icon.Warning)
+        msg.setWindowTitle("Page Not Found")
+        msg.setText(message)
+        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+        
+        # Apply theme to the message box
+        styles = theme_manager.get_theme_styles()
+        msg.setStyleSheet(f"""
+            QMessageBox {{
+                background-color: {styles['background_color']};
+                color: {styles['text_color']};
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+                font-size: 14px;
+            }}
+            QMessageBox QLabel {{
+                color: {styles['text_color']};
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+                font-size: 14px;
+                background-color: transparent;
+            }}
+            QMessageBox QPushButton {{
+                background-color: {styles['secondary_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['border_color']};
+                border-radius: 8px;
+                padding: 8px 16px;
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+                font-weight: 500;
+                min-width: 80px;
+            }}
+            QMessageBox QPushButton:hover {{
+                background-color: {styles['button_hover']};
+                border-color: {styles['border_hover']};
+            }}
+            QMessageBox QPushButton:pressed {{
+                background-color: {styles['button_pressed']};
+                border-color: {styles['border_pressed']};
+            }}
+            QMessageBox QIcon {{
+                background-color: transparent;
+            }}
+        """)
+        
+        msg.exec()
 
     def toggleCustomEntry(self):
         isCustomStart = self.startPageCombo.currentText() == 'Custom'

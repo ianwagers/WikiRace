@@ -49,14 +49,14 @@ class MainApplication(QMainWindow):
         # Apply initial theme
         self.apply_theme()
 
-    def addSoloGameTab(self, start_url, end_url):
+    def addSoloGameTab(self, start_url, end_url, start_title=None, end_title=None):
         # Adds the Solo Game tab only if it doesn't exist
         if not hasattr(self, 'soloGamePage'):
-            self.soloGamePage = SoloGamePage(self.tabWidget, start_url, end_url)
+            self.soloGamePage = SoloGamePage(self.tabWidget, start_url, end_url, start_title, end_title)
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
         else:
             self.closeTab(self.tabWidget.indexOf(self.soloGamePage))
-            self.soloGamePage = SoloGamePage(self.tabWidget, start_url, end_url)
+            self.soloGamePage = SoloGamePage(self.tabWidget, start_url, end_url, start_title, end_title)
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
 
     def addMultiplayerTab(self):

@@ -103,8 +103,57 @@ class GameLogic(QObject):
             case _:
                 end_url = self.findWikiPage(end_url)
                
-        # Notify the UI to open a new game tab with the start and end URLs
-        return start_url, end_url
+        # Get titles for the URLs (for custom pages)
+        start_title = None
+        end_title = None
+        
+        # If these are custom pages (not from categories), try to get titles
+        if start_url and ("curid=" in start_url):
+            # This is a custom page from search, try to get the title
+            try:
+                start_title = self._getTitleFromSearchUrl(start_url)
+            except:
+                pass
+        
+        if end_url and ("curid=" in end_url):
+            # This is a custom page from search, try to get the title
+            try:
+                end_title = self._getTitleFromSearchUrl(end_url)
+            except:
+                pass
+        
+        # Notify the UI to open a new game tab with the start and end URLs and titles
+        return start_url, end_url, start_title, end_title
+    
+    def _getTitleFromSearchUrl(self, url):
+        """Helper method to get title from a curid URL"""
+        # This is a simple cache-like approach - in a real app you might want to cache this
+        import urllib.parse
+        parsed = urllib.parse.urlparse(url)
+        query_params = urllib.parse.parse_qs(parsed.query)
+        if "curid" in query_params:
+            page_id = query_params["curid"][0]
+            
+            # Make a quick API call to get the title
+            api_url = "https://en.wikipedia.org/w/api.php"
+            headers = {'User-Agent': 'WikiRace Game/1.0 (https://github.com/ianwagers/wikirace)'}
+            params = {
+                "action": "query",
+                "pageids": page_id,
+                "format": "json"
+            }
+            
+            try:
+                import requests
+                response = requests.get(api_url, params=params, headers=headers, timeout=5)
+                data = response.json()
+                pages = data.get("query", {}).get("pages", {})
+                for page_data in pages.values():
+                    return page_data.get("title", None)
+            except:
+                pass
+        
+        return None
 
     def getLinkFromCategory(self, category):
         match category:
@@ -172,18 +221,19 @@ class GameLogic(QObject):
 
             # Check if search results are present
             if data["query"]["search"]:
-                # Extract the page ID of the top search result
+                # Extract the page ID and title of the top search result
                 page_id = data["query"]["search"][0]["pageid"]
+                page_title = data["query"]["search"][0]["title"]
 
                 # Construct the URL to the Wikipedia page
                 wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
 
-                print(f"Found Wikipedia page: {wiki_url}")
+                print(f"Found Wikipedia page: {wiki_url} (Title: {page_title})")
                 return wiki_url
             else:
                 # Handle the case where no results are found
                 print(f"No results found for '{search_text}'. Using fallback.")
-                return self.getRandomWikiLink()
+                return None  # Return None to indicate no page found
         except requests.exceptions.RequestException as e:
             print(f"Error searching for '{search_text}': {e}")
             print("Using fallback random page...")
@@ -192,6 +242,42 @@ class GameLogic(QObject):
             print(f"Unexpected error searching for '{search_text}': {e}")
             print("Using fallback random page...")
             return self.getRandomWikiLink()
+    
+    def findWikiPageWithTitle(self, search_text):
+        """Find a Wikipedia page and return both URL and title, or None if not found"""
+        api_url = "https://en.wikipedia.org/w/api.php"
+
+        headers = {
+            'User-Agent': 'WikiRace Game/1.0 (https://github.com/ianwagers/wikirace)'
+        }
+
+        params = {
+            "action": "query",
+            "list": "search",
+            "srsearch": search_text,
+            "format": "json",
+            "srlimit": 1
+        }
+
+        try:
+            response = requests.get(api_url, params=params, headers=headers, timeout=10)
+            response.raise_for_status()
+
+            data = response.json()
+
+            if data["query"]["search"]:
+                page_id = data["query"]["search"][0]["pageid"]
+                page_title = data["query"]["search"][0]["title"]
+                wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
+
+                print(f"Found Wikipedia page: {wiki_url} (Title: {page_title})")
+                return wiki_url, page_title
+            else:
+                print(f"No results found for '{search_text}'.")
+                return None, None
+        except Exception as e:
+            print(f"Error searching for '{search_text}': {e}")
+            return None, None
         
     # In the future this will be saved in some kind of external doc/database
     def initGameDatabase(self):

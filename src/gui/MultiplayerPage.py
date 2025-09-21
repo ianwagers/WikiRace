@@ -1,47 +1,57 @@
 
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
 from PyQt6.QtCore import Qt
+from src.logic.ThemeManager import theme_manager
 
 class MultiplayerPage(QWidget):
     def __init__(self, tabWidget, parent=None):
         super().__init__(parent)
         self.tabWidget = tabWidget
         self.initUI()
+        self.apply_theme()
+        
+        # Connect to theme changes
+        theme_manager.theme_changed.connect(self.apply_theme)
 
-    def initUI(self):
-        # Apply dark mode styling
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #101418;
-                color: #E0E0E0;
+    def apply_theme(self):
+        """Apply theme-based styles to the multiplayer page"""
+        styles = theme_manager.get_theme_styles()
+        
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {styles['background_color']};
+                color: {styles['text_color']};
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-            }
-            QLabel {
-                color: #E0E0E0;
+            }}
+            QLabel {{
+                color: {styles['text_color']};
                 font-size: 24px;
                 font-weight: bold;
                 padding: 20px;
-            }
-            QPushButton {
-                background-color: #2D2D2D;
-                color: #FFFFFF;
-                border: 1px solid #404040;
+                background-color: transparent;
+            }}
+            QPushButton {{
+                background-color: {styles['secondary_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['border_color']};
                 border-radius: 8px;
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
                 font-size: 16px;
                 font-weight: 600;
                 padding: 16px 24px;
                 margin: 8px;
-            }
-            QPushButton:hover {
-                background-color: #3E3E3E;
-                border-color: #00FFFF;
-            }
-            QPushButton:pressed {
-                background-color: #1E1E1E;
-                border-color: #8A2BE2;
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {styles['button_hover']};
+                border-color: {styles['border_hover']};
+            }}
+            QPushButton:pressed {{
+                background-color: {styles['button_pressed']};
+                border-color: {styles['border_pressed']};
+            }}
         """)
+
+    def initUI(self):
         
         # Main layout
         self.layout = QVBoxLayout(self)
