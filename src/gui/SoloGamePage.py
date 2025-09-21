@@ -5,8 +5,9 @@ from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineProfile, QWebEngineS
 from PyQt6.QtGui import QIcon
 from bs4 import BeautifulSoup
 import requests
-from src.gui.components.WikipediaDarkTheme import WikipediaDarkTheme
+from src.gui.components.WikipediaTheme import WikipediaTheme
 from src.gui.components.ConfettiEffect import ConfettiWidget
+from src.logic.ThemeManager import theme_manager
 
 class SoloGamePage(QWidget):
 
@@ -60,14 +61,15 @@ class SoloGamePage(QWidget):
         # Initialize and configure the web view with Wikipedia dark theme
         self.webView = QWebEngineView()
         
-        # Set up Wikipedia dark theme using the official mwclientpreferences cookie
-        WikipediaDarkTheme.setupDarkTheme(self.webView)
+        # Set up Wikipedia theme using the official mwclientpreferences cookie
+        WikipediaTheme.setupTheme(self.webView, theme_manager.get_theme())
         
         # Hide the webview initially to prevent flash of light content
         self.webView.setVisible(False)
         
-        # Set initial dark background to prevent any flash
-        self.webView.setStyleSheet("background-color: #101418;")
+        # Set initial background to prevent any flash
+        styles = theme_manager.get_theme_styles()
+        self.webView.setStyleSheet(f"background-color: {styles['background_color']};")
         
         # Connect signals before loading
         self.webView.page().loadStarted.connect(self.onLoadStarted)
@@ -75,9 +77,9 @@ class SoloGamePage(QWidget):
         self.webView.page().loadFinished.connect(self.onPageLoaded)
         self.webView.urlChanged.connect(self.onUrlChanged)
         
-        # Ensure Vector 2022 skin is used for dark mode support
-        start_url_with_skin = WikipediaDarkTheme.ensureVector2022Skin(self.start_url)
-        end_url_with_skin = WikipediaDarkTheme.ensureVector2022Skin(self.end_url)
+        # Ensure Vector 2022 skin is used for theme support
+        start_url_with_skin = WikipediaTheme.ensureVector2022Skin(self.start_url)
+        end_url_with_skin = WikipediaTheme.ensureVector2022Skin(self.end_url)
         
         # Update the URLs to use Vector 2022 skin
         self.start_url = start_url_with_skin
@@ -113,32 +115,37 @@ class SoloGamePage(QWidget):
         # Create confetti widget (initially hidden)
         self.confetti_widget = ConfettiWidget(self)
         self.confetti_widget.hide()
+        
+        # Connect to theme changes
+        theme_manager.theme_changed.connect(self.on_theme_changed)
 
     def onLoadStarted(self):
-        """Handle page load started - dark theme is already set via cookies"""
-        print("🚀 WikiRace: Page load started - Wikipedia dark theme should be active via mwclientpreferences cookie")
+        """Handle page load started - theme is already set via cookies"""
+        current_theme = theme_manager.get_theme()
+        print(f"🚀 WikiRace: Page load started - Wikipedia {current_theme} theme should be active via mwclientpreferences cookie")
         print(f"🚀 WikiRace: Loading URL: {self.webView.url().toString()}")
 
     def onPageLoaded(self, success):
-        """Handle page load finished - verify dark theme was applied"""
+        """Handle page load finished - verify theme was applied"""
         if success:
-            print("✅ WikiRace: Page loaded successfully with Wikipedia dark theme")
+            current_theme = theme_manager.get_theme()
+            print(f"✅ WikiRace: Page loaded successfully with Wikipedia {current_theme} theme")
             print(f"✅ WikiRace: Final URL: {self.webView.url().toString()}")
-            # Verify dark mode was applied (for debugging)
-            print("🔍 WikiRace: Running dark mode verification...")
-            WikipediaDarkTheme.verifyDarkModeApplied(self.webView)
+            # Verify theme was applied (for debugging)
+            print(f"🔍 WikiRace: Running {current_theme} mode verification...")
+            WikipediaTheme.verifyDarkModeApplied(self.webView)
             
             # Also check what cookies are actually in the browser
             print("🍪 WikiRace: Checking cookies in browser...")
-            WikipediaDarkTheme.checkCookiesInBrowser(self.webView)
+            WikipediaTheme.checkCookiesInBrowser(self.webView)
             
-            # If dark theme wasn't applied properly, force it
-            print("🔧 WikiRace: Attempting to force dark theme as fallback...")
-            WikipediaDarkTheme.forceDarkTheme(self.webView)
+            # If theme wasn't applied properly, force it
+            print(f"🔧 WikiRace: Attempting to force {current_theme} theme as fallback...")
+            WikipediaTheme.forceTheme(self.webView, current_theme)
             
             # Hide Wikipedia navigation elements to show only main content
             print("🔧 WikiRace: Hiding Wikipedia navigation elements...")
-            WikipediaDarkTheme.hideNavigationElements(self.webView)
+            WikipediaTheme.hideNavigationElements(self.webView)
             
             self.darkModeApplied = True
         else:
@@ -146,10 +153,10 @@ class SoloGamePage(QWidget):
 
     def onUrlChanged(self, url):
         """Handle URL changes - ensure Vector 2022 skin is used"""
-        # Ensure the new URL uses Vector 2022 skin for dark mode support
+        # Ensure the new URL uses Vector 2022 skin for theme support
         url_str = url.toString()
         if "wikipedia.org" in url_str and "useskin=vector-2022" not in url_str:
-            new_url = WikipediaDarkTheme.ensureVector2022Skin(url_str)
+            new_url = WikipediaTheme.ensureVector2022Skin(url_str)
             if new_url != url_str:
                 self.webView.load(QUrl(new_url))
                 return
@@ -157,11 +164,33 @@ class SoloGamePage(QWidget):
         
         # Schedule hiding navigation elements after a brief delay to ensure page is loaded
         from PyQt6.QtCore import QTimer
-        QTimer.singleShot(500, lambda: WikipediaDarkTheme.hideNavigationElements(self.webView))
+        QTimer.singleShot(500, lambda: WikipediaTheme.hideNavigationElements(self.webView))
 
     def showWebView(self):
-        """Show the webview after dark theme has been applied"""
+        """Show the webview after theme has been applied"""
         self.webView.setVisible(True)
+    
+    def refreshWikipediaPage(self):
+        """Refresh the Wikipedia page to apply new theme"""
+        if hasattr(self, 'webView') and self.webView:
+            current_url = self.webView.url().toString()
+            if current_url and "wikipedia.org" in current_url:
+                print(f"🔄 WikiRace: Refreshing Wikipedia page to apply {theme_manager.get_theme()} theme")
+                # Re-setup theme for the webview
+                WikipediaTheme.setupTheme(self.webView, theme_manager.get_theme())
+                # Reload the page
+                self.webView.reload()
+    
+    def on_theme_changed(self, theme):
+        """Handle theme changes"""
+        print(f"🎨 WikiRace: SoloGamePage - Theme changed to: {theme}")
+        
+        # Update webview background
+        styles = theme_manager.get_theme_styles()
+        self.webView.setStyleSheet(f"background-color: {styles['background_color']};")
+        
+        # Refresh Wikipedia page to apply new theme
+        self.refreshWikipediaPage()
 
     def getTitleFromUrl(self, url):
         try:
@@ -309,31 +338,37 @@ class EndGameDialog(QDialog):
         self.setWindowTitle("Game Over")
         self.setWindowIcon(QIcon('C:/Project_Workspace/WikiRace/src/resources/icons/game_icon.ico'))
         # self.setWindowIcon(QIcon(self.projectPath + 'resources/icons/game_icon.ico'))
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #101418;
-                color: #E0E0E0;
-            }
-            QLabel {
-                color: #E0E0E0;
+        self.apply_theme()
+        self.setFixedSize(400, 280)  # Further increased size to prevent text cutoff
+        self.initUI()
+    
+    def apply_theme(self):
+        """Apply theme-based styles to the dialog"""
+        styles = theme_manager.get_theme_styles()
+        
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {styles['background_color']};
+                color: {styles['text_color']};
+            }}
+            QLabel {{
+                color: {styles['text_color']};
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-            }
-            QPushButton {
-                background-color: #2D2D2D;
-                color: #FFFFFF;
-                border: 1px solid #404040;
+            }}
+            QPushButton {{
+                background-color: {styles['secondary_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['border_color']};
                 border-radius: 8px;
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
                 font-weight: 600;
                 padding: 12px 24px;
-            }
-            QPushButton:hover {
-                background-color: #3E3E3E;
-                border-color: #00FFFF;
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {styles['button_hover']};
+                border-color: {styles['border_hover']};
+            }}
         """)
-        self.setFixedSize(400, 280)  # Further increased size to prevent text cutoff
-        self.initUI()
 
     def initUI(self):
         layout = QVBoxLayout(self)

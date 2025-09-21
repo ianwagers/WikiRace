@@ -18,7 +18,7 @@ src/gui/__init__.py
 src/gui/components/ConfettiEffect.py
 src/gui/components/CustomTimer.py
 src/gui/components/LinkHistory.py
-src/gui/components/WikipediaDarkTheme.py
+src/gui/components/WikipediaTheme.py
 src/gui/components/__init__.py
 src/logic/GameLogic.py
 src/logic/Network.py

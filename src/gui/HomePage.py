@@ -3,8 +3,9 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSizePolicy, QFrame, QDialog, QComboBox, QLineEdit
 from PyQt6.QtCore import Qt, QSize, QUrl, QRect
 from src.logic.GameLogic import GameLogic
-from src.gui.components.WikipediaDarkTheme import WikipediaDarkTheme
+from src.gui.components.WikipediaTheme import WikipediaTheme
 from src.gui.components.ConfettiEffect import ConfettiWidget
+from src.logic.ThemeManager import theme_manager
 
 
 class HomePage(QWidget):
@@ -37,45 +38,7 @@ class HomePage(QWidget):
         # Title Image - WIKIRACE Logo (single word with WIKI as one block and RACE with gradient)
         self.titleImage = QLabel()
         # Use HTML to create the stylized WIKIRACE text with WIKI as one block and RACE with gradient
-        self.titleImage.setText("""
-        <html>
-        <head>
-        <style>
-        .wikirace-logo {
-            font-family: 'Linux Libertine', 'Times New Roman', 'Times', serif;
-            font-size: 36px;
-            font-weight: 400;
-            color: #ffffff;
-            background: #101418;
-            letter-spacing: 1px;
-            font-style: normal;
-            padding: 1px 16px;
-            border-radius: 6px;
-        }
-        .large-w {
-            font-size: 48px;
-            font-weight: 600;
-        }
-        .race-text {
-            font-family: 'Linux Libertine', 'Times New Roman', 'Times', serif;
-            font-size: 36px;
-            font-weight: 400;
-            background: linear-gradient(90deg, #00FFFF 0%, #8A2BE2 50%, #FF00FF 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-style: italic;
-            letter-spacing: 1px;
-        }
-        </style>
-        </head>
-        <body>
-        <div class="wikirace-logo">
-            <span class="large-w">W</span>IKIRACE</span>
-        </div>
-        </body>
-        </html>
-        """)
+        self.updateTitleStyling()
         
         self.titleImage.setScaledContents(True)
         self.titleImage.setMaximumSize(280, 50)
@@ -111,14 +74,6 @@ class HomePage(QWidget):
 
         # Frame for the buttons with refined card styling
         self.buttonsFrame = QFrame()
-        self.buttonsFrame.setStyleSheet("""
-            QFrame {
-                background-color: #2D2D2D;
-                border-radius: 8px;
-                border: 1px solid #404040;
-                padding: 8px;
-            }
-        """)
         # Set maximum width to prevent floating appearance
         self.buttonsFrame.setMaximumWidth(400)
         self.buttonsLayout = QHBoxLayout(self.buttonsFrame)
@@ -131,85 +86,11 @@ class HomePage(QWidget):
         self.soloGameButton.setMinimumHeight(36)
         self.soloGameButton.setMinimumWidth(115)
         self.soloGameButton.setMaximumWidth(145)
-        self.soloGameButton.setStyleSheet("""
-            QPushButton {
-                background-color: #2D2D2D;
-                color: #FFFFFF;
-                border: 1px solid #3a3a3a;
-                border-radius: 8px;
-                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-                font-size: 13px;
-                font-weight: 500;
-                padding: 0 14px;
-                height: 36px;
-            }
-            QPushButton:hover {
-                background-color: #2f2f2f;
-                border-color: #00FFFF;
-            }
-            QPushButton:pressed {
-                background-color: #1E1E1E;
-                border-color: #8A2BE2;
-            }
-            QPushButton:focus {
-                outline: none;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:focus-visible {
-                outline: none;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:checked {
-                background-color: #2D2D2D;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:selected {
-                background-color: #2D2D2D;
-                border: 1px solid #3a3a3a;
-            }
-        """)
 
         self.multiplayerButton = QPushButton("Multiplayer")
         self.multiplayerButton.setMinimumHeight(36)
         self.multiplayerButton.setMinimumWidth(115)
         self.multiplayerButton.setMaximumWidth(145)
-        self.multiplayerButton.setStyleSheet("""
-            QPushButton {
-                background-color: #2D2D2D;
-                color: #FFFFFF;
-                border: 1px solid #3a3a3a;
-                border-radius: 8px;
-                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-                font-size: 13px;
-                font-weight: 500;
-                padding: 0 14px;
-                height: 36px;
-            }
-            QPushButton:hover {
-                background-color: #2f2f2f;
-                border-color: #00FFFF;
-            }
-            QPushButton:pressed {
-                background-color: #1E1E1E;
-                border-color: #8A2BE2;
-            }
-            QPushButton:focus {
-                outline: none;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:focus-visible {
-                outline: none;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:checked {
-                background-color: #2D2D2D;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:selected {
-                background-color: #2D2D2D;
-                border: 1px solid #3a3a3a;
-            }
-        """)
 
         self.soloGameButton.setCheckable(True)
         self.multiplayerButton.setCheckable(True)
@@ -218,43 +99,6 @@ class HomePage(QWidget):
         self.settingsButton.setMinimumHeight(36)
         self.settingsButton.setMinimumWidth(115)
         self.settingsButton.setMaximumWidth(145)
-        self.settingsButton.setStyleSheet("""
-            QPushButton {
-                background-color: #2D2D2D;
-                color: #FFFFFF;
-                border: 1px solid #3a3a3a;
-                border-radius: 8px;
-                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-                font-size: 13px;
-                font-weight: 500;
-                padding: 0 14px;
-                height: 36px;
-            }
-            QPushButton:hover {
-                background-color: #2f2f2f;
-                border-color: #00FFFF;
-            }
-            QPushButton:pressed {
-                background-color: #1E1E1E;
-                border-color: #8A2BE2;
-            }
-            QPushButton:focus {
-                outline: none;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:focus-visible {
-                outline: none;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:checked {
-                background-color: #2D2D2D;
-                border: 1px solid #3a3a3a;
-            }
-            QPushButton:selected {
-                background-color: #2D2D2D;
-                border: 1px solid #3a3a3a;
-            }
-        """)
 
         # Adding buttons to the layout
         self.buttonsLayout.addWidget(self.soloGameButton)
@@ -263,31 +107,17 @@ class HomePage(QWidget):
 
         self.layout.addWidget(self.buttonsFrame)
 
-        # Wikipedia content area with dark theme container
+        # Wikipedia content area with theme container
         self.contentFrame = QFrame()
-        self.contentFrame.setStyleSheet("""
-            QFrame {
-                background-color: #101418;
-                border-radius: 12px;
-                border: 1px solid #2a2a2a;
-                margin: 10px;
-            }
-        """)
         self.contentLayout = QVBoxLayout(self.contentFrame)
         self.contentLayout.setContentsMargins(0, 0, 0, 0)
         
-        # Web view with Wikipedia dark theme
+        # Web view with Wikipedia theme
         self.webView = QWebEngineView()
         self.webView.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        self.webView.setStyleSheet("""
-            QWebEngineView {
-                background-color: #101418;
-                border-radius: 12px;
-            }
-        """)
         
-        # Set up Wikipedia dark theme using the official mwclientpreferences cookie
-        WikipediaDarkTheme.setupDarkTheme(self.webView)
+        # Set up Wikipedia theme using the official mwclientpreferences cookie
+        WikipediaTheme.setupTheme(self.webView, theme_manager.get_theme())
         
         # Hide the webview initially to prevent flash of light content
         self.webView.setVisible(False)
@@ -297,8 +127,8 @@ class HomePage(QWidget):
         self.webView.page().loadFinished.connect(self.onPageLoaded)
         self.webView.urlChanged.connect(self.onUrlChanged)
         
-        # Ensure Vector 2022 skin is used for dark mode support
-        main_page_url = WikipediaDarkTheme.ensureVector2022Skin("https://en.wikipedia.org/wiki/Main_Page")
+        # Ensure Vector 2022 skin is used for theme support
+        main_page_url = WikipediaTheme.ensureVector2022Skin("https://en.wikipedia.org/wiki/Main_Page")
         
         # Start loading the page
         self.webView.load(QUrl(main_page_url))
@@ -309,6 +139,10 @@ class HomePage(QWidget):
         # Show the webview after a brief delay to ensure dark theme is applied
         from PyQt6.QtCore import QTimer
         QTimer.singleShot(100, self.showWebView)
+        
+        # Apply initial styling after all widgets are created
+        self.updateButtonStyling()
+        self.updateContentFrameStyling()
 
         # Set the layout for the widget
         self.setLayout(self.layout)
@@ -324,33 +158,38 @@ class HomePage(QWidget):
         # Create confetti widget (initially hidden)
         self.confetti_widget = ConfettiWidget(self)
         self.confetti_widget.hide()
+        
+        # Connect to theme changes
+        theme_manager.theme_changed.connect(self.on_theme_changed)
 
 
     def onLoadStarted(self):
-        """Handle page load started - dark theme is already set via cookies"""
-        print("🚀 WikiRace: HomePage - Page load started - Wikipedia dark theme should be active via mwclientpreferences cookie")
+        """Handle page load started - theme is already set via cookies"""
+        current_theme = theme_manager.get_theme()
+        print(f"🚀 WikiRace: HomePage - Page load started - Wikipedia {current_theme} theme should be active via mwclientpreferences cookie")
         print(f"🚀 WikiRace: HomePage - Loading URL: {self.webView.url().toString()}")
 
     def onPageLoaded(self, success):
-        """Handle page load finished - verify dark theme was applied"""
+        """Handle page load finished - verify theme was applied"""
         if success:
-            print("✅ WikiRace: HomePage - Page loaded successfully with Wikipedia dark theme")
+            current_theme = theme_manager.get_theme()
+            print(f"✅ WikiRace: HomePage - Page loaded successfully with Wikipedia {current_theme} theme")
             print(f"✅ WikiRace: HomePage - Final URL: {self.webView.url().toString()}")
-            # Verify dark mode was applied (for debugging)
-            print("🔍 WikiRace: HomePage - Running dark mode verification...")
-            WikipediaDarkTheme.verifyDarkModeApplied(self.webView)
+            # Verify theme was applied (for debugging)
+            print(f"🔍 WikiRace: HomePage - Running {current_theme} mode verification...")
+            WikipediaTheme.verifyDarkModeApplied(self.webView)
             
             # Also check what cookies are actually in the browser
             print("🍪 WikiRace: HomePage - Checking cookies in browser...")
-            WikipediaDarkTheme.checkCookiesInBrowser(self.webView)
+            WikipediaTheme.checkCookiesInBrowser(self.webView)
             
-            # If dark theme wasn't applied properly, force it
-            print("🔧 WikiRace: HomePage - Attempting to force dark theme as fallback...")
-            WikipediaDarkTheme.forceDarkTheme(self.webView)
+            # If theme wasn't applied properly, force it
+            print(f"🔧 WikiRace: HomePage - Attempting to force {current_theme} theme as fallback...")
+            WikipediaTheme.forceTheme(self.webView, current_theme)
             
             # Hide Wikipedia navigation elements to show only main content
             print("🔧 WikiRace: HomePage - Hiding Wikipedia navigation elements...")
-            WikipediaDarkTheme.hideNavigationElements(self.webView)
+            WikipediaTheme.hideNavigationElements(self.webView)
             
             self.darkModeApplied = True
         else:
@@ -358,10 +197,10 @@ class HomePage(QWidget):
 
     def onUrlChanged(self, url):
         """Handle URL changes - ensure Vector 2022 skin is used"""
-        # Ensure the new URL uses Vector 2022 skin for dark mode support
+        # Ensure the new URL uses Vector 2022 skin for theme support
         url_str = url.toString()
         if "wikipedia.org" in url_str and "useskin=vector-2022" not in url_str:
-            new_url = WikipediaDarkTheme.ensureVector2022Skin(url_str)
+            new_url = WikipediaTheme.ensureVector2022Skin(url_str)
             if new_url != url_str:
                 self.webView.load(QUrl(new_url))
                 return
@@ -369,10 +208,10 @@ class HomePage(QWidget):
         
         # Schedule hiding navigation elements after a brief delay to ensure page is loaded
         from PyQt6.QtCore import QTimer
-        QTimer.singleShot(500, lambda: WikipediaDarkTheme.hideNavigationElements(self.webView))
+        QTimer.singleShot(500, lambda: WikipediaTheme.hideNavigationElements(self.webView))
 
     def showWebView(self):
-        """Show the webview after dark theme has been applied"""
+        """Show the webview after theme has been applied"""
         self.webView.setVisible(True)
     
     def triggerConfetti(self):
@@ -422,72 +261,216 @@ class HomePage(QWidget):
         '''
     
     def onSettingsClicked(self):
-        dialog = UnderConstructionDialog(self)
-        dialog.exec()
-        ''' # Placeholder for settings page
         if not hasattr(self.mainApplication, 'settingsPage') or self.tabWidget.indexOf(self.mainApplication.settingsPage) == -1:
             self.mainApplication.addSettingsTab()
         else:
             index = self.tabWidget.indexOf(self.mainApplication.settingsPage)
             self.tabWidget.setCurrentIndex(index)
-        '''
 
     def openLinkInWebView(self, url):
-        # Ensure Vector 2022 skin is used for dark mode support
-        url_with_skin = WikipediaDarkTheme.ensureVector2022Skin(url)
+        # Ensure Vector 2022 skin is used for theme support
+        url_with_skin = WikipediaTheme.ensureVector2022Skin(url)
         # Convert string URL to QUrl object
         qurl = QUrl(url_with_skin)
         self.webView.load(qurl)
-        # Dark mode will be applied automatically via mwclientpreferences cookie
+        # Theme will be applied automatically via mwclientpreferences cookie
+
+    def updateTitleStyling(self):
+        """Update the WIKIRACE title styling based on current theme"""
+        styles = theme_manager.get_theme_styles()
+        
+        self.titleImage.setText(f"""
+        <html>
+        <head>
+        <style>
+        .wikirace-logo {{
+            font-family: 'Linux Libertine', 'Times New Roman', 'Times', serif;
+            font-size: 36px;
+            font-weight: 400;
+            color: {styles['text_color']};
+            background: {styles['background_color']};
+            letter-spacing: 1px;
+            font-style: normal;
+            padding: 1px 16px;
+            border-radius: 6px;
+        }}
+        .large-w {{
+            font-size: 48px;
+            font-weight: 600;
+        }}
+        .race-text {{
+            font-family: 'Linux Libertine', 'Times New Roman', 'Times', serif;
+            font-size: 36px;
+            font-weight: 400;
+            background: linear-gradient(90deg, #00FFFF 0%, #8A2BE2 50%, #FF00FF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-style: italic;
+            letter-spacing: 1px;
+        }}
+        </style>
+        </head>
+        <body>
+        <div class="wikirace-logo">
+            <span class="large-w">W</span>IKIRACE</span>
+        </div>
+        </body>
+        </html>
+        """)
+    
+    def updateButtonStyling(self):
+        """Update button styling based on current theme"""
+        styles = theme_manager.get_theme_styles()
+        
+        # Update buttons frame styling
+        self.buttonsFrame.setStyleSheet(f"""
+            QFrame {{
+                background-color: {styles['card_background']};
+                border-radius: 8px;
+                border: 1px solid {styles['card_border']};
+                padding: 8px;
+            }}
+        """)
+        
+        # Update button styling
+        button_style = f"""
+            QPushButton {{
+                background-color: {styles['secondary_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['border_color']};
+                border-radius: 8px;
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+                font-size: 13px;
+                font-weight: 500;
+                padding: 0 14px;
+                height: 36px;
+            }}
+            QPushButton:hover {{
+                background-color: {styles['button_hover']};
+                border-color: {styles['border_hover']};
+            }}
+            QPushButton:pressed {{
+                background-color: {styles['button_pressed']};
+                border-color: {styles['border_pressed']};
+            }}
+            QPushButton:focus {{
+                outline: none;
+                border: 1px solid {styles['border_color']};
+            }}
+            QPushButton:focus-visible {{
+                outline: none;
+                border: 1px solid {styles['border_color']};
+            }}
+            QPushButton:checked {{
+                background-color: {styles['secondary_background']};
+                border: 1px solid {styles['border_color']};
+            }}
+            QPushButton:selected {{
+                background-color: {styles['secondary_background']};
+                border: 1px solid {styles['border_color']};
+            }}
+        """
+        
+        self.soloGameButton.setStyleSheet(button_style)
+        self.multiplayerButton.setStyleSheet(button_style)
+        self.settingsButton.setStyleSheet(button_style)
+    
+    def updateContentFrameStyling(self):
+        """Update content frame styling based on current theme"""
+        styles = theme_manager.get_theme_styles()
+        
+        self.contentFrame.setStyleSheet(f"""
+            QFrame {{
+                background-color: {styles['background_color']};
+                border-radius: 12px;
+                border: 1px solid {styles['border_color']};
+                margin: 10px;
+            }}
+        """)
+        
+        self.webView.setStyleSheet(f"""
+            QWebEngineView {{
+                background-color: {styles['background_color']};
+                border-radius: 12px;
+            }}
+        """)
+    
+    def refreshWikipediaPage(self):
+        """Refresh the Wikipedia page to apply new theme"""
+        if hasattr(self, 'webView') and self.webView:
+            current_url = self.webView.url().toString()
+            if current_url and "wikipedia.org" in current_url:
+                print(f"🔄 WikiRace: Refreshing Wikipedia page to apply {theme_manager.get_theme()} theme")
+                # Re-setup theme for the webview
+                WikipediaTheme.setupTheme(self.webView, theme_manager.get_theme())
+                # Reload the page
+                self.webView.reload()
+    
+    def on_theme_changed(self, theme):
+        """Handle theme changes"""
+        print(f"🎨 WikiRace: HomePage - Theme changed to: {theme}")
+        
+        # Update all styling
+        self.updateTitleStyling()
+        self.updateButtonStyling()
+        self.updateContentFrameStyling()
+        self.setStyles()
+        
+        # Refresh Wikipedia page to apply new theme
+        self.refreshWikipediaPage()
 
     def setStyles(self):
-        self.setStyleSheet("""
-        QWidget {
-            background-color: #101418; /* Updated dark background */
-            color: #E0E0E0; /* Light text */
+        """Apply theme-based styles"""
+        styles = theme_manager.get_theme_styles()
+        
+        self.setStyleSheet(f"""
+        QWidget {{
+            background-color: {styles['background_color']};
+            color: {styles['text_color']};
             font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-        }
+        }}
 
-        QLabel {
-            color: #E0E0E0;
+        QLabel {{
+            color: {styles['text_color']};
             font-size: 14px;
             font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-        }
+        }}
 
-        QMainWindow {
-            background-color: #101418; /* Updated dark main window background */
-        }
+        QMainWindow {{
+            background-color: {styles['background_color']};
+        }}
         """)
 
-        # Dark Theme for QTabWidget
-        self.tabWidget.setStyleSheet("""
-        QTabWidget::pane {
-            border-top: 2px solid #404040;
-            background-color: #101418;
-        }
+        # Theme for QTabWidget
+        self.tabWidget.setStyleSheet(f"""
+        QTabWidget::pane {{
+            border-top: 2px solid {styles['border_color']};
+            background-color: {styles['background_color']};
+        }}
 
-        QTabBar::tab {
-            background: #2D2D2D;
-            color: #E0E0E0;
+        QTabBar::tab {{
+            background: {styles['tab_background']};
+            color: {styles['tab_text']};
             padding: 8px 16px;
-            border: 1px solid #404040;
-            border-bottom-color: #2D2D2D;
+            border: 1px solid {styles['border_color']};
+            border-bottom-color: {styles['tab_background']};
             border-radius: 6px 6px 0px 0px;
             margin-right: 2px;
             font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
             font-weight: 500;
-        }
+        }}
 
-        QTabBar::tab:selected, QTabBar::tab:hover {
-            background: #3E3E3E;
-            color: #00FFFF;
-            border-color: #00FFFF;
-        }
+        QTabBar::tab:selected, QTabBar::tab:hover {{
+            background: {styles['tab_selected']};
+            color: {styles['tab_text_selected']};
+            border-color: {styles['border_hover']};
+        }}
 
-        QWidget {
-            background-color: #101418;
-            color: #E0E0E0;
-        }
+        QWidget {{
+            background-color: {styles['background_color']};
+            color: {styles['text_color']};
+        }}
         """)
 
 class CustomGameDialog(QDialog):
@@ -495,58 +478,14 @@ class CustomGameDialog(QDialog):
         super().__init__(homePage)
         self.homePage = homePage
         self.setWindowTitle('Race Setup')
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #101418;
-                color: #E0E0E0;
-            }
-            QLabel {
-                color: #E0E0E0;
-                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-            }
-            QComboBox {
-                background-color: #2D2D2D;
-                color: #E0E0E0;
-                border: 1px solid #404040;
-                border-radius: 6px;
-                padding: 8px;
-                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-            }
-            QComboBox:hover {
-                border-color: #00FFFF;
-            }
-            QLineEdit {
-                background-color: #2D2D2D;
-                color: #E0E0E0;
-                border: 1px solid #404040;
-                border-radius: 6px;
-                padding: 8px;
-                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-            }
-            QLineEdit:focus {
-                border-color: #00FFFF;
-            }
-            QPushButton {
-                background-color: #2D2D2D;
-                color: #FFFFFF;
-                border: 1px solid #404040;
-                border-radius: 8px;
-                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-                font-weight: 600;
-                padding: 12px 24px;
-            }
-            QPushButton:hover {
-                background-color: #3E3E3E;
-                border-color: #00FFFF;
-            }
-        """)
+        self.apply_theme()
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(20, 20, 20, 20)
 
         # Layout for starting page selection
         startingPageLayout = QHBoxLayout()
         startingPageLabel = QLabel('Starting Page:')
-        startingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #00FFFF; } ") 
+        startingPageLabel.setObjectName("sectionLabel")
         self.startPageCombo = QComboBox()
         self.startPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Random', 'Custom'])
         if self.startPageCombo.currentText() == 'Custom':
@@ -559,13 +498,12 @@ class CustomGameDialog(QDialog):
         self.customStartPageEdit = QLineEdit()
         self.customStartPageEdit.setPlaceholderText('Enter custom starting page')
         self.customStartPageEdit.setEnabled(False)
-        self.customStartPageEdit.setStyleSheet("QLineEdit { background-color: #2D2D2D; color: #E0E0E0; }")
         self.layout.addWidget(self.customStartPageEdit)
 
         # Layout for ending page selection
         endingPageLayout = QHBoxLayout()
         endingPageLabel = QLabel('Ending Page:')
-        endingPageLabel.setStyleSheet("QLabel { font-weight: bold; color: #00FFFF; } ") 
+        endingPageLabel.setObjectName("sectionLabel")
         self.endPageCombo = QComboBox()
         self.endPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Random', 'Custom'])
         if self.endPageCombo.currentText() == 'Custom':
@@ -578,7 +516,6 @@ class CustomGameDialog(QDialog):
         self.customEndPageEdit = QLineEdit()
         self.customEndPageEdit.setPlaceholderText('Enter custom ending page')
         self.customEndPageEdit.setEnabled(False)
-        self.customEndPageEdit.setStyleSheet("QLineEdit { background-color: #2D2D2D; color: #E0E0E0; }")
         self.layout.addWidget(self.customEndPageEdit)
 
         # Start Game button
@@ -592,6 +529,61 @@ class CustomGameDialog(QDialog):
 
         # Set minimum dialog size for better UI experience
         self.setMinimumSize(275, 175)  # Example improvement for resizing
+    
+    def apply_theme(self):
+        """Apply theme-based styles to the dialog"""
+        styles = theme_manager.get_theme_styles()
+        
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {styles['background_color']};
+                color: {styles['text_color']};
+            }}
+            QLabel {{
+                color: {styles['text_color']};
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+            }}
+            QLabel[objectName="sectionLabel"] {{
+                color: {styles['accent_color']};
+                font-weight: bold;
+                font-size: 14px;
+            }}
+            QComboBox {{
+                background-color: {styles['input_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['input_border']};
+                border-radius: 6px;
+                padding: 8px;
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+            }}
+            QComboBox:hover {{
+                border-color: {styles['border_hover']};
+            }}
+            QLineEdit {{
+                background-color: {styles['input_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['input_border']};
+                border-radius: 6px;
+                padding: 8px;
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+            }}
+            QLineEdit:focus {{
+                border-color: {styles['input_focus']};
+            }}
+            QPushButton {{
+                background-color: {styles['secondary_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['border_color']};
+                border-radius: 8px;
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+                font-weight: 600;
+                padding: 12px 24px;
+            }}
+            QPushButton:hover {{
+                background-color: {styles['button_hover']};
+                border-color: {styles['border_hover']};
+            }}
+        """)
         
     def startGameAndClose(self):
         # Here you can add any logic you need before closing the dialog
@@ -605,69 +597,67 @@ class CustomGameDialog(QDialog):
         self.customStartPageEdit.setEnabled(isCustomStart)
         self.customEndPageEdit.setEnabled(isCustomEnd)
         
-        # Change background color based on the selection (dark mode)
-        if isCustomStart:
-            self.customStartPageEdit.setStyleSheet("QLineEdit { background-color: #2D2D2D; color: #E0E0E0; }")
-        else:
-            # Set to the default dark background color
-            self.customStartPageEdit.setStyleSheet("QLineEdit { background-color: #2D2D2D; color: #E0E0E0; }")
-        
-        if isCustomEnd:
-            self.customEndPageEdit.setStyleSheet("QLineEdit { background-color: #2D2D2D; color: #E0E0E0; }")
-        else:
-            # Set to the default dark background color
-            self.customEndPageEdit.setStyleSheet("QLineEdit { background-color: #2D2D2D; color: #E0E0E0; }")
+        # Reapply theme styling to ensure proper colors
+        self.apply_theme()
 
 class UnderConstructionDialog(QDialog):
     def __init__(self, parent=None):
         super(UnderConstructionDialog, self).__init__(parent)
         self.setWindowTitle("Under Construction")
-        self.setStyleSheet("""
-            QDialog {
-                background-color: #101418;
-                color: #E0E0E0;
-            }
-            QLabel {
-                color: #E0E0E0;
+        self.apply_theme()
+        self.setFixedSize(300, 180)
+        self.initUI()
+    
+    def apply_theme(self):
+        """Apply theme-based styles to the dialog"""
+        styles = theme_manager.get_theme_styles()
+        
+        self.setStyleSheet(f"""
+            QDialog {{
+                background-color: {styles['background_color']};
+                color: {styles['text_color']};
+            }}
+            QLabel {{
+                color: {styles['text_color']};
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-            }
-            QPushButton {
-                background-color: #2D2D2D;
-                color: #FFFFFF;
-                border: 1px solid #404040;
+            }}
+            QLabel[objectName="titleLabel"] {{
+                color: {styles['accent_color']};
+                font-size: 20px;
+                font-weight: bold;
+                padding: 10px;
+            }}
+            QLabel[objectName="iconLabel"] {{
+                color: {styles['accent_secondary']};
+                font-size: 40px;
+                padding: 6px;
+            }}
+            QPushButton {{
+                background-color: {styles['secondary_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['border_color']};
                 border-radius: 8px;
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
                 font-weight: 600;
                 padding: 12px 24px;
-            }
-            QPushButton:hover {
-                background-color: #3E3E3E;
-                border-color: #00FFFF;
-            }
+            }}
+            QPushButton:hover {{
+                background-color: {styles['button_hover']};
+                border-color: {styles['border_hover']};
+            }}
         """)
-        self.setFixedSize(300, 180)
-        self.initUI()
 
     def initUI(self):
         layout = QVBoxLayout(self)
 
         messageLabel = QLabel("Coming Soon...")
-        messageLabel.setStyleSheet("""
-            font-size: 20px; 
-            font-weight: bold; 
-            padding: 10px;
-            color: #00FFFF;
-        """)
+        messageLabel.setObjectName("titleLabel")
         messageLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(messageLabel)
         
         messageSubscript = QLabel("🚧")
+        messageSubscript.setObjectName("iconLabel")
         messageSubscript.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        messageSubscript.setStyleSheet("""
-            font-size: 40px; 
-            padding: 6px;
-            color: #8A2BE2;
-        """) 
         layout.addWidget(messageSubscript)
 
         closeButton = QPushButton("Close")

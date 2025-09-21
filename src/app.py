@@ -13,6 +13,7 @@ from src.gui.HomePage import HomePage
 from src.gui.SoloGamePage import SoloGamePage
 from src.gui.MultiplayerPage import MultiplayerPage
 from src.gui.SettingsPage import SettingsPage
+from src.logic.ThemeManager import theme_manager
 
 class MainApplication(QMainWindow):
     def __init__(self):
@@ -34,6 +35,9 @@ class MainApplication(QMainWindow):
         self.setCentralWidget(self.tabWidget)
 
         self.initUI()
+        
+        # Connect to theme changes
+        theme_manager.theme_changed.connect(self.on_theme_changed)
 
     def initUI(self):
         # Initialize landing page
@@ -41,6 +45,9 @@ class MainApplication(QMainWindow):
 
         # Add home tab
         self.tabWidget.addTab(self.homePage, "Home")
+        
+        # Apply initial theme
+        self.apply_theme()
 
     def addSoloGameTab(self, start_url, end_url):
         # Adds the Solo Game tab only if it doesn't exist
@@ -79,6 +86,54 @@ class MainApplication(QMainWindow):
                 delattr(self, 'multiplayerPage')
             elif widgetType == 'SettingsPage':
                 delattr(self, 'settingsPage')
+    
+    def apply_theme(self):
+        """Apply theme to the main application"""
+        styles = theme_manager.get_theme_styles()
+        
+        # Apply theme to main window
+        self.setStyleSheet(f"""
+            QMainWindow {{
+                background-color: {styles['background_color']};
+                color: {styles['text_color']};
+            }}
+        """)
+        
+        # Apply theme to tab widget
+        self.tabWidget.setStyleSheet(f"""
+            QTabWidget::pane {{
+                border-top: 2px solid {styles['border_color']};
+                background-color: {styles['background_color']};
+            }}
+
+            QTabBar::tab {{
+                background: {styles['tab_background']};
+                color: {styles['tab_text']};
+                padding: 8px 16px;
+                border: 1px solid {styles['border_color']};
+                border-bottom-color: {styles['tab_background']};
+                border-radius: 6px 6px 0px 0px;
+                margin-right: 2px;
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+                font-weight: 500;
+            }}
+
+            QTabBar::tab:selected, QTabBar::tab:hover {{
+                background: {styles['tab_selected']};
+                color: {styles['tab_text_selected']};
+                border-color: {styles['border_hover']};
+            }}
+
+            QWidget {{
+                background-color: {styles['background_color']};
+                color: {styles['text_color']};
+            }}
+        """)
+    
+    def on_theme_changed(self, theme):
+        """Handle theme changes"""
+        print(f"🎨 WikiRace: Main application - Theme changed to: {theme}")
+        self.apply_theme()
 
 def main():
     """Main entry point for the application."""
