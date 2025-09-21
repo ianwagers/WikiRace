@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget
-from PyQt5.QtGui import QIcon
+from PyQt6.QtWidgets import QApplication, QMainWindow, QTabWidget
+from PyQt6.QtGui import QIcon
 
 import sys
 sys.path.append('C:/Project_Workspace/WikiRace')
@@ -74,4 +74,4 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     mainApp = MainApplication()
     mainApp.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

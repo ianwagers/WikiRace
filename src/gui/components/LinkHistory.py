@@ -1,5 +1,5 @@
 
-from PyQt5.QtWidgets import QListWidget
+from PyQt6.QtWidgets import QListWidget
 
 class LinkHistory(QListWidget):
     def __init__(self):

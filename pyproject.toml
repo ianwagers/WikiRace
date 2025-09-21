@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=75.3.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wikirace"
+version = "1.4.0"
+description = "A Wikipedia race game built with PyQt"
+authors = [
+    {name = "Ian Wagers", email = "wagersian@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Games/Entertainment",
+]
+keywords = ["wikipedia", "game", "race", "pyqt", "desktop"]
+dependencies = [
+    "PyQt6>=6.7.0",
+    "PyQt6-WebEngine>=6.7.0",
+    "requests>=2.32.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/wikirace"
+Repository = "https://github.com/yourusername/wikirace"
+Issues = "https://github.com/yourusername/wikirace/issues"
+
+[project.scripts]
+wikirace = "src.app:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.png", "*.ico", "*.PNG"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-qt>=4.2.0",
+    "black>=24.0.0",
+    "flake8>=7.0.0",
+    "mypy>=1.8.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py313']
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

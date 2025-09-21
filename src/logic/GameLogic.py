@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt6.QtCore import QObject, pyqtSignal
 from random import random
 import requests, sys
 sys.path.append('C:\Program Files\WikiRace')
@@ -13,6 +13,11 @@ class GameLogic(QObject):
 
     def getRandomWikiLink(self):
         try:
+            # Headers to avoid 403 errors
+            headers = {
+                'User-Agent': 'WikiRace Game/1.0 (https://github.com/ianwagers/wikirace)'
+            }
+            
             # Use Wikipedia's API to get a random page
             response = requests.get('https://en.wikipedia.org/w/api.php', {
                 'action': 'query',
@@ -20,7 +25,8 @@ class GameLogic(QObject):
                 'list': 'random',
                 'rnnamespace': 0,
                 'rnlimit': 1
-            })
+            }, headers=headers, timeout=10)
+            
             # Check if the request was successful
             if response.status_code == 200:
                 json_data = response.json()
@@ -142,6 +148,11 @@ class GameLogic(QObject):
         # URL to Wikipedia's API for searching
         api_url = "https://en.wikipedia.org/w/api.php"
 
+        # Headers to avoid 403 errors
+        headers = {
+            'User-Agent': 'WikiRace Game/1.0 (https://github.com/ianwagers/wikirace)'
+        }
+
         # Parameters for the API request
         params = {
             "action": "query",
@@ -151,27 +162,36 @@ class GameLogic(QObject):
             "srlimit": 1  # Limit the search to the top result
         }
 
-        # Send the request to Wikipedia's API
-        response = requests.get(api_url, params=params)
-        response.raise_for_status()  # Raises an exception for HTTP errors
+        try:
+            # Send the request to Wikipedia's API with headers
+            response = requests.get(api_url, params=params, headers=headers, timeout=10)
+            response.raise_for_status()  # Raises an exception for HTTP errors
 
-        # Parse the JSON response
-        data = response.json()
+            # Parse the JSON response
+            data = response.json()
 
-        # Check if search results are present
-        if data["query"]["search"]:
-            # Extract the page ID of the top search result
-            page_id = data["query"]["search"][0]["pageid"]
+            # Check if search results are present
+            if data["query"]["search"]:
+                # Extract the page ID of the top search result
+                page_id = data["query"]["search"][0]["pageid"]
 
-            # Construct the URL to the Wikipedia page
-            wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
+                # Construct the URL to the Wikipedia page
+                wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
 
-            print(f"Found Wikipedia page: {wiki_url}")
-            return wiki_url
-        else:
-            # Handle the case where no results are found
-            print("No results found for the given search text.")
-            return wiki_url
+                print(f"Found Wikipedia page: {wiki_url}")
+                return wiki_url
+            else:
+                # Handle the case where no results are found
+                print(f"No results found for '{search_text}'. Using fallback.")
+                return self.getRandomWikiLink()
+        except requests.exceptions.RequestException as e:
+            print(f"Error searching for '{search_text}': {e}")
+            print("Using fallback random page...")
+            return self.getRandomWikiLink()
+        except Exception as e:
+            print(f"Unexpected error searching for '{search_text}': {e}")
+            print("Using fallback random page...")
+            return self.getRandomWikiLink()
         
     # In the future this will be saved in some kind of external doc/database
     def initGameDatabase(self):
@@ -185,7 +205,7 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Cougar",
             "https://en.wikipedia.org/wiki/Grizzly_bear",
             "https://en.wikipedia.org/wiki/Brown_bear",
-            "https://en.wikipedia.org/wiki/Black_bear"
+            "https://en.wikipedia.org/wiki/Black_bear",
             "https://en.wikipedia.org/wiki/Polar_bear",
             "https://en.wikipedia.org/wiki/Panda",
             "https://en.wikipedia.org/wiki/Koala",
@@ -211,7 +231,6 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Bill_Gates",
             "https://en.wikipedia.org/wiki/Jeff_Bezos",
             "https://en.wikipedia.org/wiki/Mark_Zuckerberg",
-            "https://en.wikipedia.org/wiki/Drake_(musician)",
             "https://en.wikipedia.org/wiki/Dwayne_Johnson",
             "https://en.wikipedia.org/wiki/Eminem",
             "https://en.wikipedia.org/wiki/Will_Smith",
@@ -255,8 +274,8 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/The_Catcher_in_the_Rye",
             "https://en.wikipedia.org/wiki/Shakespeare%27s_sonnets",
             "https://en.wikipedia.org/wiki/The_Odyssey",
-            "https://en.wikipedia.org/wiki/Infinite_Jest"
-            "https://en.wikipedia.org/wiki/Simulacra_and_Simulation"
+            "https://en.wikipedia.org/wiki/Infinite_Jest",
+            "https://en.wikipedia.org/wiki/Simulacra_and_Simulation",
             "https://en.wikipedia.org/wiki/Thus_Spoke_Zarathustra"
 
         ]
@@ -272,15 +291,6 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/My_Way",
             "https://en.wikipedia.org/wiki/Despacito",
             "https://en.wikipedia.org/wiki/Shape_of_You",
-            "https://en.wikipedia.org/wiki/Drake_(musician)",
-            "https://en.wikipedia.org/wiki/Drake_discography",
-            "https://en.wikipedia.org/wiki/Drake_(musician)#Studio_albums",
-            "https://en.wikipedia.org/wiki/Drake_(musician)#Singles",
-            "https://en.wikipedia.org/wiki/Drake_(musician)#Tours",
-            "https://en.wikipedia.org/wiki/Drake_(musician)#Filmography",
-            "https://en.wikipedia.org/wiki/Drake_(musician)#Awards_and_nominations",
-            "https://en.wikipedia.org/wiki/God%27s_Plan_(song)",
-            "https://en.wikipedia.org/wiki/Rich_Baby_Daddy",
             "https://en.wikipedia.org/wiki/Daft_Punk",
             "https://en.wikipedia.org/wiki/Glass_Animals"
         ]
@@ -384,8 +394,8 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Donald_Trump",
             "https://en.wikipedia.org/wiki/COVID-19_pandemic",
             "https://en.wikipedia.org/wiki/World_War_II",
-            "https://en.wikipedia.org/wiki/Chernobyl_disaster"
-            "https://en.wikipedia.org/wiki/Star_Wars"
+            "https://en.wikipedia.org/wiki/Chernobyl_disaster",
+            "https://en.wikipedia.org/wiki/Star_Wars",
             "https://en.wikipedia.org/wiki/Facebook"
 
         ]

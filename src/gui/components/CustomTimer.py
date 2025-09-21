@@ -1,5 +1,5 @@
 
-from PyQt5.QtCore import QTimer, pyqtSignal, QObject
+from PyQt6.QtCore import QTimer, pyqtSignal, QObject
 
 class CustomTimer(QObject):
     # Signal to emit the elapsed time in the format hh:mm:ss
