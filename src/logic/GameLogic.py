@@ -1,7 +1,6 @@
 from PyQt6.QtCore import QObject, pyqtSignal
 from random import random
-import requests, sys
-sys.path.append('C:\Program Files\WikiRace')
+import requests
 
 class GameLogic(QObject):
     linkClicked = pyqtSignal(str)

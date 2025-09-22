@@ -114,7 +114,8 @@ class ThemeManager(QObject):
             'tab_selected': '#3E3E3E',
             'tab_hover': '#3E3E3E',
             'tab_text': '#E0E0E0',
-            'tab_text_selected': '#00FFFF'
+            'tab_text_selected': '#00FFFF',
+            'is_dark': True  # Added missing is_dark key
         }
     
     def _get_light_theme_styles(self) -> Dict[str, str]:
@@ -141,7 +142,8 @@ class ThemeManager(QObject):
             'tab_selected': '#E8E8E8',
             'tab_hover': '#E8E8E8',
             'tab_text': '#1A1A1A',
-            'tab_text_selected': '#0066CC'
+            'tab_text_selected': '#0066CC',
+            'is_dark': False  # Added missing is_dark key
         }
     
     def apply_theme_to_widget(self, widget: QWidget, theme: str = None):

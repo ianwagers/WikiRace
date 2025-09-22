@@ -270,6 +270,9 @@ class HomePage(QWidget):
         # Open the multiplayer tab
         if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
             self.mainApplication.addMultiplayerTab()
+            # Switch to the newly created tab
+            index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
+            self.tabWidget.setCurrentIndex(index)
         else:
             index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
             self.tabWidget.setCurrentIndex(index)
@@ -277,6 +280,9 @@ class HomePage(QWidget):
     def onSettingsClicked(self):
         if not hasattr(self.mainApplication, 'settingsPage') or self.tabWidget.indexOf(self.mainApplication.settingsPage) == -1:
             self.mainApplication.addSettingsTab()
+            # Switch to the newly created tab
+            index = self.tabWidget.indexOf(self.mainApplication.settingsPage)
+            self.tabWidget.setCurrentIndex(index)
         else:
             index = self.tabWidget.indexOf(self.mainApplication.settingsPage)
             self.tabWidget.setCurrentIndex(index)

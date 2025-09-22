@@ -6,7 +6,7 @@ Defines the core data structures for game rooms, players, and game state.
 
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field, validator
 
 
@@ -19,6 +19,22 @@ class GameState(str, Enum):
     ABANDONED = "abandoned"
 
 
+class NavigationEntry(BaseModel):
+    """Single navigation entry in a player's history"""
+    
+    page_url: str = Field(..., description="Full Wikipedia page URL")
+    page_title: str = Field(..., description="Wikipedia page title")
+    timestamp: datetime = Field(default_factory=datetime.utcnow, description="When page was visited")
+    link_number: int = Field(..., ge=0, description="Sequential link number (0 = start page)")
+    time_elapsed: float = Field(default=0.0, ge=0, description="Time elapsed since game start (seconds)")
+    
+    class Config:
+        # Allow datetime serialization
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+
+
 class Player(BaseModel):
     """Player model for multiplayer games"""
     
@@ -28,10 +44,12 @@ class Player(BaseModel):
     
     # Game state
     current_page: Optional[str] = Field(default=None, description="Current Wikipedia page URL")
+    current_page_title: Optional[str] = Field(default=None, description="Current Wikipedia page title")
     links_clicked: int = Field(default=0, ge=0, description="Number of links used")
-    navigation_history: List[str] = Field(default_factory=list, description="Pages visited (titles)")
+    navigation_history: List[NavigationEntry] = Field(default_factory=list, description="Detailed navigation path")
     game_completed: bool = Field(default=False, description="Whether reached destination")
-    completion_time: Optional[int] = Field(default=None, ge=0, description="Time to complete (seconds)")
+    completion_time: Optional[float] = Field(default=None, ge=0, description="Time to complete (seconds)")
+    game_start_time: Optional[datetime] = Field(default=None, description="When game started for this player")
     
     # Timestamps
     joined_at: datetime = Field(default_factory=datetime.utcnow, description="When player joined room")
@@ -45,6 +63,53 @@ class Player(BaseModel):
         if not v:
             raise ValueError('Display name cannot be empty')
         return v
+    
+    def add_navigation_entry(self, page_url: str, page_title: str) -> NavigationEntry:
+        """Add a new navigation entry to the player's history"""
+        # Calculate time elapsed since game start
+        time_elapsed = 0.0
+        if self.game_start_time:
+            time_elapsed = (datetime.utcnow() - self.game_start_time).total_seconds()
+        
+        # Create navigation entry
+        entry = NavigationEntry(
+            page_url=page_url,
+            page_title=page_title,
+            link_number=len(self.navigation_history),
+            time_elapsed=time_elapsed
+        )
+        
+        # Add to history
+        self.navigation_history.append(entry)
+        
+        # Update current page info
+        self.current_page = page_url
+        self.current_page_title = page_title
+        # Links clicked should be the number of actual link clicks (excluding the start page)
+        # If this is the first entry (start page), links_clicked remains 0
+        # Otherwise, links_clicked = total entries - 1 (to exclude start page)
+        if len(self.navigation_history) == 1:
+            # This is the start page, no links clicked yet
+            self.links_clicked = 0
+        else:
+            # This is a link click, count all entries after the start page
+            self.links_clicked = len(self.navigation_history) - 1
+        self.last_activity = datetime.utcnow()
+        
+        return entry
+    
+    def get_navigation_summary(self) -> List[Dict[str, Any]]:
+        """Get a summary of navigation history for results display"""
+        return [
+            {
+                'page_title': entry.page_title,
+                'page_url': entry.page_url,
+                'link_number': entry.link_number,
+                'time_elapsed': entry.time_elapsed,
+                'timestamp': entry.timestamp.isoformat()
+            }
+            for entry in self.navigation_history
+        ]
 
 
 class GameRoom(BaseModel):
@@ -98,6 +163,13 @@ class GameRoom(BaseModel):
         """Get a player by socket ID"""
         return self.players.get(socket_id)
     
+    def get_player_by_name(self, display_name: str) -> Optional[Player]:
+        """Get a player by display name"""
+        for player in self.players.values():
+            if player.display_name == display_name:
+                return player
+        return None
+    
     def is_host(self, socket_id: str) -> bool:
         """Check if socket ID belongs to room host"""
         return self.host_id == socket_id
@@ -107,14 +179,20 @@ class GameRoom(BaseModel):
         if len(self.players) <= 1:
             return None
         
+        # Store old host ID
+        old_host_id = self.host_id
+        
         # Find next available player (not current host)
         for socket_id, player in self.players.items():
             if socket_id != self.host_id:
+                # Set new host
                 self.host_id = socket_id
                 player.is_host = True
-                # Update old host
-                if self.host_id in self.players:
-                    self.players[self.host_id].is_host = False
+                
+                # Update old host (if still in room)
+                if old_host_id in self.players:
+                    self.players[old_host_id].is_host = False
+                
                 return socket_id
         
         return None
@@ -127,7 +205,6 @@ class RoomCreateRequest(BaseModel):
 
 class RoomJoinRequest(BaseModel):
     """Request model for joining an existing room"""
-    room_code: str = Field(..., min_length=4, max_length=4)
     display_name: str = Field(..., min_length=1, max_length=50)
 
 

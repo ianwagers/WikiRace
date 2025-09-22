@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     """Application settings with environment variable support"""
     
     # Server settings
-    HOST: str = "0.0.0.0"
-    PORT: int = 8000
+    HOST: str = "0.0.0.0"  # Bind to all interfaces for cross-device access
+    PORT: int = 8001  # Changed from 8000 to avoid port conflicts
     DEBUG: bool = False
     
     # CORS settings

@@ -35,6 +35,7 @@ def set_room_manager(manager: RoomManager):
     global room_manager
     room_manager = manager
 
+
 @router.post("/rooms", response_model=Dict[str, Any])
 async def create_room(request: RoomCreateRequest) -> Dict[str, Any]:
     """Create a new game room"""
@@ -47,7 +48,11 @@ async def create_room(request: RoomCreateRequest) -> Dict[str, Any]:
     try:
         # For REST API, we need a temporary socket ID
         # In real usage, this would be called from Socket.IO handlers
-        temp_socket_id = f"rest_{request.display_name}_{id(request)}"
+        import time
+        import random
+        timestamp = int(time.time() * 1000)  # milliseconds
+        random_suffix = random.randint(1000, 9999)
+        temp_socket_id = f"rest_{request.display_name}_{timestamp}_{random_suffix}"
         
         room = await room_manager.create_room(temp_socket_id, request.display_name)
         
@@ -130,7 +135,11 @@ async def join_room(room_code: str, request: RoomJoinRequest) -> Dict[str, Any]:
     
     try:
         # For REST API, we need a temporary socket ID
-        temp_socket_id = f"rest_{request.display_name}_{id(request)}"
+        import time
+        import random
+        timestamp = int(time.time() * 1000)  # milliseconds
+        random_suffix = random.randint(1000, 9999)
+        temp_socket_id = f"rest_{request.display_name}_{timestamp}_{random_suffix}"
         
         room = room_manager.join_room(room_code, temp_socket_id, request.display_name)
         

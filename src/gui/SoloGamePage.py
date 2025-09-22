@@ -2,7 +2,7 @@ import time
 import re
 import urllib.parse
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLabel, QListWidget, QPushButton, QDialog
-from PyQt6.QtCore import Qt, QTimer, QUrl
+from PyQt6.QtCore import Qt, QTimer, QUrl, pyqtSignal
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineProfile, QWebEngineSettings, QWebEngineUrlRequestInterceptor, QWebEngineUrlRequestInfo
 from PyQt6.QtGui import QIcon
@@ -15,8 +15,13 @@ from src.logic.ThemeManager import theme_manager
 DEBUG_THEME = False
 
 class SoloGamePage(QWidget):
+    
+    # Signals for multiplayer integration
+    urlChanged = pyqtSignal(str)  # Emitted when URL changes (for multiplayer progress tracking)
+    linkClicked = pyqtSignal()    # Emitted when a link is clicked
+    gameCompleted = pyqtSignal()  # Emitted when game is completed
 
-    def __init__(self, tabWidget, start_url, end_url, start_title=None, end_title=None, parent=None):
+    def __init__(self, tabWidget, start_url, end_url, start_title=None, end_title=None, parent=None, is_multiplayer=False):
         init_start = time.time()
         print(f"🏁 WikiRace: [{init_start:.3f}] SoloGamePage initialization starting...")
         
@@ -29,6 +34,7 @@ class SoloGamePage(QWidget):
         self.startTime = 0
         self.linksUsed = 0  # Start at 0, will increment on first link click
         self.darkModeApplied = False  # Track if dark mode has been applied
+        self.is_multiplayer = is_multiplayer  # Flag to indicate multiplayer mode
         
         # Track page loading phases
         self.page_load_start_time = None
@@ -336,6 +342,9 @@ class SoloGamePage(QWidget):
         url_str = url.toString()
         print(f"🔄 WikiRace: [{self.url_change_time:.3f}] URL changed to: {url_str}")
         
+        # Emit signal for multiplayer integration
+        self.urlChanged.emit(url_str)
+        
         # OPTIMIZED: URL interceptor handles useskin=vector-2022 automatically
         # No need to reload - prevents redirect loops and double loading
         self.darkModeApplied = False  # Reset flag for new page
@@ -347,6 +356,9 @@ class SoloGamePage(QWidget):
                 self.linksUsed += 1
                 self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
                 print(f"🔗 WikiRace: [{time.time():.3f}] Link navigation detected - Links used: {self.linksUsed}")
+                
+                # Emit link clicked signal for multiplayer integration
+                self.linkClicked.emit()
                 
                 # OPTIMIZED: Use fast URL path parser to get page title
                 titleString = self.getTitleFromUrlPath(url_str)
@@ -502,6 +514,9 @@ class SoloGamePage(QWidget):
             # Stop the timer immediately
             self.timer.stop()
             
+            # Emit game completed signal for multiplayer integration
+            self.gameCompleted.emit()
+            
             # Wait for page to load, then show confetti, then dialog
             QTimer.singleShot(500, self.showConfettiAndDialog)  # Wait 500ms for page load
         else:
@@ -519,19 +534,44 @@ class SoloGamePage(QWidget):
                     if exact_current_normalized == destination_normalized:
                         print(f"🏆 WikiRace: [{time.time():.3f}] GAME COMPLETED! (via exact title check) Player reached destination page!")
                         self.timer.stop()
+                        
+                        # Emit game completed signal for multiplayer integration
+                        self.gameCompleted.emit()
+                        
                         QTimer.singleShot(500, self.showConfettiAndDialog)
             
             # Get exact title for more accurate comparison
             QTimer.singleShot(200, lambda: self.getExactTitleFromJavaScript(check_with_exact_title))
+    
+    def startGame(self):
+        """Start the game - for multiplayer integration"""
+        # Reset game state for new game
+        self.linksUsed = 0
+        self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
+        self.startTime = time.time()
+        self._initial_load_complete = False  # Reset initial load flag
+        
+        # Clear previous links list
+        self.previousLinksList.clear()
+        
+        # Start the timer if not already running
+        if not self.timer.isActive():
+            self.timer.start()
+        
+        # Load the starting page
+        if self.start_url:
+            self.webView.load(QUrl(self.start_url))
     
     def showConfettiAndDialog(self):
         """Show confetti first, then dialog after confetti finishes"""
         # Show confetti on the current game page
         self.triggerConfetti()
         
-        # After confetti finishes (4 seconds), show the dialog
-        from PyQt6.QtCore import QTimer
-        QTimer.singleShot(4000, self.showEndGameDialog)
+        # Only show dialog in solo mode, not in multiplayer mode
+        if not self.is_multiplayer:
+            # After confetti finishes (4 seconds), show the dialog
+            from PyQt6.QtCore import QTimer
+            QTimer.singleShot(4000, self.showEndGameDialog)
     
     def triggerConfetti(self):
         """Trigger confetti effect on the game page"""
