@@ -66,7 +66,7 @@ WikiRace is a fun and educational game that challenges you to navigate from one 
 - **Learn as You Play**: Each game teaches you about new topics and connections
 
 
-## Current Status (v1.6.0 Beta)
+## Current Status (v1.7.0 Beta)
 
 - ✅ Solo games fully functional and polished
 - ✅ Multiplayer server infrastructure complete

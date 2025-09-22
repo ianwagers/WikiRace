@@ -3,7 +3,7 @@ echo 🔧 Installing PyQt6 and dependencies...
 echo ========================================
 
 REM Set the path to your local Python 3.13 installation
-set PYTHON313_PATH=%~dp0..\Python313\python.exe
+set PYTHON313_PATH=%~dp0..\deployment\Python313\python.exe
 
 REM Check if local Python 3.13 is available, otherwise use system Python
 echo 🔍 Checking for local Python 3.13...

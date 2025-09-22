@@ -403,8 +403,8 @@ For issues or questions, please check the documentation in the `docs/` folder or
             "docs/",
             "README.md",
             "pyproject.toml",
-            "install_client.bat",
-            "install_client.sh"
+            "scripts/install_client.bat",
+            "scripts/install_client.sh"
         ]
         
         for item in files_to_copy:

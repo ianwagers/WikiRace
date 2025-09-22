@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: wikirace
-Version: 1.6.0
+Version: 1.7.0
 Summary: A Wikipedia race game built with PyQt
 Author-email: Ian Wagers <wagersian@gmail.com>
 License: MIT

@@ -3,7 +3,7 @@ echo 🎮 WikiRace Python 3.13 Setup
 echo ================================
 
 REM Set the path to your local Python 3.13 installation
-set PYTHON313_PATH=%~dp0..\Python313\python.exe
+set PYTHON313_PATH=%~dp0..\deployment\Python313\python.exe
 
 REM Check if local Python 3.13 is available, otherwise use system Python
 echo 🔍 Checking for local Python 3.13...
@@ -19,7 +19,7 @@ REM Check Python version
 echo 🔍 Checking Python version...
 "%PYTHON313_PATH%" --version
 if %errorlevel% neq 0 (
-    echo ❌ Python 3.13 not working. Please check your Python313 installation
+    echo ❌ Python 3.13 not working. Please check your deployment\Python313 installation
     pause
     exit /b 1
 )

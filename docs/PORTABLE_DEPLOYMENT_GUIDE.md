@@ -5,12 +5,12 @@ This guide explains how to create and deploy portable versions of WikiRace for c
 ## Quick Start
 
 ### Option 1: Automated Build (Recommended)
-1. **Windows**: Double-click `build_portable.bat`
-2. **Linux/macOS**: Run `./build_portable.sh`
+1. **Windows**: Double-click `scripts/build_portable.bat`
+2. **Linux/macOS**: Run `./scripts/build_portable.sh`
 
 ### Option 2: Manual Build
 ```bash
-python build_portable.py
+python scripts/build_portable.py
 ```
 
 ## What Gets Created
@@ -37,7 +37,7 @@ build_portable/
 ### Step 1: Build the Portable Version
 Run the build script on your development machine:
 ```bash
-python build_portable.py
+python scripts/build_portable.py
 ```
 
 ### Step 2: Test Locally

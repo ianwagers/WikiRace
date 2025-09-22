@@ -3,7 +3,7 @@
 ## Project Overview
 WikiRace is a desktop Wikipedia navigation game built with PyQt6 and Python 3.13. Originally a solo game, it has been significantly expanded with real-time multiplayer functionality using a FastAPI + Socket.IO server architecture.
 
-## Current Status: v1.7.0 (Multiplayer 100% Complete + Production Ready)
+## Current Status: v1.7.0 Beta (Multiplayer 100% Complete + Production Ready)
 - ✅ Solo gameplay fully functional
 - ✅ Multiplayer server infrastructure complete and running
 - ✅ Real-time room management and player communication working
@@ -61,10 +61,12 @@ WikiRace is a desktop Wikipedia navigation game built with PyQt6 and Python 3.13
 ## Project Structure
 ```
 WikiRace/
-├── bin/main.py                 # Application entry point
+├── bin/                        # Application entry points
+│   ├── main.py                 # Main game executable
+│   └── start_all.py            # Combined client/server startup
 ├── src/                        # Main application code
 │   ├── app.py                  # Application initialization
-│   ├── gui/                    # PyQt6 UI components (0 files)
+│   ├── gui/                    # PyQt6 UI components
 │   │   ├── MainApplication.py  # Main window with tabs
 │   │   ├── HomePage.py         # Landing page and game setup
 │   │   ├── SoloGamePage.py     # Solo Wikipedia racing game
@@ -73,14 +75,16 @@ WikiRace/
 │   │   ├── CountdownDialog.py  # Game start countdown
 │   │   ├── ServerConfigDialog.py # Server configuration UI
 │   │   ├── MultiplayerResultsDialog.py # Results with path visualization
-│   │   └── ...                 # Other UI components
-│   ├── logic/                  # Business logic (0 files)
+│   │   ├── SettingsPage.py     # Application settings
+│   │   └── components/         # Reusable UI components
+│   ├── logic/                  # Business logic
 │   │   ├── GameLogic.py        # Core game mechanics
 │   │   ├── Network.py          # Multiplayer networking with reconnection
 │   │   ├── MultiplayerConfig.py # Configuration management
 │   │   ├── ThemeManager.py     # UI theming system
-│   │   └── ...
+│   │   └── SettingsLogic.py    # Settings management
 │   └── resources/              # Assets (icons, images)
+│       └── icons/              # Application icons
 ├── server/                     # Multiplayer server
 │   ├── main.py                 # FastAPI application
 │   ├── start_server.py         # Server startup script
@@ -90,21 +94,56 @@ WikiRace/
 │   ├── api_routes.py           # REST API endpoints
 │   ├── game_logic.py           # Server-side Wikipedia page selection
 │   ├── config.py               # Server configuration
+│   ├── redis_manager.py        # Redis integration (optional)
+│   ├── test_server.py          # Server testing utilities
 │   ├── Dockerfile              # Docker container configuration
 │   ├── docker-compose.yml      # Full stack deployment
 │   ├── deploy.sh               # Automated deployment script
 │   ├── nginx.conf              # Production reverse proxy
-│   └── DEPLOYMENT.md           # Comprehensive deployment guide
-├── docs/                       # Documentation (4 files)
+│   ├── requirements.txt        # Server dependencies
+│   ├── DEPLOYMENT.md           # Comprehensive deployment guide
+│   ├── SETUP.md                # Server setup instructions
+│   └── README.md               # Server documentation
+├── docs/                       # Documentation
 │   ├── MULTIPLAYER_SPEC.md     # Detailed multiplayer architecture
 │   ├── SETUP_INSTRUCTIONS.md   # Installation guide
-│   └── ...
-├── tests/                      # Test files (1238 files)
-├── install_client.bat          # Windows client installer
-├── install_client.sh           # Linux/macOS client installer
+│   ├── IMPLEMENTATION_SUMMARY.md # Feature implementation summary
+│   ├── MULTIPLAYER_COMPLETION_REPORT.md # Complete implementation report
+│   ├── PORTABLE_DEPLOYMENT_GUIDE.md # Portable deployment guide
+│   ├── PYQT6_CHANGES.md        # PyQt6 migration notes
+│   └── VSCODE_SETUP.md         # VS Code configuration
+├── scripts/                    # Utility scripts and automation tools
+│   ├── build_portable.py       # Portable build script (main)
+│   ├── build_portable.bat      # Windows portable build
+│   ├── build_portable.sh       # Linux/macOS portable build
+│   ├── install_client.bat      # Windows client installer
+│   ├── install_client.sh       # Linux/macOS client installer
+│   ├── install_pyqt6.bat       # Windows PyQt6 installer
+│   ├── install_pyqt6.py        # Cross-platform PyQt6 installer
+│   ├── setup.bat               # Windows environment setup
+│   ├── setup_environment.py    # Cross-platform environment setup
+│   ├── setup_git_hooks.py      # Git hooks configuration
+│   ├── update_context.py       # Documentation auto-update
+│   └── README.md               # Scripts documentation
+├── tests/                      # Test files and validation scripts
+│   ├── test_imports.py         # Import validation
+│   ├── test_page_titles.py     # Wikipedia API tests
+│   ├── test_python313.py       # Python version validation
+│   ├── test_wikipedia_api.py   # API functionality tests
+│   ├── test_multiplayer_tab.py # Multiplayer UI tests
+│   ├── test_multiplier_gui.py  # GUI component tests
+│   ├── test_server_connection.py # Server connectivity tests
+│   └── start_multiplier_server.py # Test server startup
+├── deployment/                 # Deployment assets
+│   └── Python313/             # Portable Python distribution (Windows)
+├── logs/                       # Log files
+│   └── wikirace_server.log     # Server log file
+├── images/                     # Screenshots and assets
+│   ├── HomePage_Beta1u6.png    # Home page screenshot
+│   └── SoloRacePage_Beta1u6.png # Solo game screenshot
+├── venv/                       # Virtual environment (local development)
+├── wikirace.egg-info/          # Package metadata
 ├── pyproject.toml              # Project configuration
-├── IMPLEMENTATION_SUMMARY.md   # Feature implementation summary
-├── MULTIPLAYER_COMPLETION_REPORT.md # Complete implementation report
 └── README.md                   # Project overview
 ```
 
@@ -242,6 +281,10 @@ When working on this project, common modification patterns include:
 - **Game Logic**: Changes in `src/logic/` often require testing both solo and multiplayer modes
 - **Server Changes**: Modifications in `server/` require server restart and client testing
 - **Dependencies**: Updates to `pyproject.toml` need virtual environment refresh
+- **Scripts**: Build and installation scripts are in `scripts/` directory
+- **Documentation**: All documentation files are organized in `docs/` directory
+- **Testing**: Test files are organized in `tests/` directory
+- **Deployment**: Portable Python and deployment assets are in `deployment/` directory
 
 ## Quick Start Commands
 
@@ -254,8 +297,15 @@ chmod +x deploy.sh
 
 ### Client Installation:
 ```bash
-# Windows: run install_client.bat
-# Linux/macOS: chmod +x install_client.sh && ./install_client.sh
+# Windows: run scripts/install_client.bat
+# Linux/macOS: chmod +x scripts/install_client.sh && ./scripts/install_client.sh
+```
+
+### Portable Build:
+```bash
+# Windows: run scripts/build_portable.bat
+# Linux/macOS: chmod +x scripts/build_portable.sh && ./scripts/build_portable.sh
+# Manual: python scripts/build_portable.py
 ```
 
 ### Development:
@@ -265,6 +315,9 @@ cd server/ && python start_server.py
 
 # Start client
 python bin/main.py
+
+# Combined startup (client + server)
+python bin/start_all.py
 ```
 
 ## Auto-Update Information

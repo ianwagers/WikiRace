@@ -24,7 +24,7 @@ def install_pyqt6():
     print("🚀 Installing PyQt6 and dependencies...")
     
     # First try local Python 3.13, then fall back to system Python
-    python313_path = Path(__file__).parent.parent / "Python313" / "python.exe"
+    python313_path = Path(__file__).parent.parent / "deployment" / "Python313" / "python.exe"
     python_executable = None
     
     if python313_path.exists():

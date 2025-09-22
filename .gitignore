@@ -9,6 +9,8 @@ __pycache__/
 *.so
 
 # Misc Directories
-/Python313/
+/deployment/Python313/
 /venv/
+/logs/
+build_portable/
 

@@ -189,7 +189,7 @@ class ContextUpdater:
         key_files = self.analyzer.get_key_files()
         
         # Read version from pyproject.toml
-        version = "1.6.0"
+        version = "1.7.0"
         try:
             import tomllib
             with open(self.project_root / "pyproject.toml", "rb") as f:

@@ -62,7 +62,7 @@ class HomePage(QWidget):
         self.layout.addWidget(self.logoContainer, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Title subscript with modern styling - positioned right edge with low opacity
-        self.titleSubscript = QLabel("v1.6 [BETA]")
+        self.titleSubscript = QLabel("v1.7 [BETA]")
         self.titleSubscript.setStyleSheet("""
             QLabel {
                 font-size: 10px;

@@ -17,7 +17,7 @@ print_header() {
     echo -e "${BLUE}"
     echo "=========================================="
     echo "   WikiRace Multiplayer Client Setup"
-    echo "   Version 1.6.0"
+    echo "   Version 1.7.0"
     echo "=========================================="
     echo -e "${NC}"
 }

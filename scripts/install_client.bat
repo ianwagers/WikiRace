@@ -14,7 +14,7 @@ set "NC=[0m"
 echo %BLUE%
 echo ==========================================
 echo    WikiRace Multiplayer Client Setup
-echo    Version 1.6.0
+echo    Version 1.7.0
 echo ==========================================
 echo %NC%
 
