@@ -67,3 +67,84 @@
 2025-09-21 20:34:41,698 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
 2025-09-21 20:34:41,699 - room_manager - WARNING - Redis connection failed, using in-memory storage only
 2025-09-21 20:35:22,573 - redis_manager - INFO - Disconnected from Redis
+2025-09-21 23:17:10,598 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-21 23:17:10,901 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-21 23:17:10,902 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-21 23:17:11,238 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-21 23:17:15,323 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-21 23:17:15,323 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-21 23:18:29,676 - engineio.server - ERROR - http://10.0.0.223:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-21 23:18:29,689 - socket_handlers - INFO - Client connected: wOE3X7l8-9ZlOYGHAAAB
+2025-09-21 23:18:30,262 - room_manager - INFO - Created room ZUKS with host Player 1
+2025-09-21 23:18:30,263 - socket_handlers - INFO - Room ZUKS created by Player 1
+2025-09-21 23:21:42,867 - room_manager - INFO - Created room RRCE with host Ducky
+2025-09-21 23:21:42,867 - socket_handlers - INFO - Room RRCE created by Ducky
+2025-09-21 23:32:32,067 - socket_handlers - INFO - Client connected: gkpkVl0rCkn1NCn7AAAD
+2025-09-21 23:32:32,710 - room_manager - INFO - Player Megan joined room RRCE
+2025-09-21 23:32:32,711 - socket_handlers - INFO - Player Megan joined room RRCE
+2025-09-21 23:32:48,512 - socket_handlers - INFO - Game configuration updated in room RRCE: Custom -> Animals
+2025-09-21 23:32:54,315 - socket_handlers - INFO - Game configuration updated in room RRCE: Custom -> Animals
+2025-09-21 23:32:56,825 - socket_handlers - INFO - Game configuration updated in room RRCE: Custom -> Animals
+2025-09-21 23:33:00,829 - socket_handlers - INFO - Game configuration updated in room RRCE: Custom -> Custom
+2025-09-21 23:33:30,766 - socket_handlers - INFO - Game configuration updated in room RRCE: Custom -> Custom
+2025-09-21 23:33:43,726 - room_manager - INFO - Created room UAHA with host Bunny
+2025-09-21 23:33:43,726 - socket_handlers - INFO - Room UAHA created by Bunny
+2025-09-21 23:34:03,564 - room_manager - INFO - Player Ducky joined room UAHA
+2025-09-21 23:34:03,565 - socket_handlers - INFO - Player Ducky joined room UAHA
+2025-09-21 23:35:25,490 - socket_handlers - INFO - Game configuration updated in room UAHA: Most Linked -> Custom
+2025-09-21 23:35:30,005 - socket_handlers - INFO - Game configuration updated in room UAHA: Custom -> Custom
+2025-09-21 23:35:54,826 - socket_handlers - INFO - Client connected: GojGM-NT79TAdbjYAAAF
+2025-09-21 23:35:55,426 - room_manager - INFO - Created room HEBH with host Ducky
+2025-09-21 23:35:55,426 - socket_handlers - INFO - Room HEBH created by Ducky
+2025-09-21 23:36:01,881 - socket_handlers - INFO - Game configuration updated in room HEBH: Custom -> Animals
+2025-09-21 23:36:04,453 - socket_handlers - INFO - Game configuration updated in room HEBH: Custom -> Animals
+2025-09-21 23:36:08,226 - socket_handlers - INFO - Game configuration updated in room HEBH: Custom -> Animals
+2025-09-21 23:36:18,218 - room_manager - INFO - Created room BGNL with host Ducky
+2025-09-21 23:36:18,219 - socket_handlers - INFO - Room BGNL created by Ducky
+2025-09-21 23:36:25,457 - socket_handlers - INFO - Game configuration updated in room BGNL: Custom -> Custom
+2025-09-21 23:37:20,443 - socket_handlers - INFO - Client connected: IKyZfIdLmCjU9leVAAAH
+2025-09-21 23:37:21,126 - room_manager - INFO - Player Bunny joined room BGNL
+2025-09-21 23:37:21,127 - socket_handlers - INFO - Player Bunny joined room BGNL
+2025-09-21 23:37:50,799 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-21 23:37:50,800 - socket_handlers - INFO - DEBUG: Received start_game request from GojGM-NT79TAdbjYAAAF with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'Laufey', 'custom_end': 'Popcorn'}
+2025-09-21 23:37:50,800 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-21 23:37:50,800 - socket_handlers - INFO - DEBUG: Found room BGNL for player GojGM-NT79TAdbjYAAAF
+2025-09-21 23:37:50,800 - socket_handlers - INFO - DEBUG: Checking if player GojGM-NT79TAdbjYAAAF is host in room BGNL
+2025-09-21 23:37:50,800 - socket_handlers - INFO - DEBUG: Player GojGM-NT79TAdbjYAAAF is host, checking player count
+2025-09-21 23:37:50,800 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-21 23:37:50,800 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'Laufey', 'custom_end': 'Popcorn'}
+2025-09-21 23:37:50,800 - socket_handlers - INFO - DEBUG: Config - start: Custom, end: Custom, custom_start: Laufey, custom_end: Popcorn
+2025-09-21 23:37:50,801 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-21 23:37:50,804 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-21 23:37:51,288 - game_logic - INFO - Found Wikipedia page for 'Laufey': https://en.wikipedia.org/?curid=69824188
+2025-09-21 23:37:51,770 - game_logic - INFO - Found Wikipedia page for 'Popcorn': https://en.wikipedia.org/?curid=232176
+2025-09-21 23:37:52,555 - game_logic - INFO - Selected game pages - Start: Laufey (singer) (https://en.wikipedia.org/?curid=69824188), End: Popcorn (https://en.wikipedia.org/?curid=232176)
+2025-09-21 23:37:52,555 - socket_handlers - INFO - DEBUG: Page selection completed - start: Laufey (singer), end: Popcorn
+2025-09-21 23:37:52,555 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-21 23:37:52,555 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-21 23:37:52,556 - socket_handlers - INFO - DEBUG: About to send game_starting event to room BGNL
+2025-09-21 23:37:52,556 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-21 23:37:52,556 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/?curid=69824188, end_url=https://en.wikipedia.org/?curid=232176
+2025-09-21 23:37:52,557 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-21 23:37:52,557 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room BGNL
+2025-09-21 23:37:52,557 - socket_handlers - INFO - DEBUG: start_game handler exiting for GojGM-NT79TAdbjYAAAF
+2025-09-21 23:37:52,557 - socket_handlers - INFO - DEBUG: Starting countdown for room BGNL
+2025-09-21 23:37:57,572 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room BGNL
+2025-09-21 23:37:57,573 - socket_handlers - INFO - DEBUG: Sending game_started event to room BGNL
+2025-09-21 23:37:57,574 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-21 23:38:20,287 - socket_handlers - INFO - Client disconnected: GojGM-NT79TAdbjYAAAF
+2025-09-21 23:38:20,288 - socket_handlers - INFO - Player Ducky disconnected from room BGNL
+2025-09-21 23:38:20,288 - room_manager - INFO - Player Ducky left room BGNL
+2025-09-21 23:38:20,288 - room_manager - INFO - Closed room BGNL
+2025-09-21 23:38:20,288 - room_manager - INFO - Closed empty room BGNL
+2025-09-21 23:38:20,288 - socket_handlers - INFO - Room BGNL was deleted - last player disconnected
+2025-09-21 23:38:45,319 - socket_handlers - INFO - Client disconnected: IKyZfIdLmCjU9leVAAAH
+2025-09-21 23:38:50,327 - socket_handlers - INFO - Client disconnected: wOE3X7l8-9ZlOYGHAAAB
+2025-09-21 23:38:50,327 - socket_handlers - INFO - Player Ducky disconnected from room UAHA
+2025-09-21 23:38:50,327 - room_manager - INFO - Player Ducky left room UAHA
+2025-09-21 23:38:50,327 - socket_handlers - INFO - Client disconnected: gkpkVl0rCkn1NCn7AAAD
+2025-09-21 23:38:50,328 - socket_handlers - INFO - Player Bunny disconnected from room UAHA
+2025-09-21 23:38:50,328 - room_manager - INFO - Player Bunny left room UAHA
+2025-09-21 23:38:50,328 - room_manager - INFO - Closed room UAHA
+2025-09-21 23:38:50,328 - room_manager - INFO - Closed empty room UAHA
+2025-09-21 23:38:50,328 - socket_handlers - INFO - Room UAHA was deleted - last player disconnected
