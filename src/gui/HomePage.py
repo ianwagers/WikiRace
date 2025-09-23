@@ -82,7 +82,7 @@ class HomePage(QWidget):
         # Set maximum width to prevent floating appearance
         self.buttonsFrame.setMaximumWidth(400)
         self.buttonsLayout = QHBoxLayout(self.buttonsFrame)
-        self.buttonsLayout.setContentsMargins(8, 8, 8, 8)
+        self.buttonsLayout.setContentsMargins(0, 0, 0, 0)
         self.buttonsLayout.setSpacing(6)
         self.buttonsLayout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
@@ -110,6 +110,8 @@ class HomePage(QWidget):
         self.buttonsLayout.addWidget(self.multiplayerButton)
         self.buttonsLayout.addWidget(self.settingsButton)
 
+        # Add modest outer margin to prevent buttons from feeling glued to the edge
+        self.buttonsFrame.setContentsMargins(8, 0, 0, 0)
         self.layout.addWidget(self.buttonsFrame)
 
         # Wikipedia content area with theme container
@@ -189,6 +191,13 @@ class HomePage(QWidget):
             current_theme = theme_manager.get_theme()
             print(f"✅ WikiRace: HomePage - Page loaded successfully with Wikipedia {current_theme} theme")
             print(f"✅ WikiRace: HomePage - Final URL: {self.webView.url().toString()}")
+            
+            # Check if this is the Wikipedia main page and apply customization
+            current_url = self.webView.url().toString()
+            if "en.wikipedia.org/wiki/Main_Page" in current_url:
+                print("🏠 WikiRace: HomePage - Detected Wikipedia main page, applying customization...")
+                WikipediaTheme.applyMainPageCustomization(self.webView)
+            
             # Verify theme was applied (for debugging)
             print(f"🔍 WikiRace: HomePage - Running {current_theme} mode verification...")
             WikipediaTheme.verifyDarkModeApplied(self.webView)
@@ -216,6 +225,12 @@ class HomePage(QWidget):
         # OPTIMIZED: URL interceptor handles useskin=vector-2022 automatically
         # No need to reload - prevents redirect loops and double loading
         self.darkModeApplied = False  # Reset flag for new page
+        
+        # Check if this is the Wikipedia main page and apply customization
+        if "en.wikipedia.org/wiki/Main_Page" in url_str:
+            print("🏠 WikiRace: HomePage - Detected Wikipedia main page in URL change, applying customization...")
+            from PyQt6.QtCore import QTimer
+            QTimer.singleShot(500, lambda: WikipediaTheme.applyMainPageCustomization(self.webView))
         
         # Schedule hiding navigation elements after a brief delay to ensure page is loaded
         from PyQt6.QtCore import QTimer
@@ -318,6 +333,10 @@ class HomePage(QWidget):
             font-size: 48px;
             font-weight: 600;
         }}
+        .large-e {{
+            font-size: 36px;
+            font-weight: 400;
+        }}
         .race-text {{
             font-family: 'Linux Libertine', 'Times New Roman', 'Times', serif;
             font-size: 36px;
@@ -333,7 +352,7 @@ class HomePage(QWidget):
         </head>
         <body>
         <div class="wikirace-logo">
-            <span class="large-w">W</span>IKIRACE</span>
+            <span class="large-w">W</span>IKIRAC<span class="large-e">E</span></span>
         </div>
         </body>
         </html>
@@ -343,36 +362,36 @@ class HomePage(QWidget):
         """Update button styling based on current theme"""
         styles = theme_manager.get_theme_styles()
         
-        # Update buttons frame styling
+        # Update buttons frame styling - remove grey card background
         self.buttonsFrame.setStyleSheet(f"""
             QFrame {{
-                background-color: {styles['card_background']};
-                border-radius: 8px;
-                border: 1px solid {styles['card_border']};
-                padding: 8px;
+                background-color: transparent;
+                border: none;
             }}
         """)
         
-        # Update button styling
+        # Update button styling - cleaner design with better hover states
         button_style = f"""
             QPushButton {{
-                background-color: {styles['secondary_background']};
+                background-color: transparent;
                 color: {styles['text_color']};
                 border: 1px solid {styles['border_color']};
                 border-radius: 8px;
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
-                font-size: 13px;
-                font-weight: 500;
+                font-size: 14px;
+                font-weight: 600;
+                letter-spacing: 0.2px;
                 padding: 0 14px;
                 height: 36px;
             }}
             QPushButton:hover {{
-                background-color: {styles['button_hover']};
-                border-color: {styles['border_hover']};
+                background-color: {styles.get('accent_weak', styles['button_hover'])};
+                border-color: {styles.get('border_hover', styles['border_color'])};
             }}
-            QPushButton:pressed {{
-                background-color: {styles['button_pressed']};
-                border-color: {styles['border_pressed']};
+            QPushButton:pressed, QPushButton:checked {{
+                background-color: {styles.get('accent', styles['button_pressed'])};
+                color: {styles.get('background_color', styles['text_color'])};
+                border-color: {styles.get('border_pressed', styles['border_color'])};
             }}
             QPushButton:focus {{
                 outline: none;
@@ -380,14 +399,6 @@ class HomePage(QWidget):
             }}
             QPushButton:focus-visible {{
                 outline: none;
-                border: 1px solid {styles['border_color']};
-            }}
-            QPushButton:checked {{
-                background-color: {styles['secondary_background']};
-                border: 1px solid {styles['border_color']};
-            }}
-            QPushButton:selected {{
-                background-color: {styles['secondary_background']};
                 border: 1px solid {styles['border_color']};
             }}
         """

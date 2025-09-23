@@ -45,14 +45,14 @@ class WikipediaTheme:
         }
         .vector-body { max-width: none !important; width: 100% !important; }
         
-        /* Preserve and style article title */
+        /* Preserve and style article title - reduced font size for better balance */
         h1.firstHeading, h1#firstHeading, h1.mw-page-title, .mw-page-title, .vector-page-title,
         .mw-body h1:first-of-type, #content h1:first-of-type, .vector-body h1:first-of-type,
         .mw-body-content h1:first-of-type, #mw-content-text h1:first-of-type,
         .vector-page-titlebar h1, .vector-page-titlebar .mw-page-title,
         .vector-page-titlebar .firstHeading {
             display: block !important; visibility: visible !important; opacity: 1 !important;
-            color: inherit !important; font-size: 2.3em !important; font-weight: bold !important;
+            color: inherit !important; font-size: 1.4em !important; font-weight: bold !important;
             margin: 0.67em 0 !important; padding: 0 !important; line-height: 1.2 !important;
             text-decoration: none !important;
         }
@@ -68,6 +68,13 @@ class WikipediaTheme:
         h2[id*="xternal"] ~ *, h2[id*="itation"] ~ *, h2[id*="ibliography"] ~ * {
             display: none !important;
         }
+    """
+    
+    # Pre-compiled CSS specifically for Wikipedia main page customization
+    _MAIN_PAGE_CUSTOMIZATION_CSS = """
+        /* Note: Main page customization is now handled via JavaScript in applyMainPageCustomization() */
+        /* CSS :contains() selectors are not supported in Chromium/QWebEngine */
+        /* All main page styling is done via JavaScript for better compatibility */
     """
     
     @staticmethod
@@ -1089,6 +1096,167 @@ class WikipediaTheme:
             import traceback
             traceback.print_exc()
 
+    @staticmethod
+    def applyMainPageCustomization(webView: QWebEngineView):
+        """
+        Apply main page specific customization (hide Main Page title, style Welcome title)
+        This should only be called for the Wikipedia main page, not for article pages
+        """
+        if not webView:
+            return
+            
+        print("🏠 WikiRace: Applying main page customization...")
+        
+        # Use JavaScript to precisely target and modify elements
+        inject_js = """
+        try {
+            console.log('WikiRace: Starting main page customization...');
+            
+            // Hide the Main Page title specifically - try multiple selectors
+            var selectors = [
+                'h1.firstHeading',
+                'h1#firstHeading', 
+                '.vector-page-titlebar .mw-page-title',
+                '.vector-page-titlebar .firstHeading',
+                '.mw-page-title'
+            ];
+            
+            for (var i = 0; i < selectors.length; i++) {
+                var element = document.querySelector(selectors[i]);
+                if (element && element.textContent.trim() === 'Main Page') {
+                    element.style.display = 'none';
+                    element.style.visibility = 'hidden';
+                    console.log('WikiRace: Hidden Main Page title using selector:', selectors[i]);
+                    
+                    // Also collapse the empty titlebar container
+                    var bar = document.querySelector('.vector-page-titlebar');
+                    if (bar) {
+                        bar.style.display = 'none';
+                        bar.style.margin = '0';
+                        bar.style.padding = '0';
+                        console.log('WikiRace: Collapsed empty titlebar container');
+                    }
+                }
+            }
+            
+            // Find and style the Welcome to Wikipedia text with new specifications
+            var allElements = document.querySelectorAll('*');
+            for (var i = 0; i < allElements.length; i++) {
+                var element = allElements[i];
+                var text = element.textContent.trim();
+                
+                // Look for "Welcome to Wikipedia" text - be more flexible
+                if (text === 'Welcome to Wikipedia' || text.includes('Welcome to Wikipedia') || 
+                    text.includes('Welcome') && text.includes('Wikipedia')) {
+                    // Make sure it's a heading or important text element
+                    if (element.tagName && (element.tagName.toLowerCase() === 'h2' || 
+                        element.tagName.toLowerCase() === 'h3' || 
+                        element.tagName.toLowerCase() === 'h4' ||
+                        element.classList.contains('mw-headline'))) {
+                        
+                        // Apply new styling specifications with !important to override any CSS
+                        element.style.setProperty('font-size', 'clamp(24px, 2.6vw, 34px)', 'important');
+                        element.style.setProperty('line-height', '1.15', 'important');
+                        element.style.setProperty('font-weight', '600', 'important');
+                        element.style.setProperty('white-space', 'nowrap', 'important');
+                        element.style.setProperty('word-break', 'normal', 'important');
+                        element.style.setProperty('letter-spacing', '0.2px', 'important');
+                        element.style.setProperty('display', 'inline-block', 'important');
+                        element.style.setProperty('visibility', 'visible', 'important');
+                        
+                        // Force its children not to stack
+                        element.querySelectorAll('*').forEach(s => { 
+                            s.style.display = 'inline'; 
+                            s.style.whiteSpace = 'nowrap'; 
+                        });
+                        
+                        // If the comma is its own node, merge any split nodes
+                        element.textContent = element.textContent.replace(/\s*,\s*/g, ', ');
+                        
+                        console.log('WikiRace: Styled Welcome to Wikipedia text with new specifications:', text);
+                        break;
+                    }
+                }
+            }
+            
+            // Fallback: look for any heading that might be the welcome text
+            var headings = document.querySelectorAll('h2, h3, h4, .mw-headline');
+            for (var i = 0; i < headings.length; i++) {
+                var heading = headings[i];
+                var text = heading.textContent.trim();
+                
+                if (text.includes('Welcome') && text.includes('Wikipedia')) {
+                    // Apply new styling specifications with !important to override any CSS
+                    heading.style.setProperty('font-size', 'clamp(24px, 2.6vw, 34px)', 'important');
+                    heading.style.setProperty('line-height', '1.15', 'important');
+                    heading.style.setProperty('font-weight', '600', 'important');
+                    heading.style.setProperty('white-space', 'nowrap', 'important');
+                    heading.style.setProperty('word-break', 'normal', 'important');
+                    heading.style.setProperty('letter-spacing', '0.2px', 'important');
+                    heading.style.setProperty('display', 'inline-block', 'important');
+                    heading.style.setProperty('visibility', 'visible', 'important');
+                    
+                    // Force its children not to stack
+                    heading.querySelectorAll('*').forEach(s => { 
+                        s.style.display = 'inline'; 
+                        s.style.whiteSpace = 'nowrap'; 
+                    });
+                    
+                    // If the comma is its own node, merge any split nodes
+                    heading.textContent = heading.textContent.replace(/\s*,\s*/g, ', ');
+                    
+                    console.log('WikiRace: Styled welcome heading as fallback with new specifications:', text);
+                    break;
+                }
+            }
+            
+            // Additional fallback: Try to find any large heading that might be the welcome text
+            var largeHeadings = document.querySelectorAll('h1, h2, h3');
+            for (var i = 0; i < largeHeadings.length; i++) {
+                var heading = largeHeadings[i];
+                var text = heading.textContent.trim();
+                var computedStyle = window.getComputedStyle(heading);
+                var fontSize = parseFloat(computedStyle.fontSize);
+                
+                // If it's a large heading and contains welcome/wikipedia keywords
+                if (fontSize > 24 && (text.includes('Welcome') || text.includes('Wikipedia'))) {
+                    console.log('WikiRace: Found large heading that might be welcome text:', text, 'font-size:', fontSize);
+                    
+                    // Apply new styling specifications with !important
+                    heading.style.setProperty('font-size', 'clamp(24px, 2.6vw, 34px)', 'important');
+                    heading.style.setProperty('line-height', '1.15', 'important');
+                    heading.style.setProperty('font-weight', '600', 'important');
+                    heading.style.setProperty('white-space', 'nowrap', 'important');
+                    heading.style.setProperty('word-break', 'normal', 'important');
+                    heading.style.setProperty('letter-spacing', '0.2px', 'important');
+                    heading.style.setProperty('display', 'inline-block', 'important');
+                    
+                    // Force its children not to stack
+                    heading.querySelectorAll('*').forEach(s => { 
+                        s.style.display = 'inline'; 
+                        s.style.whiteSpace = 'nowrap'; 
+                    });
+                    
+                    // If the comma is its own node, merge any split nodes
+                    heading.textContent = heading.textContent.replace(/\s*,\s*/g, ', ');
+                    
+                    console.log('WikiRace: Applied styling to large heading:', text);
+                    break;
+                }
+            }
+            
+            console.log('WikiRace: Main page customization completed');
+        } catch (e) {
+            console.log('WikiRace: Error in main page customization:', e);
+        }
+        """
+        
+        try:
+            webView.page().runJavaScript(inject_js)
+            print("✅ WikiRace: Main page customization applied successfully")
+        except Exception as e:
+            print(f"❌ WikiRace: Error applying main page customization: {e}")
+    
     @staticmethod
     def hideNavigationElements(webView: QWebEngineView):
         """

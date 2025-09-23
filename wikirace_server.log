@@ -1342,3 +1342,9 @@ OSError: [Errno 22] Invalid argument
 2025-09-22 23:40:42,344 - room_manager - INFO - Closed empty room SFMQ
 2025-09-22 23:40:42,344 - socket_handlers - INFO - Room SFMQ was deleted - last player disconnected
 2025-09-22 23:40:51,247 - redis_manager - INFO - Disconnected from Redis
+2025-09-23 07:29:26,930 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-23 07:29:27,240 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-23 07:29:27,241 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-23 07:29:27,583 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-23 07:29:31,673 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-23 07:29:31,674 - room_manager - WARNING - Redis connection failed, using in-memory storage only
