@@ -467,8 +467,14 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     import traceback
                     logger.error(f"ERROR DEBUG: Countdown traceback: {traceback.format_exc()}")
             
-            # Start the countdown task in the background
-            asyncio.create_task(start_game_after_countdown())
+            # Start the countdown task in the background with error handling
+            try:
+                asyncio.create_task(start_game_after_countdown())
+                logger.info(f"DEBUG: Countdown task created successfully for room {room.room_code}")
+            except Exception as task_error:
+                logger.error(f"ERROR DEBUG: Failed to create countdown task: {task_error}")
+                await sio.emit('error', {'message': 'Failed to start countdown'}, room=sid)
+                return
             
             logger.info(f"DEBUG: Game start handler completed successfully for room {room.room_code}")
             
@@ -490,13 +496,17 @@ def register_socket_handlers(sio, room_manager: RoomManager):
     @sio.event
     async def player_progress(sid, data):
         """Handle player progress updates with detailed navigation tracking"""
+        print(f"📊 DEBUG: Received player_progress from {sid}: {data}")
         try:
             room_code = data.get('room_code')
             player_name = data.get('player_name')
             page_url = data.get('page_url')
             page_title = data.get('page_title')
             
+            print(f"📊 DEBUG: Progress data - room: {room_code}, player: {player_name}, page: {page_title}")
+            
             if not room_code or not player_name or not page_url or not page_title:
+                print(f"❌ DEBUG: Invalid progress data - missing fields")
                 await sio.emit('error', {'message': 'Invalid progress data - missing required fields'}, room=sid)
                 return
             

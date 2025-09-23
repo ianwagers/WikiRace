@@ -233,6 +233,8 @@ class MultiplayerGamePage(QWidget):
     
     def connect_network_signals(self):
         """Connect to network manager signals"""
+        self.network_manager.game_starting.connect(self.on_game_starting)
+        self.network_manager.game_started.connect(self.on_game_started)
         self.network_manager.player_progress.connect(self.on_player_progress)
         self.network_manager.game_ended.connect(self.on_game_ended)
         self.network_manager.player_completed.connect(self.on_player_completed)
@@ -374,6 +376,10 @@ class MultiplayerGamePage(QWidget):
     
     def start_game(self):
         """Start the multiplayer game"""
+        print(f"🎮 DEBUG: Starting multiplayer game...")
+        print(f"🎮 DEBUG: Network manager connected: {self.network_manager.connected_to_server}")
+        print(f"🎮 DEBUG: Current room: {self.network_manager.current_room}")
+        
         self.game_started = True
         self.game_finished = False  # Reset game finished flag for new race
         self.start_time = time.time()
@@ -391,6 +397,8 @@ class MultiplayerGamePage(QWidget):
         # Set flag after a short delay to allow initial page load
         from PyQt6.QtCore import QTimer
         QTimer.singleShot(1000, lambda: setattr(self, 'initial_page_loaded', True))
+        
+        print(f"🎮 DEBUG: Multiplayer game started successfully!")
     
     def reset_all_progress(self):
         """Reset all player progress to 0 at game start"""
@@ -401,11 +409,17 @@ class MultiplayerGamePage(QWidget):
     def on_url_changed(self, url):
         """Handle URL changes from SoloGamePage"""
         if not self.game_started:
+            print(f"🚫 Game not started yet, skipping URL change: {url}")
             return
         
         # Skip the initial page load to prevent duplicate starting page
         if not getattr(self, 'initial_page_loaded', True):
             print(f"🚫 Skipping initial page load: {url}")
+            return
+        
+        # Check network connection before sending progress
+        if not self.network_manager.connected_to_server:
+            print(f"⚠️ Not connected to server, skipping progress update")
             return
         
         # Get current page title
@@ -420,6 +434,7 @@ class MultiplayerGamePage(QWidget):
             self.players[local_player_name].update_progress(current_title, links_used)
         
         # Broadcast detailed progress to other players
+        print(f"📊 Sending progress: {current_title} (URL: {url})")
         self.network_manager.send_player_progress(url, current_title)
     
     def on_link_clicked(self):
@@ -447,6 +462,29 @@ class MultiplayerGamePage(QWidget):
             
             # Notify server of completion
             self.network_manager.send_game_completion(completion_time, self.solo_game.linksUsed)
+    
+    def on_game_starting(self, countdown_data):
+        """Handle game starting countdown event from server"""
+        print(f"🎬 DEBUG: MultiplayerGamePage received game_starting event: {countdown_data}")
+        
+        # Show countdown dialog if available
+        try:
+            from src.gui.CountdownDialog import CountdownDialog
+            countdown_dialog = CountdownDialog(countdown_data, parent=self)
+            countdown_dialog.exec()
+        except Exception as e:
+            print(f"❌ Failed to show countdown dialog: {e}")
+            # Continue without countdown dialog
+    
+    def on_game_started(self, game_data):
+        """Handle game start event from server"""
+        print(f"🎮 DEBUG: MultiplayerGamePage received game_started event: {game_data}")
+        print(f"🎮 DEBUG: Current game_started state: {self.game_started}")
+        print(f"🎮 DEBUG: Current game_finished state: {self.game_finished}")
+        
+        # Start the multiplayer game
+        self.start_game()
+        print(f"🎮 DEBUG: Game started successfully, game_started is now: {self.game_started}")
     
     def on_player_progress(self, player_name, current_page, links_used):
         """Handle progress updates from other players"""

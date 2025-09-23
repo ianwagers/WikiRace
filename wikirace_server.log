@@ -1,0 +1,344 @@
+2025-09-22 19:29:28,426 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 19:29:28,968 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 19:29:28,968 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 19:29:29,403 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 19:29:33,495 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 19:29:33,495 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 19:37:42,886 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 19:37:43,158 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 19:37:43,158 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 19:37:46,372 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 19:37:50,450 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 19:37:50,450 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 19:38:15,971 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-22 19:38:15,977 - socket_handlers - INFO - Client connected: vQThOWKONOe6wSugAAAB
+2025-09-22 19:38:16,506 - room_manager - INFO - Created room IGUS with host Player1
+2025-09-22 19:38:16,507 - socket_handlers - INFO - Room IGUS created by Player1
+2025-09-22 19:38:24,777 - socket_handlers - INFO - Client connected: MO50NEslk_DWslylAAAD
+2025-09-22 19:38:25,293 - room_manager - INFO - Player Player2 joined room IGUS
+2025-09-22 19:38:25,294 - socket_handlers - INFO - Player Player2 joined room IGUS
+2025-09-22 19:38:50,064 - socket_handlers - INFO - Game configuration updated in room IGUS: Custom -> Animals
+2025-09-22 19:38:51,479 - socket_handlers - INFO - Game configuration updated in room IGUS: Custom -> Custom
+2025-09-22 19:38:53,385 - socket_handlers - INFO - Game configuration updated in room IGUS: Custom -> Custom
+2025-09-22 19:38:58,916 - socket_handlers - INFO - Game configuration updated in room IGUS: Custom -> Custom
+2025-09-22 19:40:08,210 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 19:40:08,475 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 19:40:08,475 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 19:40:11,679 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 19:40:15,759 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 19:40:15,759 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 19:40:45,549 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-22 19:40:45,554 - socket_handlers - INFO - Client connected: 6elivmYDAnyMsT0-AAAB
+2025-09-22 19:40:46,084 - room_manager - INFO - Created room NZLN with host Player1
+2025-09-22 19:40:46,085 - socket_handlers - INFO - Room NZLN created by Player1
+2025-09-22 19:40:54,363 - socket_handlers - INFO - Game configuration updated in room NZLN: Custom -> Animals
+2025-09-22 19:40:57,666 - socket_handlers - INFO - Game configuration updated in room NZLN: Custom -> Custom
+2025-09-22 19:41:01,611 - socket_handlers - INFO - Client connected: WBoeaeNfaiWmKccxAAAD
+2025-09-22 19:41:02,116 - room_manager - INFO - Player Player2 joined room NZLN
+2025-09-22 19:41:02,117 - socket_handlers - INFO - Player Player2 joined room NZLN
+2025-09-22 19:41:16,255 - socket_handlers - INFO - Game configuration updated in room NZLN: Custom -> Custom
+2025-09-22 19:41:22,336 - socket_handlers - INFO - Game configuration updated in room NZLN: Custom -> Custom
+2025-09-22 19:41:28,351 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 19:46:27,228 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 19:46:27,450 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 19:46:27,451 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 19:46:27,735 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 19:46:31,807 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 19:46:31,807 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 19:46:47,350 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-22 19:46:47,353 - socket_handlers - INFO - Client connected: 5gqOrdWC53Bx_iTNAAAB
+2025-09-22 19:46:47,857 - room_manager - INFO - Created room SKFA with host Player1
+2025-09-22 19:46:47,857 - socket_handlers - INFO - Room SKFA created by Player1
+2025-09-22 19:47:09,443 - socket_handlers - INFO - Client connected: 9xbyleYzreSHe-TIAAAD
+2025-09-22 19:47:09,959 - room_manager - INFO - Player Player2 joined room SKFA
+2025-09-22 19:47:09,960 - socket_handlers - INFO - Player Player2 joined room SKFA
+2025-09-22 19:47:14,051 - socket_handlers - INFO - Game configuration updated in room SKFA: Custom -> Animals
+2025-09-22 19:47:16,043 - socket_handlers - INFO - Game configuration updated in room SKFA: Custom -> Custom
+2025-09-22 19:47:19,316 - socket_handlers - INFO - Game configuration updated in room SKFA: Custom -> Custom
+2025-09-22 19:47:24,289 - socket_handlers - INFO - Game configuration updated in room SKFA: Custom -> Custom
+2025-09-22 19:47:28,513 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 19:48:07,081 - socket_handlers - INFO - DEBUG: Received start_game request from 5gqOrdWC53Bx_iTNAAAB with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-22 19:48:07,081 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-22 19:48:07,081 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-92' coro=<AsyncServer._handle_event_internal() done, defined at C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py:610> exception=OSError(22, 'Invalid argument')>
+Traceback (most recent call last):
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py", line 612, in _handle_event_internal
+    r = await server._trigger_event(data[0], namespace, sid, *data[1:])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py", line 640, in _trigger_event
+    ret = await handler(*args)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\server\socket_handlers.py", line 336, in start_game
+    handler.flush()
+    ~~~~~~~~~~~~~^^
+  File "C:\Project_Workspace\WikiRace\Python313\Lib\logging\__init__.py", line 1137, in flush
+    self.stream.flush()
+    ~~~~~~~~~~~~~~~~~^^
+OSError: [Errno 22] Invalid argument
+2025-09-22 19:48:37,124 - socket_handlers - INFO - Client disconnected: 5gqOrdWC53Bx_iTNAAAB
+2025-09-22 19:48:37,124 - socket_handlers - INFO - Player Player1 disconnected from room SKFA
+2025-09-22 19:48:37,125 - room_manager - INFO - Player Player1 left room SKFA
+2025-09-22 19:48:37,125 - room_manager - INFO - Closed room SKFA
+2025-09-22 19:48:37,125 - room_manager - INFO - Closed empty room SKFA
+2025-09-22 19:48:37,125 - socket_handlers - INFO - Room SKFA was deleted - last player disconnected
+2025-09-22 19:48:39,632 - socket_handlers - INFO - Client disconnected: 9xbyleYzreSHe-TIAAAD
+2025-09-22 19:50:23,457 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 19:50:23,668 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 19:50:23,668 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 19:50:23,950 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 19:50:28,029 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 19:50:28,029 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 19:51:09,937 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 19:51:10,147 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 19:51:10,147 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 19:51:10,430 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 19:51:14,514 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 19:51:14,514 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 19:51:36,464 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-22 19:51:36,468 - socket_handlers - INFO - Client connected: arnQI5AK1b91up3QAAAB
+2025-09-22 19:51:36,983 - room_manager - INFO - Created room SPWY with host Player1
+2025-09-22 19:51:36,983 - socket_handlers - INFO - Room SPWY created by Player1
+2025-09-22 19:51:45,720 - socket_handlers - INFO - Game configuration updated in room SPWY: Custom -> Animals
+2025-09-22 19:51:47,179 - socket_handlers - INFO - Game configuration updated in room SPWY: Custom -> Custom
+2025-09-22 19:51:49,471 - socket_handlers - INFO - Game configuration updated in room SPWY: Custom -> Custom
+2025-09-22 19:51:51,832 - socket_handlers - INFO - Client connected: rTaGuIDa6P5WX0b7AAAD
+2025-09-22 19:51:52,336 - room_manager - INFO - Player Player2 joined room SPWY
+2025-09-22 19:51:52,337 - socket_handlers - INFO - Player Player2 joined room SPWY
+2025-09-22 19:52:07,935 - socket_handlers - INFO - Game configuration updated in room SPWY: Custom -> Custom
+2025-09-22 19:52:10,789 - socket_handlers - INFO - Game configuration updated in room SPWY: Custom -> Custom
+2025-09-22 19:52:53,094 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 19:52:53,095 - socket_handlers - INFO - Client disconnected: rTaGuIDa6P5WX0b7AAAD
+2025-09-22 19:52:53,095 - socket_handlers - INFO - Player Player2 disconnected from room SPWY
+2025-09-22 19:52:53,095 - room_manager - INFO - Player Player2 left room SPWY
+2025-09-22 19:53:23,141 - socket_handlers - INFO - Client disconnected: arnQI5AK1b91up3QAAAB
+2025-09-22 19:53:23,141 - socket_handlers - INFO - Player Player1 disconnected from room SPWY
+2025-09-22 19:53:23,141 - room_manager - INFO - Player Player1 left room SPWY
+2025-09-22 19:53:23,142 - room_manager - INFO - Closed room SPWY
+2025-09-22 19:53:23,142 - room_manager - INFO - Closed empty room SPWY
+2025-09-22 19:53:23,142 - socket_handlers - INFO - Room SPWY was deleted - last player disconnected
+2025-09-22 19:57:22,738 - socket_handlers - INFO - Client connected: PT5ATgNTEi09yiAVAAAI
+2025-09-22 19:57:23,242 - room_manager - INFO - Created room JNLQ with host Player1
+2025-09-22 19:57:23,243 - socket_handlers - INFO - Room JNLQ created by Player1
+2025-09-22 19:57:32,447 - socket_handlers - INFO - Client connected: do9u70MbOqEs32IZAAAK
+2025-09-22 19:57:32,952 - room_manager - INFO - Player Player2 joined room JNLQ
+2025-09-22 19:57:32,953 - socket_handlers - INFO - Player Player2 joined room JNLQ
+2025-09-22 19:57:37,790 - socket_handlers - INFO - Game configuration updated in room JNLQ: Custom -> Animals
+2025-09-22 19:57:39,213 - socket_handlers - INFO - Game configuration updated in room JNLQ: Custom -> Custom
+2025-09-22 19:57:44,923 - socket_handlers - INFO - Game configuration updated in room JNLQ: Custom -> Custom
+2025-09-22 19:57:48,239 - socket_handlers - INFO - Game configuration updated in room JNLQ: Custom -> Custom
+2025-09-22 19:57:52,999 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 19:57:53,001 - socket_handlers - INFO - DEBUG: Received start_game request from PT5ATgNTEi09yiAVAAAI with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-22 19:57:53,001 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-22 19:57:53,001 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-190' coro=<AsyncServer._handle_event_internal() done, defined at C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py:610> exception=OSError(22, 'Invalid argument')>
+Traceback (most recent call last):
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py", line 612, in _handle_event_internal
+    r = await server._trigger_event(data[0], namespace, sid, *data[1:])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py", line 640, in _trigger_event
+    ret = await handler(*args)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\server\socket_handlers.py", line 336, in start_game
+    handler.flush()
+    ~~~~~~~~~~~~~^^
+  File "C:\Project_Workspace\WikiRace\Python313\Lib\logging\__init__.py", line 1137, in flush
+    self.stream.flush()
+    ~~~~~~~~~~~~~~~~~^^
+OSError: [Errno 22] Invalid argument
+2025-09-22 19:59:13,350 - socket_handlers - INFO - Client disconnected: do9u70MbOqEs32IZAAAK
+2025-09-22 19:59:13,350 - socket_handlers - INFO - Player Player2 disconnected from room JNLQ
+2025-09-22 19:59:13,350 - room_manager - INFO - Player Player2 left room JNLQ
+2025-09-22 19:59:23,365 - socket_handlers - INFO - Client disconnected: PT5ATgNTEi09yiAVAAAI
+2025-09-22 19:59:23,366 - socket_handlers - INFO - Player Player1 disconnected from room JNLQ
+2025-09-22 19:59:23,366 - room_manager - INFO - Player Player1 left room JNLQ
+2025-09-22 19:59:23,366 - room_manager - INFO - Closed room JNLQ
+2025-09-22 19:59:23,366 - room_manager - INFO - Closed empty room JNLQ
+2025-09-22 19:59:23,366 - socket_handlers - INFO - Room JNLQ was deleted - last player disconnected
+2025-09-22 20:00:33,168 - socket_handlers - INFO - Client connected: A5724Ue4Z3H1NM3mAAAM
+2025-09-22 20:00:33,672 - room_manager - INFO - Created room MBNK with host Player1
+2025-09-22 20:00:33,672 - socket_handlers - INFO - Room MBNK created by Player1
+2025-09-22 20:00:40,010 - socket_handlers - INFO - Client connected: VL8PS_Bu0t3TUMHXAAAO
+2025-09-22 20:00:40,526 - room_manager - INFO - Player Player2 joined room MBNK
+2025-09-22 20:00:40,527 - socket_handlers - INFO - Player Player2 joined room MBNK
+2025-09-22 20:00:44,875 - socket_handlers - INFO - Game configuration updated in room MBNK: Celebrities -> Animals
+2025-09-22 20:00:47,748 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 20:00:47,750 - socket_handlers - INFO - DEBUG: Received start_game request from A5724Ue4Z3H1NM3mAAAM with data: {'start_page': 'Celebrities', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-22 20:00:47,750 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-22 20:00:47,750 - asyncio - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-274' coro=<AsyncServer._handle_event_internal() done, defined at C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py:610> exception=OSError(22, 'Invalid argument')>
+Traceback (most recent call last):
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py", line 612, in _handle_event_internal
+    r = await server._trigger_event(data[0], namespace, sid, *data[1:])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\socketio\async_server.py", line 640, in _trigger_event
+    ret = await handler(*args)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\server\socket_handlers.py", line 336, in start_game
+    handler.flush()
+    ~~~~~~~~~~~~~^^
+  File "C:\Project_Workspace\WikiRace\Python313\Lib\logging\__init__.py", line 1137, in flush
+    self.stream.flush()
+    ~~~~~~~~~~~~~~~~~^^
+OSError: [Errno 22] Invalid argument
+2025-09-22 20:01:43,468 - socket_handlers - INFO - Client disconnected: A5724Ue4Z3H1NM3mAAAM
+2025-09-22 20:01:43,469 - socket_handlers - INFO - Player Player1 disconnected from room MBNK
+2025-09-22 20:01:43,469 - room_manager - INFO - Player Player1 left room MBNK
+2025-09-22 20:01:43,469 - room_manager - INFO - Closed room MBNK
+2025-09-22 20:01:43,469 - room_manager - INFO - Closed empty room MBNK
+2025-09-22 20:01:43,469 - socket_handlers - INFO - Room MBNK was deleted - last player disconnected
+2025-09-22 20:01:53,482 - socket_handlers - INFO - Client disconnected: VL8PS_Bu0t3TUMHXAAAO
+2025-09-22 20:02:27,443 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 20:02:27,649 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 20:02:27,649 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 20:02:27,929 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 20:02:32,019 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 20:02:32,019 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 20:02:47,091 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-22 20:02:47,093 - socket_handlers - INFO - Client connected: 2gvaUhiNfuRy7iipAAAB
+2025-09-22 20:02:47,597 - room_manager - INFO - Created room LWMZ with host Player1
+2025-09-22 20:02:47,597 - socket_handlers - INFO - Room LWMZ created by Player1
+2025-09-22 20:02:53,556 - socket_handlers - INFO - Client connected: NuvCAD4Qum4hlQtAAAAD
+2025-09-22 20:02:54,071 - room_manager - INFO - Player Player2 joined room LWMZ
+2025-09-22 20:02:54,072 - socket_handlers - INFO - Player Player2 joined room LWMZ
+2025-09-22 20:02:57,510 - socket_handlers - INFO - Game configuration updated in room LWMZ: Countries -> Animals
+2025-09-22 20:03:02,112 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 20:03:02,113 - socket_handlers - INFO - DEBUG: Received start_game request from 2gvaUhiNfuRy7iipAAAB with data: {'start_page': 'Countries', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-22 20:03:02,113 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-22 20:03:02,113 - socket_handlers - INFO - DEBUG: Found room LWMZ for player 2gvaUhiNfuRy7iipAAAB
+2025-09-22 20:03:02,113 - socket_handlers - INFO - DEBUG: Checking if player 2gvaUhiNfuRy7iipAAAB is host in room LWMZ
+2025-09-22 20:03:02,113 - socket_handlers - INFO - DEBUG: Player 2gvaUhiNfuRy7iipAAAB is host, checking player count
+2025-09-22 20:03:02,114 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-22 20:03:02,114 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Countries', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-22 20:03:02,114 - socket_handlers - INFO - DEBUG: Config - start: Countries, end: Animals, custom_start: None, custom_end: None
+2025-09-22 20:03:02,114 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-22 20:03:02,117 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-22 20:03:02,117 - game_logic - INFO - Selected game pages - Start: Japan (https://en.wikipedia.org/wiki/Japan), End: Eagle (https://en.wikipedia.org/wiki/Eagle)
+2025-09-22 20:07:57,390 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 20:07:57,610 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 20:07:57,611 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 20:07:57,893 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 20:08:01,985 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 20:08:01,985 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 20:08:34,910 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-22 20:08:34,912 - socket_handlers - INFO - Client connected: aPz1Gwwgiu9cLdWpAAAB
+2025-09-22 20:08:35,427 - room_manager - INFO - Created room LUWM with host Player1
+2025-09-22 20:08:35,428 - socket_handlers - INFO - Room LUWM created by Player1
+2025-09-22 20:08:43,130 - socket_handlers - INFO - Client connected: a89FRaAKlQr0YYQlAAAD
+2025-09-22 20:08:43,634 - room_manager - INFO - Player Player2 joined room LUWM
+2025-09-22 20:08:43,635 - socket_handlers - INFO - Player Player2 joined room LUWM
+2025-09-22 20:08:47,956 - socket_handlers - INFO - Game configuration updated in room LUWM: Custom -> Animals
+2025-09-22 20:08:49,487 - socket_handlers - INFO - Game configuration updated in room LUWM: Custom -> Custom
+2025-09-22 20:08:53,487 - socket_handlers - INFO - Game configuration updated in room LUWM: Custom -> Custom
+2025-09-22 20:08:56,751 - socket_handlers - INFO - Game configuration updated in room LUWM: Custom -> Custom
+2025-09-22 20:09:00,878 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 20:10:50,950 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-22 20:10:51,152 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-22 20:10:51,152 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-22 20:10:51,424 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-22 20:10:55,518 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-22 20:10:55,519 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-22 20:12:12,809 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-22 20:12:12,812 - socket_handlers - INFO - Client connected: 08Mj53Dwkvz8P-wXAAAB
+2025-09-22 20:12:13,328 - room_manager - INFO - Created room QJCH with host Player1
+2025-09-22 20:12:13,328 - socket_handlers - INFO - Room QJCH created by Player1
+2025-09-22 20:12:23,642 - socket_handlers - INFO - Client connected: C0zhyk16mkVpBmnwAAAD
+2025-09-22 20:12:24,147 - room_manager - INFO - Player Player2 joined room QJCH
+2025-09-22 20:12:24,148 - socket_handlers - INFO - Player Player2 joined room QJCH
+2025-09-22 20:12:28,570 - socket_handlers - INFO - Game configuration updated in room QJCH: Custom -> Animals
+2025-09-22 20:12:30,313 - socket_handlers - INFO - Game configuration updated in room QJCH: Custom -> Custom
+2025-09-22 20:12:34,222 - socket_handlers - INFO - Game configuration updated in room QJCH: Custom -> Custom
+2025-09-22 20:12:37,507 - socket_handlers - INFO - Game configuration updated in room QJCH: Custom -> Custom
+2025-09-22 20:12:40,878 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 20:12:40,880 - socket_handlers - INFO - DEBUG: Received start_game request from 08Mj53Dwkvz8P-wXAAAB with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-22 20:12:40,880 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-22 20:12:40,880 - socket_handlers - INFO - DEBUG: Found room QJCH for player 08Mj53Dwkvz8P-wXAAAB
+2025-09-22 20:12:40,880 - socket_handlers - INFO - DEBUG: Checking if player 08Mj53Dwkvz8P-wXAAAB is host in room QJCH
+2025-09-22 20:12:40,880 - socket_handlers - INFO - DEBUG: Player 08Mj53Dwkvz8P-wXAAAB is host, checking player count
+2025-09-22 20:12:40,880 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-22 20:12:40,881 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-22 20:12:40,881 - socket_handlers - INFO - DEBUG: Config - start: Custom, end: Custom, custom_start: YouTube, custom_end: YouTube Music
+2025-09-22 20:12:40,881 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-22 20:12:40,882 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-22 20:12:41,446 - game_logic - INFO - Found Wikipedia page for 'YouTube': https://en.wikipedia.org/?curid=3524766
+2025-09-22 20:12:42,079 - game_logic - INFO - Found Wikipedia page for 'YouTube Music': https://en.wikipedia.org/?curid=52135003
+2025-09-22 20:12:42,889 - game_logic - INFO - Selected game pages - Start: YouTube (https://en.wikipedia.org/?curid=3524766), End: YouTube Music (https://en.wikipedia.org/?curid=52135003)
+2025-09-22 20:12:42,890 - socket_handlers - INFO - DEBUG: Page selection completed - start: YouTube, end: YouTube Music
+2025-09-22 20:12:42,890 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-22 20:12:42,890 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-22 20:12:42,890 - socket_handlers - INFO - DEBUG: About to send game_starting event to room QJCH
+2025-09-22 20:12:42,890 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-22 20:12:42,890 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/?curid=3524766, end_url=https://en.wikipedia.org/?curid=52135003
+2025-09-22 20:12:42,892 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-22 20:12:42,892 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room QJCH
+2025-09-22 20:12:42,892 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room QJCH
+2025-09-22 20:12:42,892 - socket_handlers - INFO - DEBUG: start_game handler exiting for 08Mj53Dwkvz8P-wXAAAB
+2025-09-22 20:12:42,892 - socket_handlers - INFO - DEBUG: Starting countdown for room QJCH
+2025-09-22 20:12:47,906 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room QJCH
+2025-09-22 20:12:47,907 - socket_handlers - INFO - DEBUG: Sending game_started event to room QJCH
+2025-09-22 20:12:47,908 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-22 20:13:32,938 - socket_handlers - INFO - Client disconnected: 08Mj53Dwkvz8P-wXAAAB
+2025-09-22 20:13:32,938 - socket_handlers - INFO - Player Player1 disconnected from room QJCH
+2025-09-22 20:13:32,938 - room_manager - INFO - Player Player1 left room QJCH
+2025-09-22 20:13:32,938 - room_manager - INFO - Closed room QJCH
+2025-09-22 20:13:32,938 - room_manager - INFO - Closed empty room QJCH
+2025-09-22 20:13:32,939 - socket_handlers - INFO - Room QJCH was deleted - last player disconnected
+2025-09-22 20:13:42,951 - socket_handlers - INFO - Client disconnected: C0zhyk16mkVpBmnwAAAD
+2025-09-22 20:14:28,404 - socket_handlers - INFO - Client connected: eaDEVSKT1Xc8OMGNAAAF
+2025-09-22 20:14:28,919 - room_manager - INFO - Created room LYKT with host Player1
+2025-09-22 20:14:28,920 - socket_handlers - INFO - Room LYKT created by Player1
+2025-09-22 20:14:38,778 - socket_handlers - INFO - Client connected: HDIBfMYS5D_RkvQAAAAH
+2025-09-22 20:14:39,292 - room_manager - INFO - Player Player2 joined room LYKT
+2025-09-22 20:14:39,294 - socket_handlers - INFO - Player Player2 joined room LYKT
+2025-09-22 20:14:43,523 - socket_handlers - INFO - Game configuration updated in room LYKT: Custom -> Animals
+2025-09-22 20:14:45,210 - socket_handlers - INFO - Game configuration updated in room LYKT: Custom -> Custom
+2025-09-22 20:14:47,329 - socket_handlers - INFO - Game configuration updated in room LYKT: Custom -> Custom
+2025-09-22 20:14:53,192 - socket_handlers - INFO - Game configuration updated in room LYKT: Custom -> Custom
+2025-09-22 20:14:54,774 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-22 20:14:54,776 - socket_handlers - INFO - DEBUG: Received start_game request from eaDEVSKT1Xc8OMGNAAAF with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-22 20:14:54,776 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-22 20:14:54,776 - socket_handlers - INFO - DEBUG: Found room LYKT for player eaDEVSKT1Xc8OMGNAAAF
+2025-09-22 20:14:54,776 - socket_handlers - INFO - DEBUG: Checking if player eaDEVSKT1Xc8OMGNAAAF is host in room LYKT
+2025-09-22 20:14:54,776 - socket_handlers - INFO - DEBUG: Player eaDEVSKT1Xc8OMGNAAAF is host, checking player count
+2025-09-22 20:14:54,776 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-22 20:14:54,776 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-22 20:14:54,777 - socket_handlers - INFO - DEBUG: Config - start: Custom, end: Custom, custom_start: YouTube, custom_end: YouTube Music
+2025-09-22 20:14:54,777 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-22 20:14:54,777 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-22 20:14:55,354 - game_logic - INFO - Found Wikipedia page for 'YouTube': https://en.wikipedia.org/?curid=3524766
+2025-09-22 20:14:56,038 - game_logic - INFO - Found Wikipedia page for 'YouTube Music': https://en.wikipedia.org/?curid=52135003
+2025-09-22 20:14:56,827 - game_logic - INFO - Selected game pages - Start: YouTube (https://en.wikipedia.org/?curid=3524766), End: YouTube Music (https://en.wikipedia.org/?curid=52135003)
+2025-09-22 20:14:56,828 - socket_handlers - INFO - DEBUG: Page selection completed - start: YouTube, end: YouTube Music
+2025-09-22 20:14:56,828 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-22 20:14:56,828 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-22 20:14:56,828 - socket_handlers - INFO - DEBUG: About to send game_starting event to room LYKT
+2025-09-22 20:14:56,828 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-22 20:14:56,828 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/?curid=3524766, end_url=https://en.wikipedia.org/?curid=52135003
+2025-09-22 20:14:56,829 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-22 20:14:56,830 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room LYKT
+2025-09-22 20:14:56,830 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room LYKT
+2025-09-22 20:14:56,830 - socket_handlers - INFO - DEBUG: start_game handler exiting for eaDEVSKT1Xc8OMGNAAAF
+2025-09-22 20:14:56,830 - socket_handlers - INFO - DEBUG: Starting countdown for room LYKT
+2025-09-22 20:15:01,844 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room LYKT
+2025-09-22 20:15:01,844 - socket_handlers - INFO - DEBUG: Sending game_started event to room LYKT
+2025-09-22 20:15:01,845 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-22 20:15:10,482 - socket_handlers - INFO - Player Player2 navigation: Monthly active user (Link #1, 8.6s)
+2025-09-22 20:15:10,842 - socket_handlers - INFO - Player Player2 navigation: Active users (Link #2, 9.0s)
+2025-09-22 20:15:14,855 - socket_handlers - INFO - Player Player2 navigation: Performance metric (Link #3, 13.0s)
+2025-09-22 20:15:15,270 - socket_handlers - INFO - Player Player2 navigation: Performance indicator (Link #4, 13.4s)
+2025-09-22 20:15:17,894 - socket_handlers - INFO - Player Player2 navigation: Performance measurement (Link #5, 16.0s)
+2025-09-22 20:15:21,385 - socket_handlers - INFO - Player Player2 navigation: Rail transport (Link #6, 19.5s)
+2025-09-22 20:15:23,123 - socket_handlers - INFO - Player Player2 navigation: Friction (Link #7, 21.3s)
+2025-09-22 20:15:24,707 - socket_handlers - INFO - Player Player2 navigation: Force (Link #8, 22.9s)
+2025-09-22 20:15:26,758 - socket_handlers - INFO - Player Player2 navigation: Velocity (Link #9, 24.9s)
+2025-09-22 20:15:28,284 - socket_handlers - INFO - Player Player2 navigation: Speed (Link #10, 26.4s)
+2025-09-22 20:15:29,544 - socket_handlers - INFO - Player Player2 navigation: Kinematics (Link #11, 27.7s)
+2025-09-22 20:15:41,733 - socket_handlers - INFO - Player Player1 navigation: YouTube Music (Link #1, 39.9s)
+2025-09-22 20:15:41,735 - socket_handlers - INFO - Game ended in room LYKT, winner: Player1
+2025-09-22 20:15:41,735 - socket_handlers - INFO - Player Player1 completed game in 39.73s with 1 links
+2025-09-22 20:17:13,116 - socket_handlers - INFO - Client disconnected: eaDEVSKT1Xc8OMGNAAAF
+2025-09-22 20:17:13,116 - socket_handlers - INFO - Player Player1 disconnected from room LYKT
+2025-09-22 20:17:13,117 - room_manager - INFO - Player Player1 left room LYKT
+2025-09-22 20:17:13,117 - room_manager - INFO - Closed room LYKT
+2025-09-22 20:17:13,117 - room_manager - INFO - Closed empty room LYKT
+2025-09-22 20:17:13,117 - socket_handlers - INFO - Room LYKT was deleted - last player disconnected
+2025-09-22 20:17:23,123 - socket_handlers - INFO - Client disconnected: HDIBfMYS5D_RkvQAAAAH

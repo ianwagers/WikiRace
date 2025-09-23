@@ -112,20 +112,15 @@ def start_client():
         
         app = QApplication(sys.argv)
         
-        # Create first client window
-        mainWindow1 = MainApplication()
-        mainWindow1.setWindowTitle("WikiRace - Player 1")
-        mainWindow1.show()
+        # Create single client window (avoiding PyQt6 event loop conflicts)
+        mainWindow = MainApplication()
+        mainWindow.setWindowTitle("WikiRace - Multiplayer Development")
+        mainWindow.show()
         
-        # Create second client window
-        mainWindow2 = MainApplication()
-        mainWindow2.setWindowTitle("WikiRace - Player 2")
-        mainWindow2.show()
-        
-        logger.info("WikiRace clients started successfully!")
-        logger.info("Server should be running at http://localhost:8001")  # Changed to port 8001
-        logger.info("Two client windows opened for multiplayer testing!")
-        logger.info("Use one window to host a game and the other to join it.")
+        logger.info("WikiRace client started successfully!")
+        logger.info("Server should be running at http://localhost:8001")
+        logger.info("For multiplayer testing, run this script again in another terminal!")
+        logger.info("Or use scripts/dev_launcher.py for automatic dual-client setup")
         
         sys.exit(app.exec())
         

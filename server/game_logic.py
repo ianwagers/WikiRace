@@ -199,12 +199,12 @@ class ServerGameLogic:
         }
         
         try:
-            response = requests.get(api_url, params=params, headers=self.headers, timeout=10)
+            response = requests.get(api_url, params=params, headers=self.headers, timeout=5)  # Reduced timeout
             response.raise_for_status()
             
             data = response.json()
             
-            if data["query"]["search"]:
+            if data.get("query", {}).get("search"):
                 page_id = data["query"]["search"][0]["pageid"]
                 wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
                 logger.info(f"Found Wikipedia page for '{search_text}': {wiki_url}")

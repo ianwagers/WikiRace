@@ -356,18 +356,25 @@ class NetworkManager(QObject):
     def send_player_progress(self, page_url: str, page_title: str):
         """Send detailed player progress update to server"""
         try:
-            if self.connected_to_server and self.current_room and self.sio.connected:
-                self.sio.emit('player_progress', {
-                    'room_code': self.current_room,
-                    'player_name': self.player_name,
-                    'page_url': page_url,
-                    'page_title': page_title
-                })
-                print(f"📊 Sent navigation: {page_title} ({page_url})")
-            else:
-                print(f"⚠️ Cannot send progress - not connected (connected: {self.connected_to_server}, room: {self.current_room})")
+            # Enhanced connection check
+            if not self._is_connection_healthy():
+                print(f"⚠️ Cannot send progress - connection unhealthy")
+                print(f"   - connected_to_server: {self.connected_to_server}")
+                print(f"   - current_room: {self.current_room}")
+                print(f"   - sio.connected: {getattr(self.sio, 'connected', 'N/A')}")
+                return
+            
+            self.sio.emit('player_progress', {
+                'room_code': self.current_room,
+                'player_name': self.player_name,
+                'page_url': page_url,
+                'page_title': page_title
+            })
+            print(f"📊 Sent navigation: {page_title} ({page_url})")
         except Exception as e:
             print(f"❌ Failed to send progress: {e}")
+            import traceback
+            print(f"❌ Progress send traceback: {traceback.format_exc()}")
     
     def send_game_completion(self, completion_time: float, links_used: int):
         """Send game completion to server"""

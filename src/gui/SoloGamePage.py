@@ -482,9 +482,11 @@ class SoloGamePage(QWidget):
         self.stopwatchLabel.setText(self.formatTime(self.startTime))
 
     def formatTime(self, seconds):
-        hours = seconds // 3600
-        minutes = (seconds % 3600) // 60
-        seconds = seconds % 60
+        # Convert to integer to avoid float formatting issues
+        total_seconds = int(seconds)
+        hours = total_seconds // 3600
+        minutes = (total_seconds % 3600) // 60
+        seconds = total_seconds % 60
         return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
     # REMOVED: onNavigationRequested method - replaced with URL change tracking

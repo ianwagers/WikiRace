@@ -4,6 +4,7 @@ Configuration settings for WikiRace Multiplayer Server
 
 import os
 from typing import List
+from pathlib import Path
 from pydantic_settings import BaseSettings
 
 
@@ -32,7 +33,8 @@ class Settings(BaseSettings):
     RATE_LIMIT_WINDOW: int = 3600  # 1 hour in seconds
     
     class Config:
-        env_file = ".env"
+        # Find .env file relative to this config file's location
+        env_file = Path(__file__).parent / ".env"
         case_sensitive = True
 
 
