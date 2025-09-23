@@ -13,4 +13,4 @@ __pycache__/
 /venv/
 /logs/
 build_portable/
-
+/Python313/
