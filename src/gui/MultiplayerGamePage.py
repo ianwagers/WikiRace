@@ -119,7 +119,7 @@ class PlayerProgressWidget(QWidget):
                 }}
             """)
             
-            # Dark theme progress bar with better contrast
+            # Dark theme progress bar with Wikipedia link blue
             progress_style = f"""
                 QProgressBar {{
                     border: 2px solid {styles['border_color']};
@@ -127,12 +127,12 @@ class PlayerProgressWidget(QWidget):
                     text-align: center;
                     font-weight: bold;
                     font-size: 11px;
-                    color: {styles['text_color']};
-                    background-color: {styles['input_background']};
+                    color: white;
+                    background-color: #1a1a1a;
                     margin: 4px 0px;
                 }}
                 QProgressBar::chunk {{
-                    background-color: {styles['accent_color']};
+                    background-color: #0645ad;
                     border-radius: 8px;
                     margin: 1px;
                 }}
@@ -160,7 +160,7 @@ class PlayerProgressWidget(QWidget):
                 }}
             """)
             
-            # Light theme progress bar with better contrast
+            # Light theme progress bar with Wikipedia link blue
             progress_style = f"""
                 QProgressBar {{
                     border: 2px solid {styles['border_color']};
@@ -168,12 +168,12 @@ class PlayerProgressWidget(QWidget):
                     text-align: center;
                     font-weight: bold;
                     font-size: 11px;
-                    color: {styles['text_color']};
+                    color: white;
                     background-color: #f0f0f0;
                     margin: 4px 0px;
                 }}
                 QProgressBar::chunk {{
-                    background-color: #4CAF50;
+                    background-color: #0645ad;
                     border-radius: 8px;
                     margin: 1px;
                 }}
@@ -183,23 +183,41 @@ class PlayerProgressWidget(QWidget):
         self.progress_bar.setStyleSheet(progress_style)
     
     def update_progress(self, current_page, links_used, is_completed=False, completion_time=None):
-        """Update player progress information"""
+        """SINGLE UPDATE METHOD: Updates both sidebar and progress bar with same data"""
+        # Store state
         self.current_page = current_page
         self.links_used = links_used
         self.is_completed = is_completed
         self.completion_time = completion_time
         
-        # Update UI
+        # Update both UI elements with identical data
         self.page_label.setText(current_page)
         self.links_label.setText(f"Links: {links_used}")
         
-        # Update progress bar (percentage based)
+        # Progress bar shows exact same count as sidebar
         if is_completed:
-            self.progress_bar.setValue(100)  # Full completion
+            self.progress_bar.setRange(0, 100)
+            self.progress_bar.setValue(100)
+            self.progress_bar.setFormat("COMPLETED")
         else:
-            # Progress based on links used (cap at 95% until completion)
-            progress = min(links_used * 4, 95)  # Each link = 4%, max 95%
-            self.progress_bar.setValue(progress)
+            # Both sidebar and progress bar show the same number
+            self.progress_bar.setRange(0, 50)
+            self.progress_bar.setValue(links_used)
+            self.progress_bar.setFormat(f"{links_used} links")
+        
+        print(f"📊 UI SYNC: {self.player_name} -> Sidebar: {links_used}, Progress: {links_used}")
+    
+    def get_debug_info(self):
+        """Debug method to check current state"""
+        return {
+            'player_name': self.player_name,
+            'current_page': self.current_page,
+            'links_used': self.links_used,
+            'is_completed': self.is_completed,
+            'sidebar_text': self.links_label.text(),
+            'progress_value': self.progress_bar.value(),
+            'progress_format': self.progress_bar.format()
+        }
 
 
 class MultiplayerGamePage(QWidget):
@@ -220,6 +238,7 @@ class MultiplayerGamePage(QWidget):
         self.game_started = False
         self.game_finished = False  # Changed variable name to avoid conflict with signal
         self.start_time = None
+        self.first_link_clicked = False  # Track if first link has been clicked
         
         # Connect to network signals
         self.connect_network_signals()
@@ -322,10 +341,13 @@ class MultiplayerGamePage(QWidget):
         """Initialize player progress widgets"""
         # Get players from game data
         players_list = self.game_data.get('players', [])
+        print(f"🎮 DEBUG: Initializing players from game data: {players_list}")
         
         for player_data in players_list:
             player_name = player_data.get('name', 'Unknown')
             is_host = player_data.get('is_host', False)
+            
+            print(f"🎮 DEBUG: Creating player widget for {player_name} (host: {is_host})")
             
             # Create player progress widget
             player_widget = PlayerProgressWidget(player_name, is_host)
@@ -337,6 +359,8 @@ class MultiplayerGamePage(QWidget):
             
             # Add to layout
             self.players_layout.addWidget(player_widget)
+        
+        print(f"🎮 DEBUG: Initialized {len(self.players)} players: {list(self.players.keys())}")
     
     def apply_theme(self):
         """Apply theme-based styling"""
@@ -384,6 +408,7 @@ class MultiplayerGamePage(QWidget):
         self.game_finished = False  # Reset game finished flag for new race
         self.start_time = time.time()
         self.initial_page_loaded = False  # Flag to prevent initial page from counting as navigation
+        self.first_link_clicked = False  # Reset first link flag for new game
         
         # Re-enable navigation in solo game
         self.solo_game.setEnabled(True)
@@ -402,39 +427,54 @@ class MultiplayerGamePage(QWidget):
     
     def reset_all_progress(self):
         """Reset all player progress to 0 at game start"""
-        for player_widget in self.players.values():
+        print(f"🎮 DEBUG: Resetting all player progress to 0")
+        for player_name, player_widget in self.players.items():
+            print(f"🎮 DEBUG: Resetting {player_name} to 0 links")
             player_widget.update_progress("Starting...", 0, False, None)
             player_widget.progress_bar.setEnabled(True)  # Re-enable progress bars
     
     def on_url_changed(self, url):
-        """Handle URL changes from SoloGamePage"""
+        """Handle URL changes from SoloGamePage - DIRECT LOCAL PROGRESS UPDATE"""
         if not self.game_started:
-            print(f"🚫 Game not started yet, skipping URL change: {url}")
             return
         
         # Skip the initial page load to prevent duplicate starting page
-        if not getattr(self, 'initial_page_loaded', True):
-            print(f"🚫 Skipping initial page load: {url}")
-            return
-        
-        # Check network connection before sending progress
-        if not self.network_manager.connected_to_server:
-            print(f"⚠️ Not connected to server, skipping progress update")
+        if not getattr(self, 'initial_page_loaded', False):
             return
         
         # Get current page title
         current_title = self.solo_game.getTitleFromUrlPath(url)
         
-        # Get current player name (assuming we're the local player)
+        # LOCAL PROGRESS BAR UPDATE: Update local player progress bar immediately (server agnostic)
         local_player_name = self.network_manager.player_name
-        
-        # Update local progress
         if local_player_name in self.players:
-            links_used = self.solo_game.linksUsed
-            self.players[local_player_name].update_progress(current_title, links_used)
+            # Update local player progress bar directly from SoloGamePage
+            self.players[local_player_name].update_progress(
+                current_title, 
+                self.solo_game.linksUsed, 
+                False, 
+                None
+            )
+            print(f"📊 LOCAL PROGRESS: Updated {local_player_name} to {self.solo_game.linksUsed} links")
+            
+            # DOUBLE UPDATE on first link click to fix local progress bar syncing issue
+            if not self.first_link_clicked:
+                self.first_link_clicked = True
+                # Update local progress bar again to ensure proper sync (LOCAL ONLY)
+                self.players[local_player_name].update_progress(
+                    current_title, 
+                    self.solo_game.linksUsed, 
+                    False, 
+                    None
+                )
+                print(f"📊 FIRST CLICK SYNC: Double updated LOCAL progress bar for {local_player_name} to {self.solo_game.linksUsed} links")
         
-        # Broadcast detailed progress to other players
-        print(f"📊 Sending progress: {current_title} (URL: {url})")
+        # SERVER COMMUNICATION: Send to server for other players (separate from local updates)
+        if not self.network_manager.connected_to_server:
+            return
+        
+        # Send to server for other players (this is independent of local progress bar)
+        print(f"📊 NAVIGATION: Sending {current_title} to server")
         self.network_manager.send_player_progress(url, current_title)
     
     def on_link_clicked(self):
@@ -450,7 +490,7 @@ class MultiplayerGamePage(QWidget):
             # Calculate completion time
             completion_time = time.time() - self.start_time if self.start_time else 0
             
-            # Update local player progress
+            # Update local player progress bar to show completion
             local_player_name = self.network_manager.player_name
             if local_player_name in self.players:
                 self.players[local_player_name].update_progress(
@@ -459,6 +499,7 @@ class MultiplayerGamePage(QWidget):
                     True, 
                     completion_time
                 )
+                print(f"🏆 LOCAL COMPLETION: Updated {local_player_name} progress bar to completed")
             
             # Notify server of completion
             self.network_manager.send_game_completion(completion_time, self.solo_game.linksUsed)
@@ -470,7 +511,11 @@ class MultiplayerGamePage(QWidget):
         # Show countdown dialog if available
         try:
             from src.gui.CountdownDialog import CountdownDialog
-            countdown_dialog = CountdownDialog(countdown_data, parent=self)
+            countdown_dialog = CountdownDialog(
+                countdown_data.get('countdown_seconds', 5),
+                countdown_data.get('message', 'Get ready!'),
+                parent=self
+            )
             countdown_dialog.exec()
         except Exception as e:
             print(f"❌ Failed to show countdown dialog: {e}")
@@ -487,12 +532,26 @@ class MultiplayerGamePage(QWidget):
         print(f"🎮 DEBUG: Game started successfully, game_started is now: {self.game_started}")
     
     def on_player_progress(self, player_name, current_page, links_used):
-        """Handle progress updates from other players"""
-        if player_name in self.players:
-            self.players[player_name].update_progress(current_page, links_used)
+        """SERVER UPDATE PATH: Updates for other players, skips local player to avoid conflicts"""
+        print(f"📊 PROGRESS UPDATE: {player_name} -> {current_page} ({links_used} links)")
+        
+        # Validate player exists
+        if player_name not in self.players:
+            print(f"❌ ERROR: Player {player_name} not found in {list(self.players.keys())}")
+            return
+        
+        # Skip local player updates from server to avoid conflicts with direct updates
+        local_player_name = self.network_manager.player_name
+        if player_name == local_player_name:
+            print(f"📊 SKIPPING: Local player progress from server (handled directly)")
+            return
+        
+        # Update progress widget for other players only
+        self.players[player_name].update_progress(current_page, links_used)
         
         # Emit signal for parent components
         self.player_progress_updated.emit(player_name, current_page, links_used)
+    
     
     def on_player_completed(self, player_name, completion_time, links_used):
         """Handle player completion events"""
@@ -583,6 +642,11 @@ class MultiplayerGamePage(QWidget):
                 # Switch to multiplayer tab (should be index 2: Home, Solo, Multiplayer)
                 if self.tabWidget.count() > 2:
                     self.tabWidget.setCurrentIndex(2)  # Multiplayer tab
+                    
+                    # Reset the multiplayer page state to allow starting new games
+                    multiplayer_widget = self.tabWidget.widget(2)
+                    if hasattr(multiplayer_widget, 'reset_for_new_game'):
+                        multiplayer_widget.reset_for_new_game()
                 
         except Exception as e:
             print(f"❌ Error closing game tab: {e}")
@@ -619,3 +683,40 @@ class MultiplayerGamePage(QWidget):
         results.sort(key=lambda x: (not x['is_completed'], x['completion_time'] or float('inf')))
         
         return results
+    
+    def debug_progress_state(self):
+        """COMPREHENSIVE DEBUG: Check all progress states for troubleshooting"""
+        print("=" * 60)
+        print("🔍 PROGRESS DEBUG STATE")
+        print("=" * 60)
+        
+        # Check local solo game state
+        local_player_name = self.network_manager.player_name
+        print(f"📊 LOCAL PLAYER: {local_player_name}")
+        print(f"📊 SOLO GAME LINKS: {self.solo_game.linksUsed}")
+        print(f"📊 SOLO GAME LABEL: {self.solo_game.linksUsedLabel.text()}")
+        
+        # Check all player progress widgets
+        print("\n📊 PLAYER PROGRESS WIDGETS:")
+        for player_name, widget in self.players.items():
+            debug_info = widget.get_debug_info()
+            print(f"  {player_name}:")
+            print(f"    Links Used: {debug_info['links_used']}")
+            print(f"    Sidebar Text: {debug_info['sidebar_text']}")
+            print(f"    Progress Value: {debug_info['progress_value']}")
+            print(f"    Progress Format: {debug_info['progress_format']}")
+            print(f"    Current Page: {debug_info['current_page']}")
+        
+        # Check if there are any mismatches
+        print("\n🔍 SYNC CHECK:")
+        for player_name, widget in self.players.items():
+            debug_info = widget.get_debug_info()
+            sidebar_count = debug_info['links_used']
+            progress_count = debug_info['progress_value']
+            
+            if sidebar_count != progress_count:
+                print(f"❌ MISMATCH: {player_name} - Sidebar: {sidebar_count}, Progress: {progress_count}")
+            else:
+                print(f"✅ SYNCED: {player_name} - Both show {sidebar_count}")
+        
+        print("=" * 60)

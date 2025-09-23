@@ -39,11 +39,74 @@ async def broadcast_room_progress(sio, room, skip_sid=None):
         logger.error(f"Error broadcasting room progress: {e}")
 
 
+async def check_inactive_players(sio, room_manager: RoomManager):
+    """Background task to check for inactive players and remove them"""
+    import asyncio
+    from datetime import datetime, timedelta
+    
+    while True:
+        try:
+            await asyncio.sleep(30)  # Check every 30 seconds (less frequent)
+            
+            current_time = datetime.utcnow()
+            inactive_threshold = timedelta(minutes=4)  # 4 minutes of inactivity (realistic for players)
+            
+            # Check all rooms for inactive players
+            for room_code, room in list(room_manager.rooms.items()):
+                inactive_players = []
+                
+                for socket_id, player in list(room.players.items()):
+                    time_since_activity = current_time - player.last_activity
+                    if time_since_activity > inactive_threshold:
+                        logger.debug(f"Player {player.display_name} inactive for {time_since_activity.total_seconds():.1f} seconds")
+                        inactive_players.append((socket_id, player))
+                    else:
+                        logger.debug(f"Player {player.display_name} active (last activity: {time_since_activity.total_seconds():.1f}s ago)")
+                
+                # Remove inactive players
+                for socket_id, player in inactive_players:
+                    logger.warning(f"Removing inactive player {player.display_name} from room {room_code}")
+                    logger.warning(f"DEBUG: Player {player.display_name} (sid: {socket_id}) was inactive for {time_since_activity.total_seconds():.1f} seconds")
+                    
+                    # Remove player from room
+                    updated_room = room_manager.leave_room(socket_id)
+                    
+                    if updated_room:
+                        # Notify remaining players
+                        await sio.emit('player_left', {
+                            'socket_id': socket_id,
+                            'player_name': player.display_name,
+                            'players': [{
+                                'socket_id': p.socket_id,
+                                'display_name': p.display_name,
+                                'is_host': p.is_host
+                            } for p in updated_room.players.values()]
+                        }, room=room_code, skip_sid=socket_id)
+                        
+                        # If host was inactive, notify about new host
+                        if player.is_host and updated_room.host_id:
+                            new_host = updated_room.get_player(updated_room.host_id)
+                            if new_host:
+                                await sio.emit('host_transferred', {
+                                    'new_host_id': updated_room.host_id,
+                                    'new_host_name': new_host.display_name,
+                                    'message': f"{new_host.display_name} is now the room leader"
+                                }, room=room_code)
+                    
+        except Exception as e:
+            logger.error(f"Error in inactive player check: {e}")
+            await asyncio.sleep(30)  # Wait before retrying
+
+
 def register_socket_handlers(sio, room_manager: RoomManager):
     """Register all Socket.IO event handlers"""
     
     print("CONSOLE: Registering Socket.IO handlers...")
     logger.error("FORCE LOG: Socket handlers being registered!")
+    
+    # Start the inactive player checker
+    import asyncio
+    asyncio.create_task(check_inactive_players(sio, room_manager))
     
     @sio.event
     async def connect(sid, environ, auth):
@@ -152,11 +215,23 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             # Try to join room
             room = room_manager.join_room(room_code, sid, display_name)
             if not room:
-                await sio.emit('error', {'message': 'Room not found or unavailable'}, room=sid)
+                # Check if it's a name conflict by trying to get the room first
+                existing_room = room_manager.get_room(room_code)
+                if existing_room and existing_room.get_player_by_name(display_name):
+                    await sio.emit('error', {'message': f'Player name "{display_name}" is already taken in this room'}, room=sid)
+                else:
+                    await sio.emit('error', {'message': 'Room not found or unavailable'}, room=sid)
                 return
             
             # Join the room namespace
             await sio.enter_room(sid, room.room_code)
+            
+            # Update player activity timestamp to ensure they're not marked inactive
+            player = room.get_player(sid)
+            if player:
+                from datetime import datetime
+                player.last_activity = datetime.utcnow()
+                logger.debug(f"Updated activity for player {player.display_name} after room join")
             
             # Send room_joined event to the joining player
             await sio.emit('room_joined', {
@@ -335,9 +410,15 @@ def register_socket_handlers(sio, room_manager: RoomManager):
         for handler in logging.getLogger().handlers:
             handler.flush()
         try:
+            # Debug: Log current room manager state
+            logger.info(f"DEBUG: Room manager has {len(room_manager.rooms)} rooms")
+            logger.info(f"DEBUG: Player-to-room mapping: {room_manager.player_to_room}")
+            
             room = room_manager.get_room_by_player(sid)
             if not room:
                 logger.warning(f"DEBUG: Player {sid} not in any room")
+                logger.warning(f"DEBUG: Available rooms: {list(room_manager.rooms.keys())}")
+                logger.warning(f"DEBUG: Player mappings: {room_manager.player_to_room}")
                 await sio.emit('error', {'message': 'Not in a room'}, room=sid)
                 return
             
@@ -355,6 +436,17 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             if room.player_count < 2:
                 logger.warning(f"DEBUG: Not enough players ({room.player_count}), need at least 2")
                 await sio.emit('error', {'message': 'At least 2 players required to start'}, room=sid)
+                return
+            
+            # Additional validation: check if all players are still connected
+            active_players = 0
+            for player in room.players.values():
+                if player.socket_id in room_manager.player_to_room:
+                    active_players += 1
+            
+            if active_players < 2:
+                logger.warning(f"DEBUG: Not enough active players ({active_players}), need at least 2")
+                await sio.emit('error', {'message': 'Not enough active players to start the game'}, room=sid)
                 return
             
             logger.info(f"DEBUG: All validations passed, proceeding with game start")
@@ -494,6 +586,24 @@ def register_socket_handlers(sio, room_manager: RoomManager):
         await sio.emit('test_response', {'received': data}, room=sid)
     
     @sio.event
+    async def ping(sid, data):
+        """Handle ping from client for heartbeat"""
+        try:
+            room = room_manager.get_room_by_player(sid)
+            if room:
+                player = room.get_player(sid)
+                if player:
+                    # Update last activity timestamp
+                    from datetime import datetime
+                    player.last_activity = datetime.utcnow()
+                    logger.debug(f"Ping received from {player.display_name} in room {room.room_code}")
+            
+            # Send pong response
+            await sio.emit('pong', {'timestamp': datetime.utcnow().isoformat()}, room=sid)
+        except Exception as e:
+            logger.error(f"Error handling ping: {e}")
+    
+    @sio.event
     async def player_progress(sid, data):
         """Handle player progress updates with detailed navigation tracking"""
         print(f"📊 DEBUG: Received player_progress from {sid}: {data}")
@@ -532,17 +642,20 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     # Use the existing last entry for broadcasting
                     navigation_entry = player.navigation_history[-1]
                 
-                # Broadcast progress to other players in the room
+                # Broadcast progress to ALL players in the room (including sender for sync)
                 await sio.emit('player_progress', {
                     'player_name': player_name,
                     'current_page': page_title,  # Send title for display
                     'current_page_url': page_url,
                     'links_used': player.links_clicked,
                     'time_elapsed': navigation_entry.time_elapsed
-                }, room=room_code, skip_sid=sid)
+                }, room=room_code)
                 
-                # Also send updated progress to all players (excluding sender) for sync
-                await broadcast_room_progress(sio, room, skip_sid=sid)
+                print(f"📊 DEBUG: Broadcasting progress for {player_name}: {page_title} (links: {player.links_clicked})")
+                print(f"📊 DEBUG: Room has {len(room.players)} players, broadcasting to room {room_code}")
+                
+                # Also send updated progress to all players for sync (including sender)
+                await broadcast_room_progress(sio, room, skip_sid=None)
                 
                 logger.info(f"Player {player_name} navigation: {page_title} (Link #{player.links_clicked}, {navigation_entry.time_elapsed:.1f}s)")
             

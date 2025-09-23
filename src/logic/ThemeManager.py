@@ -99,22 +99,23 @@ class ThemeManager(QObject):
             'text_color': '#E0E0E0',
             'text_secondary': '#B0B0B0',
             'border_color': '#404040',
-            'border_hover': '#00FFFF',
-            'border_pressed': '#8A2BE2',
-            'accent_color': '#00FFFF',
-            'accent_secondary': '#8A2BE2',
+            'border_hover': '#0645ad',
+            'border_pressed': '#0645ad',
+            'accent_color': '#0645ad',
+            'accent_secondary': '#0645ad',
+            'button_background': '#2D2D2D',
             'button_hover': '#2f2f2f',
             'button_pressed': '#1E1E1E',
             'card_background': '#2D2D2D',
             'card_border': '#404040',
             'input_background': '#2D2D2D',
             'input_border': '#404040',
-            'input_focus': '#00FFFF',
+            'input_focus': '#0645ad',
             'tab_background': '#2D2D2D',
             'tab_selected': '#3E3E3E',
             'tab_hover': '#3E3E3E',
             'tab_text': '#E0E0E0',
-            'tab_text_selected': '#00FFFF',
+            'tab_text_selected': '#4A90E2',
             'is_dark': True  # Added missing is_dark key
         }
     
@@ -131,6 +132,7 @@ class ThemeManager(QObject):
             'border_pressed': '#8A2BE2',
             'accent_color': '#0066CC',
             'accent_secondary': '#8A2BE2',
+            'button_background': '#F5F5F5',
             'button_hover': '#F0F0F0',
             'button_pressed': '#E0E0E0',
             'card_background': '#F5F5F5',
@@ -142,7 +144,7 @@ class ThemeManager(QObject):
             'tab_selected': '#E8E8E8',
             'tab_hover': '#E8E8E8',
             'tab_text': '#1A1A1A',
-            'tab_text_selected': '#0066CC',
+            'tab_text_selected': '#4A90E2',
             'is_dark': False  # Added missing is_dark key
         }
     

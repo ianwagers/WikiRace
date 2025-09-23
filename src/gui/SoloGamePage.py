@@ -478,8 +478,13 @@ class SoloGamePage(QWidget):
     # Replaced with fast getTitleFromUrlPath and optional getExactTitleFromJavaScript
 
     def updateStopwatch(self):
-        self.startTime += 1
-        self.stopwatchLabel.setText(self.formatTime(self.startTime))
+        # Calculate elapsed time since game start
+        if hasattr(self, 'startTime') and self.startTime:
+            elapsed_time = time.time() - self.startTime
+            self.stopwatchLabel.setText(self.formatTime(elapsed_time))
+        else:
+            # Fallback if startTime is not set
+            self.stopwatchLabel.setText("00:00:00")
 
     def formatTime(self, seconds):
         # Convert to integer to avoid float formatting issues

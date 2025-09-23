@@ -27,6 +27,7 @@ class MultiplayerPage(QWidget):
         self.player_name = None
         self.is_leader = False
         self.players_in_room = []
+        self.countdown_dialogs = []  # Store list of countdown dialogs for debugging
         
         self.initUI()
         self.apply_theme()
@@ -98,22 +99,52 @@ class MultiplayerPage(QWidget):
         self.update_server_status()
     
     def show_server_status(self, title, message, status_type):
-        """Show server connection status"""
+        """Show server connection status with improved formatting"""
         if hasattr(self, 'statusLabel'):
-            # Truncate very long messages to prevent UI from becoming too wide
-            if len(message) > 100:
-                message = message[:97] + "..."
-            
-            self.statusLabel.setText(f"{title}: {message}")
-            if status_type == "error":
-                self.statusLabel.setStyleSheet("color: #ff6b6b; font-weight: bold;")
-            elif status_type == "warning":
-                self.statusLabel.setStyleSheet("color: #ffa726; font-weight: bold;")
+            # Format the status with better line breaks and styling
+            if "Rooms:" in message or "rooms:" in message:
+                # Split server status and room count into separate lines
+                parts = message.split("Active rooms:")
+                if len(parts) == 2:
+                    server_status = parts[0].strip()
+                    room_count = parts[1].strip()
+                    formatted_text = f"{title}\n{server_status}\nRooms: {room_count}"
+                else:
+                    formatted_text = f"{title}\n{message}"
             else:
-                self.statusLabel.setStyleSheet("color: #51cf66; font-weight: bold;")
+                formatted_text = f"{title}\n{message}"
+            
+            self.statusLabel.setText(formatted_text)
+            
+            # Apply status-specific styling
+            if status_type == "error":
+                self.statusLabel.setStyleSheet("""
+                    color: #ff6b6b; 
+                    font-weight: bold; 
+                    font-size: 13px;
+                    margin-bottom: 5px;
+                """)
+            elif status_type == "warning":
+                self.statusLabel.setStyleSheet("""
+                    color: #ffa726; 
+                    font-weight: bold; 
+                    font-size: 13px;
+                    margin-bottom: 5px;
+                """)
+            else:
+                self.statusLabel.setStyleSheet("""
+                    color: #51cf66; 
+                    font-weight: bold; 
+                    font-size: 13px;
+                    margin-bottom: 5px;
+                """)
 
     def initUI(self):
         """Initialize the multiplayer UI"""
+        # Calculate dynamic width based on screen size - 35% larger than before for better visibility
+        screen_width = self.screen().availableGeometry().width()
+        self.dynamic_width = min(int(screen_width * 0.45), 600)  # 45% of screen width, max 600px
+        
         # Main layout with scroll area
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(5, 5, 5, 5)
@@ -126,11 +157,32 @@ class MultiplayerPage(QWidget):
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.scroll_area.setMinimumHeight(400)  # Ensure scroll area has minimum height
         
-        # Create scroll content widget
+        # Create scroll content widget with horizontal layout
         self.scroll_content = QWidget()
-        self.layout = QVBoxLayout(self.scroll_content)
-        self.layout.setContentsMargins(15, 15, 15, 15)
-        self.layout.setSpacing(15)
+        self.main_layout = QHBoxLayout(self.scroll_content)
+        self.main_layout.setContentsMargins(15, 15, 15, 15)
+        self.main_layout.setSpacing(20)
+        
+        # Create left side (players) and right side (game settings)
+        self.left_panel = QWidget()
+        self.right_panel = QWidget()
+        
+        # Left panel layout (players)
+        self.left_layout = QVBoxLayout(self.left_panel)
+        self.left_layout.setContentsMargins(0, 0, 0, 0)
+        self.left_layout.setSpacing(15)
+        
+        # Right panel layout (game settings)
+        self.right_layout = QVBoxLayout(self.right_panel)
+        self.right_layout.setContentsMargins(0, 0, 0, 0)
+        self.right_layout.setSpacing(15)
+        
+        # Add panels to main layout
+        self.main_layout.addWidget(self.left_panel, 1)  # Left panel gets more space
+        self.main_layout.addWidget(self.right_panel, 1)  # Right panel gets equal space
+        
+        # Keep the old layout reference for compatibility
+        self.layout = self.left_layout
         
         # Set minimum size to ensure scroll bar appears when needed
         self.scroll_content.setMinimumHeight(500)
@@ -139,151 +191,219 @@ class MultiplayerPage(QWidget):
         self.scroll_area.setWidget(self.scroll_content)
         main_layout.addWidget(self.scroll_area)
 
-        # Title
+        # Title (left panel)
         self.titleLabel = QLabel("🎮 Multiplayer WikiRace")
         self.titleLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.titleLabel.setStyleSheet("font-size: 20px; font-weight: bold; margin-bottom: 10px;")
-        self.layout.addWidget(self.titleLabel)
+        self.left_layout.addWidget(self.titleLabel)
 
         # Server status and settings
-        status_layout = QHBoxLayout()
+        status_layout = QVBoxLayout()  # Changed to vertical layout for better spacing
+        
+        # Server status section
+        status_info_layout = QHBoxLayout()
         
         self.statusLabel = QLabel("Checking server connection...")
         self.statusLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.statusLabel.setStyleSheet("font-size: 12px; margin-bottom: 10px;")
+        self.statusLabel.setStyleSheet("font-size: 13px; margin-bottom: 5px; font-weight: 500;")
         self.statusLabel.setWordWrap(True)
-        self.statusLabel.setMaximumWidth(300)  # Limit width to prevent app from becoming too wide
-        status_layout.addWidget(self.statusLabel)
+        self.statusLabel.setMaximumWidth(400)  # Increased width for better readability
+        status_info_layout.addWidget(self.statusLabel)
         
-        status_layout.addStretch()
+        status_info_layout.addStretch()
         
-        # Server settings button
+        # Server settings button with better sizing
         self.settingsButton = QPushButton("⚙️ Server Settings")
-        self.settingsButton.setMinimumWidth(140)
-        self.settingsButton.setMinimumHeight(35)
-        self.settingsButton.setMaximumHeight(40)
+        self.settingsButton.setMinimumWidth(160)  # Increased width
+        self.settingsButton.setMinimumHeight(40)  # Increased height
+        self.settingsButton.setMaximumHeight(45)  # Increased max height
+        self.settingsButton.setStyleSheet("""
+            QPushButton {
+                font-size: 13px;
+                font-weight: 600;
+                padding: 8px 16px;
+            }
+        """)
         self.settingsButton.clicked.connect(self.show_server_settings)
-        status_layout.addWidget(self.settingsButton)
+        status_info_layout.addWidget(self.settingsButton)
+        
+        status_layout.addLayout(status_info_layout)
         
         self.layout.addLayout(status_layout)
 
-        # Player name input
-        name_frame = QFrame()
-        name_layout = QHBoxLayout(name_frame)
-        name_layout.setContentsMargins(0, 0, 0, 0)
-        
-        name_label = QLabel("Your Name:")
-        name_label.setMinimumWidth(100)
-        name_layout.addWidget(name_label)
-        
-        self.playerNameInput = QLineEdit()
-        self.playerNameInput.setPlaceholderText("Enter your display name...")
-        self.playerNameInput.setText("Player")
-        name_layout.addWidget(self.playerNameInput)
-        
-        self.layout.addWidget(name_frame)
+        # Player name input removed - now handled by dialog
 
         # Host Game section
         self.host_frame = QFrame()
         self.host_frame.setFrameStyle(QFrame.Shape.StyledPanel)
-        self.host_frame.setMaximumWidth(400)  # Limit width
+        # Remove width constraints to allow horizontal expansion
+        self.host_frame.setMinimumWidth(200)  # Minimum width for readability
         host_layout = QVBoxLayout(self.host_frame)
-        host_layout.setContentsMargins(12, 12, 12, 12)
+        host_layout.setContentsMargins(20, 20, 20, 20)  # Further increased padding for better spacing
         
         host_title = QLabel("🏠 Host a Game")
-        host_title.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 5px;")
+        host_title.setStyleSheet("font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #2c3e50;")  # Larger and better color
         host_layout.addWidget(host_title)
         
         host_desc = QLabel("Create a new game room and invite friends to join")
-        host_desc.setStyleSheet("color: #868e96; margin-bottom: 8px; font-size: 11px;")
+        host_desc.setStyleSheet("color: #868e96; margin-bottom: 12px; font-size: 13px; line-height: 1.4;")  # Better line height
+        host_desc.setWordWrap(True)  # Enable text wrapping
+        host_desc.setMaximumWidth(400)  # Allow wrapping at reasonable width
         host_layout.addWidget(host_desc)
         
         self.hostGameButton = QPushButton("Create Room")
-        self.hostGameButton.setMinimumHeight(40)
-        self.hostGameButton.setMaximumHeight(45)
+        self.hostGameButton.setMinimumHeight(55)  # Even larger for better usability
+        self.hostGameButton.setMaximumHeight(60)  # Even larger for better usability
+        self.hostGameButton.setMinimumWidth(200)  # Fixed minimum width for horizontal layout
+        self.hostGameButton.setStyleSheet("""
+            QPushButton {
+                font-size: 14px;
+                font-weight: 600;
+                padding: 12px 20px;
+                border-radius: 8px;
+            }
+        """)
         host_layout.addWidget(self.hostGameButton)
         
-        self.layout.addWidget(self.host_frame)
+        # Create horizontal layout for host and join frames
+        self.host_join_layout = QHBoxLayout()
+        self.host_join_layout.setSpacing(20)
+        self.host_join_layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Add host frame to horizontal layout
+        self.host_join_layout.addWidget(self.host_frame)
 
         # Join Game section
         self.join_frame = QFrame()
         self.join_frame.setFrameStyle(QFrame.Shape.StyledPanel)
-        self.join_frame.setMaximumWidth(400)  # Limit width
+        # Remove width constraints to allow horizontal expansion
+        self.join_frame.setMinimumWidth(200)  # Minimum width for readability
         join_layout = QVBoxLayout(self.join_frame)
-        join_layout.setContentsMargins(12, 12, 12, 12)
+        join_layout.setContentsMargins(20, 20, 20, 20)  # Further increased padding for better spacing
         
         join_title = QLabel("🚪 Join a Game")
-        join_title.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 5px;")
+        join_title.setStyleSheet("font-size: 16px; font-weight: bold; margin-bottom: 8px; color: #2c3e50;")  # Larger and better color
         join_layout.addWidget(join_title)
         
         join_desc = QLabel("Enter a room code to join an existing game")
-        join_desc.setStyleSheet("color: #868e96; margin-bottom: 8px; font-size: 11px;")
+        join_desc.setStyleSheet("color: #868e96; margin-bottom: 12px; font-size: 13px; line-height: 1.4;")  # Better line height
         join_layout.addWidget(join_desc)
         
         room_input_layout = QHBoxLayout()
         room_label = QLabel("Room Code:")
-        room_label.setMinimumWidth(80)
-        room_label.setStyleSheet("font-size: 12px;")
+        room_label.setMinimumWidth(120)  # Even larger for better spacing
+        room_label.setStyleSheet("font-size: 13px; font-weight: 500;")
         room_input_layout.addWidget(room_label)
         
         self.roomCodeInput = QLineEdit()
         self.roomCodeInput.setPlaceholderText("Enter 4-letter room code...")
         self.roomCodeInput.setMaxLength(4)
-        self.roomCodeInput.setStyleSheet("font-family: monospace; font-size: 14px; letter-spacing: 1px;")
+        self.roomCodeInput.setStyleSheet("""
+            font-family: monospace; 
+            font-size: 18px; 
+            letter-spacing: 2px; 
+            padding: 10px 12px;
+            border-radius: 6px;
+            text-align: center;
+        """)  # Better styling for room code input
+        self.roomCodeInput.setMinimumHeight(40)  # Larger input height
         room_input_layout.addWidget(self.roomCodeInput)
         
         join_layout.addLayout(room_input_layout)
         
         self.joinGameButton = QPushButton("Join Room")
-        self.joinGameButton.setMinimumHeight(40)
-        self.joinGameButton.setMaximumHeight(45)
+        self.joinGameButton.setMinimumHeight(55)  # Even larger for better usability
+        self.joinGameButton.setMaximumHeight(60)  # Even larger for better usability
+        self.joinGameButton.setMinimumWidth(200)  # Fixed minimum width for horizontal layout
+        self.joinGameButton.setStyleSheet("""
+            QPushButton {
+                font-size: 14px;
+                font-weight: 600;
+                padding: 12px 20px;
+                border-radius: 8px;
+            }
+        """)
         join_layout.addWidget(self.joinGameButton)
         
-        self.layout.addWidget(self.join_frame)
+        # Add join frame to horizontal layout
+        self.host_join_layout.addWidget(self.join_frame)
+        
+        # Add the horizontal layout to main layout
+        self.layout.addLayout(self.host_join_layout)
 
         # Room info (hidden initially)
         self.roomInfoFrame = QFrame()
         self.roomInfoFrame.setFrameStyle(QFrame.Shape.StyledPanel)
-        self.roomInfoFrame.setMaximumWidth(400)  # Limit width
+        self.roomInfoFrame.setMaximumWidth(self.dynamic_width)  # Use same dynamic width
+        self.roomInfoFrame.setMinimumWidth(int(self.dynamic_width * 0.8))  # Minimum 80% of calculated width
         self.roomInfoFrame.hide()
         room_info_layout = QVBoxLayout(self.roomInfoFrame)
-        room_info_layout.setContentsMargins(12, 12, 12, 12)
+        room_info_layout.setContentsMargins(16, 16, 16, 16)  # Increased padding by 25%
         
         self.roomInfoLabel = QLabel()
-        self.roomInfoLabel.setStyleSheet("font-size: 16px; font-weight: bold; margin-bottom: 8px; padding: 5px;")
+        self.roomInfoLabel.setStyleSheet("font-size: 32px; font-weight: bold; margin-bottom: 8px; padding: 5px;")  # Doubled from 16px to 32px
         self.roomInfoLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.roomInfoLabel.setWordWrap(True)
-        self.roomInfoLabel.setMaximumWidth(400)  # Limit width to prevent app from becoming too wide
+        self.roomInfoLabel.setMaximumWidth(self.dynamic_width)  # Use dynamic width
         room_info_layout.addWidget(self.roomInfoLabel)
         
-        self.playersList = QTextEdit()
-        self.playersList.setMaximumHeight(80)
-        self.playersList.setMaximumWidth(400)  # Limit width to prevent app from becoming too wide
-        self.playersList.setReadOnly(True)
-        self.playersList.setStyleSheet("font-size: 11px;")
-        room_info_layout.addWidget(self.playersList)
+        # Create players grid layout (3 rows, up to 10 players)
+        self.playersGrid = QWidget()
+        self.playersGrid.setMaximumHeight(200)  # Increased height for grid
+        self.playersGrid.setMaximumWidth(self.dynamic_width)  # Use dynamic width
+        self.playersGridLayout = QGridLayout(self.playersGrid)
+        self.playersGridLayout.setSpacing(8)
+        self.playersGridLayout.setContentsMargins(8, 8, 8, 8)
+        
+        # Initialize player labels (up to 10 players)
+        self.playerLabels = []
+        for i in range(10):
+            label = QLabel("")
+            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            label.setStyleSheet("""
+                QLabel {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 8px;
+                    padding: 8px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    min-height: 40px;
+                }
+                QLabel:empty {
+                    background-color: transparent;
+                    border: 1px dashed rgba(255, 255, 255, 0.3);
+                }
+            """)
+            label.hide()  # Hide empty slots
+            self.playerLabels.append(label)
+            self.playersGridLayout.addWidget(label, i // 4, i % 4)  # 3 rows, 4 columns (3*4=12, but we use 10)
+        
+        room_info_layout.addWidget(self.playersGrid)
         
         # Game Configuration Section (only visible for leader)
         self.gameConfigFrame = QFrame()
         self.gameConfigFrame.setFrameStyle(QFrame.Shape.StyledPanel)
         self.gameConfigFrame.hide()  # Hidden by default
+        self.gameConfigFrame.setMaximumWidth(self.dynamic_width)  # Use dynamic width
         game_config_layout = QVBoxLayout(self.gameConfigFrame)
-        game_config_layout.setContentsMargins(8, 8, 8, 8)
+        game_config_layout.setContentsMargins(12, 12, 12, 12)  # Increased padding by 25%
         
         # Game config title
         config_title = QLabel("🎮 Game Configuration")
-        config_title.setStyleSheet("font-size: 12px; font-weight: bold; margin-bottom: 6px;")
+        config_title.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 8px;")  # Increased font size
         game_config_layout.addWidget(config_title)
         
         # Starting page selection
         start_layout = QHBoxLayout()
         start_label = QLabel("Start Page:")
-        start_label.setMinimumWidth(70)
-        start_label.setStyleSheet("font-size: 11px;")
+        start_label.setMinimumWidth(90)  # Increased by 25% (70 * 1.25 = 87.5, rounded to 90)
+        start_label.setStyleSheet("font-size: 12px;")  # Increased font size
         start_layout.addWidget(start_label)
         
         self.startPageCombo = QComboBox()
-        self.startPageCombo.setStyleSheet("font-size: 11px;")
+        self.startPageCombo.setStyleSheet("font-size: 12px; padding: 6px;")  # Increased font size and padding
+        self.startPageCombo.setMinimumHeight(35)  # Increased combo box height
         self.startPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 
                                      'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 
                                      'Historical Events', 'Random', 'Custom'])
@@ -294,18 +414,20 @@ class MultiplayerPage(QWidget):
         self.customStartPageEdit = QLineEdit()
         self.customStartPageEdit.setPlaceholderText("Enter custom starting page...")
         self.customStartPageEdit.setEnabled(False)
-        self.customStartPageEdit.setStyleSheet("font-size: 11px;")
+        self.customStartPageEdit.setStyleSheet("font-size: 12px; padding: 6px;")  # Increased font size and padding
+        self.customStartPageEdit.setMinimumHeight(35)  # Increased input height
         game_config_layout.addWidget(self.customStartPageEdit)
         
         # Ending page selection
         end_layout = QHBoxLayout()
         end_label = QLabel("End Page:")
-        end_label.setMinimumWidth(70)
-        end_label.setStyleSheet("font-size: 11px;")
+        end_label.setMinimumWidth(90)  # Increased by 25% (70 * 1.25 = 87.5, rounded to 90)
+        end_label.setStyleSheet("font-size: 12px;")  # Increased font size
         end_layout.addWidget(end_label)
         
         self.endPageCombo = QComboBox()
-        self.endPageCombo.setStyleSheet("font-size: 11px;")
+        self.endPageCombo.setStyleSheet("font-size: 12px; padding: 6px;")  # Increased font size and padding
+        self.endPageCombo.setMinimumHeight(35)  # Increased combo box height
         self.endPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 
                                    'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 
                                    'Historical Events', 'Random', 'Custom'])
@@ -316,14 +438,15 @@ class MultiplayerPage(QWidget):
         self.customEndPageEdit = QLineEdit()
         self.customEndPageEdit.setPlaceholderText("Enter custom ending page...")
         self.customEndPageEdit.setEnabled(False)
-        self.customEndPageEdit.setStyleSheet("font-size: 11px;")
+        self.customEndPageEdit.setStyleSheet("font-size: 12px; padding: 6px;")  # Increased font size and padding
+        self.customEndPageEdit.setMinimumHeight(35)  # Increased input height
         game_config_layout.addWidget(self.customEndPageEdit)
         
         # Game selection display (for non-leaders)
         self.gameSelectionDisplay = QLabel("Waiting for leader to configure game...")
-        self.gameSelectionDisplay.setStyleSheet("font-style: italic; color: #666; margin: 5px; font-size: 10px;")
+        self.gameSelectionDisplay.setStyleSheet("font-style: italic; color: #666; margin: 8px; font-size: 12px;")  # Increased font size and margin
         self.gameSelectionDisplay.setWordWrap(True)
-        self.gameSelectionDisplay.setMaximumWidth(400)  # Limit width to prevent app from becoming too wide
+        self.gameSelectionDisplay.setMaximumWidth(self.dynamic_width)  # Use dynamic width
         self.gameSelectionDisplay.hide()
         game_config_layout.addWidget(self.gameSelectionDisplay)
         
@@ -331,8 +454,9 @@ class MultiplayerPage(QWidget):
         
         # Start Game button (only visible for leader)
         self.startGameButton = QPushButton("Start Game")
-        self.startGameButton.setMinimumHeight(40)
-        self.startGameButton.setMaximumHeight(45)
+        self.startGameButton.setMinimumHeight(50)  # Increased by 25% (40 * 1.25 = 50)
+        self.startGameButton.setMaximumHeight(56)  # Increased by 25% (45 * 1.25 = 56)
+        self.startGameButton.setMinimumWidth(int(self.dynamic_width * 0.8))  # Dynamic button width
         self.startGameButton.setEnabled(False)
         self.startGameButton.hide()  # Hidden by default
         self.startGameButton.setStyleSheet("""
@@ -345,8 +469,9 @@ class MultiplayerPage(QWidget):
         room_info_layout.addWidget(self.startGameButton)
         
         self.leaveRoomButton = QPushButton("Leave Room")
-        self.leaveRoomButton.setMinimumHeight(40)
-        self.leaveRoomButton.setMaximumHeight(45)
+        self.leaveRoomButton.setMinimumHeight(50)  # Increased by 25% (40 * 1.25 = 50)
+        self.leaveRoomButton.setMaximumHeight(56)  # Increased by 25% (45 * 1.25 = 56)
+        self.leaveRoomButton.setMinimumWidth(int(self.dynamic_width * 0.8))  # Dynamic button width
         room_info_layout.addWidget(self.leaveRoomButton)
         
         self.layout.addWidget(self.roomInfoFrame)
@@ -369,7 +494,46 @@ class MultiplayerPage(QWidget):
         # Connect input events
         self.roomCodeInput.textChanged.connect(self.on_room_code_changed)
         self.roomCodeInput.returnPressed.connect(self.on_join_game_clicked)
-        self.playerNameInput.returnPressed.connect(self.on_host_game_clicked)
+        
+        # Dynamic width is already set at the beginning of initUI
+    
+    def resizeEvent(self, event):
+        """Handle window resize events for dynamic sizing"""
+        super().resizeEvent(event)
+        
+        # Update dynamic width based on current window size
+        current_width = self.width()
+        new_dynamic_width = min(int(current_width * 0.4), 500)
+        
+        # Only update if there's a significant change to avoid constant updates
+        if abs(new_dynamic_width - self.dynamic_width) > 20:
+            self.dynamic_width = new_dynamic_width
+            self.update_dynamic_sizing()
+    
+    def update_dynamic_sizing(self):
+        """Update all dynamic sizing elements"""
+        # Update frame widths - host and join frames now expand horizontally
+        # Calculate available width for each frame (half of available space minus spacing)
+        available_width = max(300, self.dynamic_width)  # Minimum 300px per frame
+        self.host_frame.setMinimumWidth(available_width)
+        self.join_frame.setMinimumWidth(available_width)
+        
+        # Room info and game config still use dynamic width
+        self.roomInfoFrame.setMaximumWidth(self.dynamic_width)
+        self.roomInfoFrame.setMinimumWidth(int(self.dynamic_width * 0.8))
+        self.gameConfigFrame.setMaximumWidth(self.dynamic_width)
+        
+        # Update button widths for horizontal layout
+        button_width = max(200, int(self.dynamic_width * 0.4))  # Each button gets half the width
+        self.hostGameButton.setMinimumWidth(button_width)
+        self.joinGameButton.setMinimumWidth(button_width)
+        self.startGameButton.setMinimumWidth(button_width)
+        self.leaveRoomButton.setMinimumWidth(button_width)
+        
+        # Update other elements
+        self.roomInfoLabel.setMaximumWidth(self.dynamic_width)
+        self.playersGrid.setMaximumWidth(self.dynamic_width)
+        self.gameSelectionDisplay.setMaximumWidth(self.dynamic_width)
     
     def hide_host_join_sections(self):
         """Hide the host and join game sections when user joins a room"""
@@ -562,16 +726,17 @@ class MultiplayerPage(QWidget):
 
     def on_room_code_changed(self, text):
         """Handle room code input changes"""
-        # Convert to uppercase and limit to 4 characters
-        text = text.upper()[:4]
+        # Convert to uppercase, limit to 4 characters, and only allow letters
+        text = ''.join(c for c in text.upper() if c.isalpha())[:4]
         if self.roomCodeInput.text() != text:
             self.roomCodeInput.setText(text)
     
     def on_host_game_clicked(self):
         """Handle host game button click"""
-        player_name = self.playerNameInput.text().strip()
+        # Show player name dialog
+        from src.gui.PlayerNameDialog import PlayerNameDialog
+        player_name = PlayerNameDialog.get_player_name("Enter Your Name", self)
         if not player_name:
-            QMessageBox.warning(self, "Invalid Name", "Please enter your display name.")
             return
         
         self.player_name = player_name
@@ -590,15 +755,22 @@ class MultiplayerPage(QWidget):
     
     def on_join_game_clicked(self):
         """Handle join game button click"""
-        player_name = self.playerNameInput.text().strip()
         room_code = self.roomCodeInput.text().strip()
         
-        if not player_name:
-            QMessageBox.warning(self, "Invalid Name", "Please enter your display name.")
-            return
-        
+        # Validate room code first before showing dialog
         if len(room_code) != 4:
             QMessageBox.warning(self, "Invalid Room Code", "Please enter a 4-letter room code.")
+            return
+        
+        # Check if room exists before showing name dialog
+        if not self._validate_room_exists(room_code):
+            QMessageBox.warning(self, "Room Not Found", f"Room '{room_code}' does not exist. Please check the room code.")
+            return
+        
+        # Show player name dialog only after room validation
+        from src.gui.PlayerNameDialog import PlayerNameDialog
+        player_name = PlayerNameDialog.get_player_name("Enter Your Name", self)
+        if not player_name:
             return
         
         self.player_name = player_name
@@ -637,10 +809,100 @@ class MultiplayerPage(QWidget):
         
         QMessageBox.information(self, "Left Room", "You have left the room.")
     
+    def reset_for_new_game(self):
+        """Reset the multiplayer page state to allow starting new games after play again"""
+        print("🔄 Resetting multiplayer page for new game...")
+        
+        # Reset game configuration to defaults
+        if hasattr(self, 'startPageCombo'):
+            self.startPageCombo.setCurrentIndex(0)  # Reset to first option
+        if hasattr(self, 'endPageCombo'):
+            self.endPageCombo.setCurrentIndex(0)  # Reset to first option
+        if hasattr(self, 'customStartPageEdit'):
+            self.customStartPageEdit.clear()
+        if hasattr(self, 'customEndPageEdit'):
+            self.customEndPageEdit.clear()
+        
+        # Clear the waiting flag immediately when resetting
+        if hasattr(self, '_waiting_for_players_ready'):
+            self._waiting_for_players_ready = False
+        
+        # Reset start game button state - enable it if we have enough players and valid config
+        if hasattr(self, 'startGameButton'):
+            self.startGameButton.show()  # Make sure it's visible for leaders
+            # Update the button state based on current conditions
+            self.update_start_game_button_state()
+        
+        # Update game selection display for non-leaders
+        if hasattr(self, 'update_game_selection_display'):
+            self.update_game_selection_display()
+        
+        # Force a configuration update to broadcast the reset settings to other players
+        if self.is_leader and hasattr(self, '_send_config_update'):
+            # Send the reset configuration to other players
+            self._send_config_update()
+        
+        print("✅ Multiplayer page reset for new game")
+    
+    def _validate_room_exists(self, room_code):
+        """Validate that a room with the given code exists"""
+        try:
+            # Check if we have a network manager and it's connected
+            if not hasattr(self, 'network_manager') or not self.network_manager.connected_to_server:
+                # If not connected, try to connect first
+                if hasattr(self.network_manager, 'connect_to_server'):
+                    self.network_manager.connect_to_server()
+                    # Give it a moment to connect
+                    import time
+                    time.sleep(0.5)
+            
+            # Use the network manager to check if room exists
+            if hasattr(self.network_manager, 'check_room_exists'):
+                return self.network_manager.check_room_exists(room_code)
+            else:
+                # Fallback: assume room exists and let server handle validation
+                return True
+                
+        except Exception as e:
+            print(f"❌ Error validating room existence: {e}")
+            # If validation fails, assume room exists and let server handle it
+            return True
+    
+    def clear_waiting_for_players(self):
+        """Clear the waiting for players flag to allow starting new games"""
+        if hasattr(self, '_waiting_for_players_ready'):
+            self._waiting_for_players_ready = False
+            print("🔄 Cleared waiting for players flag - can now start new games")
+            # Update button state
+            self.update_start_game_button_state()
+    
+    def on_player_play_again(self):
+        """Handle when a player hits 'Play Again' - clear waiting flag for leader"""
+        if self.is_leader and hasattr(self, '_waiting_for_players_ready') and self._waiting_for_players_ready:
+            self._waiting_for_players_ready = False
+            print("🔄 Player hit 'Play Again' - clearing waiting flag for leader")
+            self.update_start_game_button_state()
+    
+    def update_players_grid(self, players):
+        """Update the players grid display"""
+        # Clear all labels first
+        for label in self.playerLabels:
+            label.setText("")
+            label.hide()
+        
+        # Only show boxes for actual players (1-10)
+        for i, player in enumerate(players[:10]):  # Limit to 10 players
+            if i < len(self.playerLabels):
+                label = self.playerLabels[i]
+                label.setText(player)
+                label.show()
+        
+        # Don't show any empty slots - only show boxes when players actually join
+    
     def show_room_info(self, title, players):
         """Show room information"""
         self.roomInfoLabel.setText(title)
-        self.playersList.setText("Players:\n" + "\n".join(f"• {player}" for player in players))
+        self.update_players_grid(players)
         
         # Show game configuration for all players, but with different permissions
         self.gameConfigFrame.show()
@@ -719,27 +981,45 @@ class MultiplayerPage(QWidget):
     
     def on_player_joined(self, player_name):
         """Handle player join event"""
-        if hasattr(self, 'playersList'):
-            current_text = self.playersList.toPlainText()
-            if player_name not in current_text:
-                self.playersList.append(f"• {player_name}")
-                # Add to our local player list
-                if player_name not in self.players_in_room:
-                    self.players_in_room.append(player_name)
-                # Update start game button state
-                self.update_start_game_button_state()
+        # Add to our local player list
+        if player_name not in self.players_in_room:
+            self.players_in_room.append(player_name)
+        
+        # Update the grid display
+        if hasattr(self, 'update_players_grid'):
+            self.update_players_grid(self.players_in_room)
+        
+        # Clear waiting for players flag if we were waiting
+        self.clear_waiting_for_players()
+        
+        # Update start game button state
+        self.update_start_game_button_state()
     
-    def on_player_left(self, player_name):
+    def on_player_left(self, player_name, players_list):
         """Handle player leave event"""
-        if hasattr(self, 'playersList'):
-            current_text = self.playersList.toPlainText()
-            new_text = current_text.replace(f"• {player_name}\n", "").replace(f"• {player_name}", "")
-            self.playersList.setText(new_text)
-            # Remove from our local player list
-            if player_name in self.players_in_room:
-                self.players_in_room.remove(player_name)
-            # Update start game button state
-            self.update_start_game_button_state()
+        print(f"🔄 Player {player_name} left the room. Remaining players: {[p['display_name'] for p in players_list]}")
+        
+        # Update our local player list with the server's authoritative list
+        self.players_in_room = [p['display_name'] for p in players_list]
+        
+        # Update the players grid display
+        if hasattr(self, 'update_players_grid'):
+            # Format players list with leader tag
+            formatted_players = []
+            for p in players_list:
+                if p.get('is_host', False):
+                    formatted_players.append(f"{p['display_name']} (Leader)")
+                else:
+                    formatted_players.append(p['display_name'])
+            
+            self.update_players_grid(formatted_players)
+        
+        # Update start game button state
+        self.update_start_game_button_state()
+        
+        # Show notification
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(self, "Player Left", f"{player_name} has left the room.")
     
     def on_host_transferred(self, new_host_id, new_host_name):
         """Handle host transfer event"""
@@ -777,25 +1057,49 @@ class MultiplayerPage(QWidget):
         # Reset to initial state
         self.on_leave_room_clicked()
     
+    def show_debug_countdown_info(self):
+        """Debug method to show information about active countdown dialogs"""
+        print(f"🎬 DEBUG: Active countdown dialogs: {len(self.countdown_dialogs)}")
+        for i, dialog in enumerate(self.countdown_dialogs):
+            if hasattr(dialog, 'dialog_id'):
+                print(f"  Dialog {i}: {dialog.dialog_id} (count: {dialog.current_count})")
+            else:
+                print(f"  Dialog {i}: No ID available")
+    
     def on_game_starting(self, countdown_data):
         """Handle game starting countdown event"""
         print(f"🎬 DEBUG: Received game_starting event with data: {countdown_data}")
         try:
             from src.gui.CountdownDialog import CountdownDialog
             
-            print(f"🎬 DEBUG: Creating countdown dialog...")
-            # Store reference to prevent garbage collection
-            self.countdown_dialog = CountdownDialog(
+            print(f"🎬 DEBUG: Creating countdown dialog... (Total dialogs: {len(self.countdown_dialogs)})")
+            # Create new countdown dialog
+            countdown_dialog = CountdownDialog(
                 countdown_data.get('countdown_seconds', 5),
                 countdown_data.get('message', 'Get ready!'),
                 parent=self
             )
             
+            # Add to list for debugging (keep multiple dialogs visible)
+            self.countdown_dialogs.append(countdown_dialog)
+            print(f"🎬 DEBUG: Added dialog to list. Total dialogs: {len(self.countdown_dialogs)}")
+            
+            # Show debug info about all dialogs
+            self.show_debug_countdown_info()
+            
+            # Store reference to prevent garbage collection (keep latest)
+            self.countdown_dialog = countdown_dialog
+            
             print(f"🎬 DEBUG: Showing countdown dialog...")
             # Show the countdown dialog
-            self.countdown_dialog.exec()  # Use exec() to make it modal and blocking
+            countdown_dialog.exec()  # Use exec() to make it modal and blocking
             
             print(f"✅ Countdown completed: {countdown_data.get('message', 'Game starting...')}")
+            
+            # Clean up completed dialogs (keep only last 3 for debugging)
+            if len(self.countdown_dialogs) > 3:
+                old_dialog = self.countdown_dialogs.pop(0)
+                print(f"🎬 DEBUG: Cleaned up old dialog, remaining: {len(self.countdown_dialogs)}")
             
         except ImportError as e:
             print(f"❌ DEBUG: CountdownDialog import failed: {e}")
@@ -878,6 +1182,11 @@ class MultiplayerPage(QWidget):
         """Handle network errors"""
         QMessageBox.critical(self, "Network Error", f"Error: {error_message}")
         self.show_server_status("❌ Error", error_message, "error")
+        
+        # Reset join button if it's in "Joining..." state
+        if self.joinGameButton.text() == "Joining...":
+            self.joinGameButton.setEnabled(True)
+            self.joinGameButton.setText("Join Room")
     
     def on_reconnecting(self, attempt_number):
         """Handle reconnection attempts"""
@@ -892,9 +1201,15 @@ class MultiplayerPage(QWidget):
     def on_reconnection_failed(self):
         """Handle failed reconnection"""
         self.show_server_status("❌ Connection Lost", "Could not reconnect to server", "error")
+        
+        # If we were in a room, reset the UI state
+        if self.current_room_code:
+            self.on_leave_room_clicked()
+        
         QMessageBox.warning(self, "Connection Lost", 
                           "Could not reconnect to the multiplayer server.\n"
-                          "You may need to rejoin your room manually.")
+                          "You have been removed from your room.\n"
+                          "Please rejoin manually if the room still exists.")
     
     def load_server_config(self):
         """Load server configuration from file or use defaults"""
@@ -1109,7 +1424,11 @@ class MultiplayerPage(QWidget):
                 self.startGameButton.setEnabled(True)
                 self.update_start_game_button_state()
         except Exception as e:
+            print(f"❌ Error starting game: {e}")
             QMessageBox.critical(self, "Error", f"Failed to start game: {e}")
             # Re-enable button on error
             self.startGameButton.setEnabled(True)
             self.update_start_game_button_state()
+            
+            # Reset button text
+            self.startGameButton.setText("Start Game")

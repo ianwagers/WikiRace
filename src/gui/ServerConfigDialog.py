@@ -49,7 +49,7 @@ class ServerConfigDialog(QDialog):
         """Initialize the configuration dialog UI"""
         self.setWindowTitle("Multiplayer Server Configuration")
         self.setModal(True)
-        self.setFixedSize(650, 450)  # Increased width from 500 to 650, height from 400 to 450
+        self.setFixedSize(750, 600)  # Further increased for better visibility and to prevent cutoff
         
         # Main layout
         layout = QVBoxLayout(self)

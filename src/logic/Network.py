@@ -18,7 +18,7 @@ class NetworkManager(QObject):
     room_created = pyqtSignal(str, str)  # room_code, player_name
     room_joined = pyqtSignal(str, str, list)   # room_code, player_name, players_list
     player_joined = pyqtSignal(str)      # player_name
-    player_left = pyqtSignal(str)        # player_name
+    player_left = pyqtSignal(str, list)  # player_name, players_list
     host_transferred = pyqtSignal(str, str)  # new_host_id, new_host_name
     room_deleted = pyqtSignal()          # room was deleted
     game_starting = pyqtSignal(dict)     # countdown_data
@@ -47,6 +47,10 @@ class NetworkManager(QObject):
         self.max_reconnection_delay = 3.0  # Max 3 seconds (much faster)
         self.current_reconnection_attempts = 0
         
+        # Heartbeat settings
+        self.heartbeat_timer = None
+        self.heartbeat_interval = 5000  # 5 seconds
+        
         # Set up Socket.IO event handlers
         self._setup_socket_handlers()
     
@@ -58,6 +62,9 @@ class NetworkManager(QObject):
             print("✅ Connected to multiplayer server")
             self.connected_to_server = True
             self.connected.emit()
+            
+            # Start heartbeat
+            self.start_heartbeat()
         
         @self.sio.event
         def disconnect():
@@ -98,7 +105,7 @@ class NetworkManager(QObject):
         @self.sio.event
         def player_left(data):
             print(f"Player left: {data}")
-            self.player_left.emit(data['player_name'])
+            self.player_left.emit(data['player_name'], data.get('players', []))
         
         @self.sio.event
         def error(data):
@@ -131,11 +138,14 @@ class NetworkManager(QObject):
         
         @self.sio.event
         def player_progress(data):
-            print(f"Player progress: {data}")
+            print(f"📊 DEBUG: Network received player_progress: {data}")
             player_name = data.get('player_name', '')
             current_page = data.get('current_page', '')
             links_used = data.get('links_used', 0)
+            print(f"📊 DEBUG: Parsed - player: {player_name}, page: {current_page}, links: {links_used}")
+            print(f"📊 DEBUG: Emitting player_progress signal...")
             self.player_progress.emit(player_name, current_page, links_used)
+            print(f"📊 DEBUG: Signal emitted successfully")
         
         @self.sio.event
         def player_completed(data):
@@ -155,6 +165,12 @@ class NetworkManager(QObject):
             print(f"Room progress sync: {data}")
             # This could be used for additional synchronization if needed
             pass
+        
+        @self.sio.event
+        def pong(data):
+            """Handle pong response from server"""
+            print(f"Pong received: {data}")
+            # Heartbeat successful, no action needed
     
     def connect_to_server(self) -> bool:
         """Connect to the multiplayer server"""
@@ -188,10 +204,43 @@ class NetworkManager(QObject):
             # Disable reconnection when manually disconnecting
             self.reconnection_enabled = False
             
+            # Stop heartbeat
+            self.stop_heartbeat()
+            
             if self.connected_to_server:
                 self.sio.disconnect()
         except Exception as e:
             print(f"Error disconnecting: {e}")
+    
+    def start_heartbeat(self):
+        """Start the heartbeat timer"""
+        if self.heartbeat_timer:
+            self.heartbeat_timer.stop()
+        
+        self.heartbeat_timer = QTimer()
+        self.heartbeat_timer.timeout.connect(self.send_heartbeat)
+        self.heartbeat_timer.start(self.heartbeat_interval)
+        print("💓 Heartbeat started")
+    
+    def stop_heartbeat(self):
+        """Stop the heartbeat timer"""
+        if self.heartbeat_timer:
+            self.heartbeat_timer.stop()
+            self.heartbeat_timer = None
+        print("💓 Heartbeat stopped")
+    
+    def send_heartbeat(self):
+        """Send heartbeat ping to server"""
+        if self.connected_to_server and self.sio.connected:
+            try:
+                import time
+                self.sio.emit('ping', {'timestamp': time.time()})
+                print("💓 Heartbeat sent")
+            except Exception as e:
+                print(f"💓 Heartbeat failed: {e}")
+                # If heartbeat fails, try to reconnect
+                if self.reconnection_enabled:
+                    self._start_reconnection()
     
     def _start_reconnection(self):
         """Start the reconnection process"""
@@ -304,6 +353,24 @@ class NetworkManager(QObject):
             print(f"❌ Failed to join room: {e}")
             self.error_occurred.emit(f"Failed to join room: {e}")
             return False
+    
+    def check_room_exists(self, room_code: str) -> bool:
+        """Check if a room with the given code exists"""
+        try:
+            if not self.connected_to_server:
+                if not self.connect_to_server():
+                    # If we can't connect to server, assume room exists and let join_room handle validation
+                    print(f"⚠️ Cannot connect to server for room validation, assuming room exists")
+                    return True
+            
+            # Use REST API to check if room exists
+            response = requests.get(f"{self.server_url}/api/rooms/{room_code.upper()}")
+            return response.status_code == 200
+            
+        except Exception as e:
+            print(f"❌ Failed to check room existence: {e}")
+            # If check fails, assume room exists and let join_room handle the error
+            return True
     
     def leave_room(self):
         """Leave the current room"""

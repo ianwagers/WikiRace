@@ -125,6 +125,12 @@ class RoomManager:
             logger.warning(f"Room {room_code} is not in lobby state, cannot join")
             return None
         
+        # Check if player name already exists in room
+        existing_player = room.get_player_by_name(display_name)
+        if existing_player:
+            logger.warning(f"Player name '{display_name}' already exists in room {room_code}")
+            return None
+        
         # Create player
         player = Player(
             socket_id=player_socket_id,

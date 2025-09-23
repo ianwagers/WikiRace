@@ -1,14 +1,72 @@
 """
 CountdownDialog - Visual countdown display for game start
 
-Shows a large countdown timer with a message to prepare players
+Shows a responsive countdown timer with drag race lights to prepare players
 for the start of a multiplayer game.
 """
 
-from PyQt6.QtWidgets import QDialog, QVBoxLayout, QLabel
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
-from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QWidget
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QSize
+from PyQt6.QtGui import QFont, QPainter, QColor, QPen
 from src.logic.ThemeManager import theme_manager
+
+
+class DragRaceLight(QWidget):
+    """Custom widget for drag race style lights"""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.is_lit = False
+        self.light_color = QColor(128, 128, 128)  # Default gray
+        self.setMinimumSize(40, 40)
+        self.setMaximumSize(80, 80)
+    
+    def set_light(self, color, is_lit=True):
+        """Set the light color and state"""
+        self.light_color = color
+        self.is_lit = is_lit
+        self.update()
+    
+    def paintEvent(self, event):
+        """Paint the circular light"""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        
+        # Calculate center and radius
+        rect = self.rect()
+        center = rect.center()
+        radius = min(rect.width(), rect.height()) // 2 - 5
+        
+        # Draw outer ring
+        painter.setPen(QPen(QColor(64, 64, 64), 2))
+        painter.setBrush(QColor(32, 32, 32))
+        painter.drawEllipse(center, radius + 3, radius + 3)
+        
+        # Draw light
+        if self.is_lit:
+            # Bright version with glow effect
+            painter.setPen(QPen(self.light_color, 1))
+            painter.setBrush(self.light_color)
+        else:
+            # Dim version
+            dim_color = QColor(self.light_color.red() // 4, 
+                             self.light_color.green() // 4, 
+                             self.light_color.blue() // 4)
+            painter.setPen(QPen(dim_color, 1))
+            painter.setBrush(dim_color)
+        
+        painter.drawEllipse(center, radius, radius)
+        
+        # Add highlight for lit lights
+        if self.is_lit:
+            highlight = QColor(255, 255, 255, 100)
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(highlight)
+            # Convert to integers to avoid float division issues
+            highlight_radius = int(radius / 1.5)
+            highlight_x = center.x() - highlight_radius // 2
+            highlight_y = center.y() - highlight_radius // 2
+            painter.drawEllipse(highlight_x, highlight_y, highlight_radius, highlight_radius)
 
 
 class CountdownDialog(QDialog):
@@ -23,6 +81,14 @@ class CountdownDialog(QDialog):
         self.current_count = countdown_seconds
         self.message = message
         
+        # Add unique identifier for debugging
+        import time
+        self.dialog_id = f"CD_{int(time.time() * 1000) % 10000}"
+        print(f"🎬 DEBUG: Created CountdownDialog {self.dialog_id}")
+        
+        # Calculate responsive size based on parent window
+        self.calculate_responsive_size()
+        
         self.initUI()
         self.apply_theme()
         self.start_countdown()
@@ -30,67 +96,133 @@ class CountdownDialog(QDialog):
         # Connect to theme changes
         theme_manager.theme_changed.connect(self.apply_theme)
     
+    def calculate_responsive_size(self):
+        """Calculate responsive size based on parent window"""
+        # Get parent window size
+        parent = self.parent()
+        while parent and parent.parent():
+            if hasattr(parent, 'geometry'):
+                parent_geo = parent.geometry()
+                break
+            parent = parent.parent()
+        else:
+            # Fallback to screen size
+            from PyQt6.QtWidgets import QApplication
+            parent_geo = QApplication.primaryScreen().geometry()
+        
+        # Calculate responsive dimensions (40-60% of parent, but not too small)
+        width = max(400, min(int(parent_geo.width() * 0.5), 800))
+        height = max(350, min(int(parent_geo.height() * 0.5), 600))
+        
+        self.dialog_width = width
+        self.dialog_height = height
+        
+        # Calculate font sizes based on dialog size
+        self.message_font_size = max(14, int(width / 25))
+        self.countdown_font_size = max(60, int(width / 6))
+        self.status_font_size = max(10, int(width / 35))
+        self.light_size = max(30, min(int(width / 12), 60))
+        
+        print(f"🎬 Countdown sizing: {width}x{height}, fonts: {self.message_font_size}/{self.countdown_font_size}/{self.status_font_size}")
+    
     def initUI(self):
-        """Initialize the countdown dialog UI"""
+        """Initialize the responsive countdown dialog UI with drag race lights"""
         self.setWindowTitle("Game Starting!")
         self.setModal(True)
-        self.setFixedSize(450, 400)  # Increased height to prevent text cut-off
+        self.setFixedSize(self.dialog_width, self.dialog_height)
         
         # Remove window decorations for full-screen feel
         self.setWindowFlags(Qt.WindowType.Dialog | Qt.WindowType.FramelessWindowHint)
         
-        # Center on the main application window, not just the immediate parent
-        main_window = self.parent()
-        while main_window and main_window.parent():
-            if hasattr(main_window, 'windowTitle') and 'WikiRace' in main_window.windowTitle():
-                break
-            main_window = main_window.parent()
+        # Center on the main application window
+        self.center_on_parent()
         
-        if main_window:
-            # Center on the main WikiRace window
-            parent_geo = main_window.geometry()
-            x = parent_geo.x() + (parent_geo.width() - self.width()) // 2
-            y = parent_geo.y() + (parent_geo.height() - self.height()) // 2
-            self.move(x, y)
-        else:
-            # Fallback to screen center
-            from PyQt6.QtWidgets import QApplication
-            screen = QApplication.primaryScreen().geometry()
-            x = (screen.width() - self.width()) // 2
-            y = (screen.height() - self.height()) // 2
-            self.move(x, y)
-        
-        # Main layout
+        # Main layout with responsive spacing
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(30, 30, 30, 30)  # Reduced margins for better text fit
-        layout.setSpacing(20)  # Reduced spacing
+        margin = max(20, int(self.dialog_width / 20))
+        spacing = max(15, int(self.dialog_width / 30))
+        layout.setContentsMargins(margin, margin, margin, margin)
+        layout.setSpacing(spacing)
+        
+        # Drag race lights at the top
+        lights_layout = QHBoxLayout()
+        lights_layout.setSpacing(max(10, int(self.dialog_width / 40)))
+        
+        # Create drag race lights (Red, Yellow, Green)
+        self.red_light = DragRaceLight()
+        self.red_light.setFixedSize(self.light_size, self.light_size)
+        self.red_light.set_light(QColor(220, 53, 69), False)  # Bootstrap red
+        
+        self.yellow_light = DragRaceLight()
+        self.yellow_light.setFixedSize(self.light_size, self.light_size)
+        self.yellow_light.set_light(QColor(255, 193, 7), False)  # Bootstrap yellow
+        
+        self.green_light = DragRaceLight()
+        self.green_light.setFixedSize(self.light_size, self.light_size)
+        self.green_light.set_light(QColor(40, 167, 69), False)  # Bootstrap green
+        
+        lights_layout.addStretch()
+        lights_layout.addWidget(self.red_light)
+        lights_layout.addWidget(self.yellow_light)
+        lights_layout.addWidget(self.green_light)
+        lights_layout.addStretch()
+        
+        layout.addLayout(lights_layout)
         
         # Message label
         self.message_label = QLabel(self.message)
         self.message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.message_label.setFont(QFont("Inter", 16, QFont.Weight.Bold))  # Slightly smaller
+        self.message_label.setFont(QFont("Inter", self.message_font_size, QFont.Weight.Bold))
         self.message_label.setWordWrap(True)
-        self.message_label.setMaximumHeight(60)  # Limit height to prevent overflow
+        self.message_label.setMaximumHeight(int(self.dialog_height * 0.15))
         layout.addWidget(self.message_label)
         
         # Countdown number
         self.countdown_label = QLabel(str(self.current_count))
         self.countdown_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.countdown_label.setFont(QFont("Inter", 64, QFont.Weight.Bold))  # Slightly smaller
+        self.countdown_label.setFont(QFont("Inter", self.countdown_font_size, QFont.Weight.Bold))
+        self.countdown_label.setMinimumHeight(int(self.dialog_height * 0.3))
         layout.addWidget(self.countdown_label)
         
         # Status label
         self.status_label = QLabel("Race starts when countdown reaches 0")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.status_label.setFont(QFont("Inter", 11))  # Slightly smaller
+        self.status_label.setFont(QFont("Inter", self.status_font_size))
         self.status_label.setWordWrap(True)
-        self.status_label.setMaximumHeight(40)  # Limit height
+        self.status_label.setMaximumHeight(int(self.dialog_height * 0.1))
         layout.addWidget(self.status_label)
         
         layout.addStretch()
     
+    def center_on_parent(self):
+        """Center the dialog on the parent window with offset for multiple dialogs"""
+        parent = self.parent()
+        while parent and parent.parent():
+            if hasattr(parent, 'geometry'):
+                parent_geo = parent.geometry()
+                break
+            parent = parent.parent()
+        else:
+            # Fallback to screen center
+            from PyQt6.QtWidgets import QApplication
+            parent_geo = QApplication.primaryScreen().geometry()
+        
+        # Calculate base center position
+        base_x = parent_geo.x() + (parent_geo.width() - self.dialog_width) // 2
+        base_y = parent_geo.y() + (parent_geo.height() - self.dialog_height) // 2
+        
+        # Add offset for multiple dialogs (stagger them)
+        offset_x = (int(self.dialog_id.split('_')[1]) % 5) * 50  # Offset based on dialog ID
+        offset_y = (int(self.dialog_id.split('_')[1]) % 3) * 30
+        
+        x = base_x + offset_x
+        y = base_y + offset_y
+        
+        print(f"🎬 DEBUG: Positioning CountdownDialog {self.dialog_id} at ({x}, {y})")
+        self.move(x, y)
+    
     def apply_theme(self):
-        """Apply theme-based styling"""
+        """Apply theme-based styling with responsive fonts"""
         styles = theme_manager.get_theme_styles()
         
         # Dialog background
@@ -106,7 +238,7 @@ class CountdownDialog(QDialog):
             }}
         """)
         
-        # Countdown number gets special styling
+        # Countdown number gets special styling with responsive font sizes
         if styles['is_dark']:
             countdown_color = "#4CAF50"  # Green for dark theme
             status_color = "#adb5bd"
@@ -114,8 +246,15 @@ class CountdownDialog(QDialog):
             countdown_color = "#2E7D32"  # Dark green for light theme  
             status_color = "#6c757d"
         
-        self.countdown_label.setStyleSheet(f"color: {countdown_color};")
-        self.status_label.setStyleSheet(f"color: {status_color};")
+        # Apply colors while preserving responsive font sizes
+        self.countdown_label.setStyleSheet(f"color: {countdown_color}; font-size: {self.countdown_font_size}px; font-weight: bold;")
+        self.status_label.setStyleSheet(f"color: {status_color}; font-size: {self.status_font_size}px;")
+        self.message_label.setStyleSheet(f"font-size: {self.message_font_size}px; font-weight: bold;")
+        
+        # Ensure fonts are properly set after theme application
+        self.message_label.setFont(QFont("Inter", self.message_font_size, QFont.Weight.Bold))
+        self.countdown_label.setFont(QFont("Inter", self.countdown_font_size, QFont.Weight.Bold))
+        self.status_label.setFont(QFont("Inter", self.status_font_size))
     
     def start_countdown(self):
         """Start the countdown timer"""
@@ -124,26 +263,49 @@ class CountdownDialog(QDialog):
         self.timer.start(1000)  # Update every second
     
     def update_countdown(self):
-        """Update the countdown display"""
+        """Update the countdown display with drag race lights"""
         self.current_count -= 1
+        print(f"🎬 DEBUG: CountdownDialog {self.dialog_id} updating: {self.current_count}")
         
         if self.current_count > 0:
             self.countdown_label.setText(str(self.current_count))
             
-            # Change color as we get closer to 0
+            # Drag race lights sequence
+            if self.current_count == 5:
+                # Red light on
+                self.red_light.set_light(QColor(220, 53, 69), True)
+                self.yellow_light.set_light(QColor(255, 193, 7), False)
+                self.green_light.set_light(QColor(40, 167, 69), False)
+            elif self.current_count == 3:
+                # Yellow light on
+                self.red_light.set_light(QColor(220, 53, 69), True)
+                self.yellow_light.set_light(QColor(255, 193, 7), True)
+                self.green_light.set_light(QColor(40, 167, 69), False)
+            elif self.current_count == 2:
+                # All lights on (red + yellow)
+                self.red_light.set_light(QColor(220, 53, 69), True)
+                self.yellow_light.set_light(QColor(255, 193, 7), True)
+                self.green_light.set_light(QColor(40, 167, 69), False)
+            
+            # Change countdown color as we get closer to 0
             if self.current_count <= 3:
                 styles = theme_manager.get_theme_styles()
                 warning_color = "#ff6b6b" if styles['is_dark'] else "#dc3545"
-                self.countdown_label.setStyleSheet(f"color: {warning_color};")
+                self.countdown_label.setStyleSheet(f"color: {warning_color}; font-size: {self.countdown_font_size}px; font-weight: bold;")
         
         elif self.current_count == 0:
+            # GREEN LIGHT! GO!
+            self.red_light.set_light(QColor(220, 53, 69), False)
+            self.yellow_light.set_light(QColor(255, 193, 7), False)
+            self.green_light.set_light(QColor(40, 167, 69), True)  # GREEN LIGHT!
+            
             self.countdown_label.setText("GO!")
             self.status_label.setText("Race has started! Good luck!")
             
             # Final color change
             styles = theme_manager.get_theme_styles()
             go_color = "#51cf66" if styles['is_dark'] else "#28a745"
-            self.countdown_label.setStyleSheet(f"color: {go_color};")
+            self.countdown_label.setStyleSheet(f"color: {go_color}; font-size: {self.countdown_font_size}px; font-weight: bold;")
             
             # Auto-close after showing GO! for 1 second
             QTimer.singleShot(1000, self.finish_countdown)
@@ -153,6 +315,7 @@ class CountdownDialog(QDialog):
     
     def finish_countdown(self):
         """Finish the countdown and close dialog"""
+        print(f"🎬 DEBUG: CountdownDialog {self.dialog_id} finishing countdown")
         self.timer.stop()
         self.countdown_finished.emit()
         self.accept()  # Close the dialog
