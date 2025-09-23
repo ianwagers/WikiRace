@@ -177,6 +177,9 @@ class HomePage(QWidget):
         
         # Connect to theme changes
         theme_manager.theme_changed.connect(self.on_theme_changed)
+        
+        # Connect to tab widget changes to uncheck buttons when returning to home page
+        self.tabWidget.currentChanged.connect(self.on_tab_changed)
 
 
     def onLoadStarted(self):
@@ -254,6 +257,9 @@ class HomePage(QWidget):
             self.confetti_widget.setGeometry(0, 0, self.width(), self.height())
 
     def onSoloGameClicked(self):
+            # Uncheck the button immediately after click
+            self.soloGameButton.setChecked(False)
+            
             dialog = CustomGameDialog(self)
             if dialog.exec():
                 starting_page_choice = dialog.startPageCombo.currentText()
@@ -282,6 +288,9 @@ class HomePage(QWidget):
             self.tabWidget.setCurrentIndex(index)
 
     def onMultiplayerClicked(self):
+        # Uncheck the button immediately after click
+        self.multiplayerButton.setChecked(False)
+        
         # Open the multiplayer tab
         if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
             self.mainApplication.addMultiplayerTab()
@@ -293,6 +302,9 @@ class HomePage(QWidget):
             self.tabWidget.setCurrentIndex(index)
     
     def onSettingsClicked(self):
+        # Uncheck the button immediately after click
+        self.settingsButton.setChecked(False)
+        
         if not hasattr(self.mainApplication, 'settingsPage') or self.tabWidget.indexOf(self.mainApplication.settingsPage) == -1:
             self.mainApplication.addSettingsTab()
             # Switch to the newly created tab
@@ -414,16 +426,16 @@ class HomePage(QWidget):
         self.contentFrame.setStyleSheet(f"""
             QFrame {{
                 background-color: {styles['background_color']};
-                border-radius: 12px;
-                border: 1px solid {styles['border_color']};
-                margin: 10px;
+                border-radius: 0px;
+                border: 0px solid {styles['border_color']};
+                margin: 0px;
             }}
         """)
         
         self.webView.setStyleSheet(f"""
             QWebEngineView {{
                 background-color: {styles['background_color']};
-                border-radius: 12px;
+                border-radius: 0px;
             }}
         """)
     
@@ -450,6 +462,21 @@ class HomePage(QWidget):
         
         # Refresh Wikipedia page to apply new theme
         self.refreshWikipediaPage()
+    
+    def on_tab_changed(self, index):
+        """Handle tab changes to uncheck buttons when returning to home page"""
+        # Get the current tab widget
+        current_widget = self.tabWidget.widget(index)
+        
+        # If we're on the home page (this widget), uncheck all buttons
+        if current_widget == self:
+            self.uncheck_all_buttons()
+    
+    def uncheck_all_buttons(self):
+        """Uncheck all buttons to remove highlighting"""
+        self.soloGameButton.setChecked(False)
+        self.multiplayerButton.setChecked(False)
+        self.settingsButton.setChecked(False)
 
     def setStyles(self):
         """Apply theme-based styles"""

@@ -31,7 +31,7 @@ class SoloGamePage(QWidget):
         self.end_url = end_url
         self.start_title = start_title
         self.end_title = end_title
-        self.startTime = 0
+        self.startTime = time.time()  # Set start time immediately for solo games
         self.linksUsed = 0  # Start at 0, will increment on first link click
         self.darkModeApplied = False  # Track if dark mode has been applied
         self.is_multiplayer = is_multiplayer  # Flag to indicate multiplayer mode
@@ -555,7 +555,7 @@ class SoloGamePage(QWidget):
         # Reset game state for new game
         self.linksUsed = 0
         self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
-        self.startTime = time.time()
+        self.startTime = time.time()  # Reset start time for multiplayer games
         self._initial_load_complete = False  # Reset initial load flag
         
         # Clear previous links list
@@ -672,7 +672,9 @@ class EndGameDialog(QDialog):
         """) 
         layout.addWidget(messageSubscript)
 
-        totalTimeLabel = QLabel("Total time (hh:mm:ss): " + self.gamePage.formatTime(self.gamePage.startTime))
+        # Calculate total elapsed time
+        elapsed_time = time.time() - self.gamePage.startTime
+        totalTimeLabel = QLabel("Total time (hh:mm:ss): " + self.gamePage.formatTime(elapsed_time))
         totalTimeLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
         totalTimeLabel.setStyleSheet(f"""
             color: {styles['text_color']}; 
