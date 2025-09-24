@@ -8,7 +8,7 @@ by wrapping SoloGamePage and adding multiplayer-specific UI elements.
 import time
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QSplitter, 
                             QLabel, QListWidget, QListWidgetItem, QFrame,
-                            QScrollArea, QProgressBar)
+                            QScrollArea, QProgressBar, QApplication)
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QSize
 from PyQt6.QtGui import QFont
 from src.gui.SoloGamePage import SoloGamePage
@@ -28,71 +28,234 @@ class PlayerProgressWidget(QWidget):
         self.is_completed = False
         self.completion_time = None
         
+        # Detect screen size for responsive design
+        self.is_small_screen = self._is_small_screen()
+        
+        # Dynamic sizing properties - more aggressive heights
+        self.min_height = 25  # Minimum height for very small spaces
+        self.standard_height = 60  # Standard height for normal spaces
+        self.compact_height = 35  # Compact height for small spaces
+        
         self.initUI()
         self.apply_theme()
+        
+        # Connect to resize events for dynamic sizing
+        self.installEventFilter(self)
+    
+    def resizeEvent(self, event):
+        """Handle resize events directly"""
+        super().resizeEvent(event)
+        print(f"🔧 PLAYER WIDGET RESIZE: {self.player_name} -> {self.width()}x{self.height()}")
+        self._update_dynamic_layout()
+    
+    def _is_small_screen(self):
+        """Detect if we're on a smaller screen (like 1920x1080p)"""
+        try:
+            app = QApplication.instance()
+            if app:
+                screen = app.primaryScreen()
+                if screen:
+                    geometry = screen.availableGeometry()
+                    # Consider screens with height <= 1080 as small
+                    return geometry.height() <= 1080
+        except Exception:
+            pass
+        return False
+    
+    def eventFilter(self, obj, event):
+        """Handle resize events for dynamic sizing"""
+        if obj == self and event.type() == event.Type.Resize:
+            self._update_dynamic_layout()
+        return super().eventFilter(obj, event)
+    
+    def _update_dynamic_layout(self):
+        """Update layout based on current widget size"""
+        # Get available height from parent container
+        available_height = self.parent().height() if self.parent() else self.height()
+        
+        # Calculate how many players we need to fit
+        num_players = len(self.parent().findChildren(PlayerProgressWidget)) if self.parent() else 1
+        
+        # Calculate available height per player
+        if num_players > 0:
+            height_per_player = available_height / num_players
+        else:
+            height_per_player = available_height
+        
+        # Very aggressive height calculation - maximize game area
+        if height_per_player < 80:  # Cramped space - use minimum
+            target_height = self.min_height
+            self._apply_compact_layout(target_height)
+        elif height_per_player < 120:  # Small space - use compact
+            target_height = self.compact_height
+            self._apply_compact_layout(target_height)
+        else:  # Normal space - use standard
+            target_height = self.standard_height
+            self._apply_standard_layout(target_height)
+        
+        # Update height constraints - use maximum height instead of fixed height
+        self.setMaximumHeight(target_height)
+        self.setMinimumHeight(target_height)
+        # Also set the preferred size
+        self.setSizePolicy(self.sizePolicy().horizontalPolicy(), self.sizePolicy().verticalPolicy())
+        
+        # Force geometry update
+        self.updateGeometry()
+        self.update()
+        
+        print(f"🔧 DYNAMIC RESIZE: {self.player_name} -> {height_per_player:.1f}px/player -> {target_height}px height")
+    
+    def _apply_compact_layout(self, height):
+        """Apply compact layout for small spaces"""
+        # Hide optional elements
+        if hasattr(self, 'page_label'):
+            self.page_label.hide()
+        if hasattr(self, 'progress_label'):
+            self.progress_label.hide()
+        
+        # Very aggressive font sizes for maximum space efficiency
+        if hasattr(self, 'name_label'):
+            self.name_label.setFont(QFont("Inter", 8, QFont.Weight.Bold))
+        if hasattr(self, 'links_label'):
+            self.links_label.setFont(QFont("Inter", 6))
+        if hasattr(self, 'host_icon'):
+            self.host_icon.setFont(QFont("Inter", 8))
+        
+        # Very compact progress bar
+        if hasattr(self, 'progress_bar'):
+            self.progress_bar.setMinimumHeight(8)
+            self.progress_bar.setMinimumWidth(80)
+        
+        # Reduce layout spacing
+        if hasattr(self, 'layout'):
+            self.layout().setContentsMargins(2, 1, 2, 1)
+            self.layout().setSpacing(2)
+    
+    def _apply_standard_layout(self, height):
+        """Apply standard layout for normal spaces"""
+        # Show all elements
+        if hasattr(self, 'page_label'):
+            self.page_label.show()
+        if hasattr(self, 'progress_label'):
+            self.progress_label.show()
+        
+        # Standard font sizes
+        if hasattr(self, 'name_label'):
+            self.name_label.setFont(QFont("Inter", 11, QFont.Weight.Bold))
+        if hasattr(self, 'links_label'):
+            self.links_label.setFont(QFont("Inter", 8))
+        if hasattr(self, 'host_icon'):
+            self.host_icon.setFont(QFont("Inter", 11))
+        
+        # Standard progress bar size
+        if hasattr(self, 'progress_bar'):
+            self.progress_bar.setMinimumHeight(14)
+            self.progress_bar.setMinimumWidth(120)
+        
+        # Restore normal layout spacing
+        if hasattr(self, 'layout'):
+            self.layout().setContentsMargins(8, 4, 8, 4)
+            self.layout().setSpacing(6)
     
     def initUI(self):
         # Horizontal layout: Player info on left, progress bar on right
         layout = QHBoxLayout(self)
-        layout.setContentsMargins(12, 8, 12, 8)
-        layout.setSpacing(12)
+        
+        # Very aggressive margins and spacing for maximum space efficiency
+        if self.is_small_screen:
+            layout.setContentsMargins(4, 2, 4, 2)
+            layout.setSpacing(4)
+        else:
+            layout.setContentsMargins(8, 4, 8, 4)
+            layout.setSpacing(6)
         
         # Left side: Player info
         info_layout = QVBoxLayout()
-        info_layout.setSpacing(4)
+        info_layout.setSpacing(2 if self.is_small_screen else 4)
         
         # Player name with host indicator
         name_layout = QHBoxLayout()
         name_layout.setContentsMargins(0, 0, 0, 0)
-        name_layout.setSpacing(6)
+        name_layout.setSpacing(4 if self.is_small_screen else 6)
         
         host_icon = QLabel("👑" if self.is_host else "🔹")
-        host_icon.setFont(QFont("Inter", 12))
+        # Smaller font for small screens
+        icon_size = 10 if self.is_small_screen else 12
+        host_icon.setFont(QFont("Inter", icon_size))
         name_layout.addWidget(host_icon)
         
         name_label = QLabel(self.player_name)
-        name_label.setFont(QFont("Inter", 12, QFont.Weight.Bold))
+        # Smaller font for small screens
+        name_size = 10 if self.is_small_screen else 12
+        name_label.setFont(QFont("Inter", name_size, QFont.Weight.Bold))
         name_layout.addWidget(name_label)
         name_layout.addStretch()
         
         info_layout.addLayout(name_layout)
         
-        # Current page (smaller text)
+        # Current page (smaller text) - hide on small screens to save space
         self.page_label = QLabel(self.current_page)
-        self.page_label.setFont(QFont("Inter", 9))
-        self.page_label.setWordWrap(True)
-        info_layout.addWidget(self.page_label)
+        if not self.is_small_screen:
+            self.page_label.setFont(QFont("Inter", 9))
+            self.page_label.setWordWrap(True)
+            info_layout.addWidget(self.page_label)
+        else:
+            # Hide on small screens
+            self.page_label.hide()
         
         # Links count
         self.links_label = QLabel(f"Links: {self.links_used}")
-        self.links_label.setFont(QFont("Inter", 9))
+        # Smaller font for small screens
+        links_size = 8 if self.is_small_screen else 9
+        self.links_label.setFont(QFont("Inter", links_size))
         info_layout.addWidget(self.links_label)
         
         layout.addLayout(info_layout)
         
         # Right side: Progress bar
         progress_container = QVBoxLayout()
-        progress_container.setSpacing(4)
+        progress_container.setSpacing(2 if self.is_small_screen else 4)
         
-        # Progress label
-        progress_label = QLabel("Progress")
-        progress_label.setFont(QFont("Inter", 9, QFont.Weight.Medium))
-        progress_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        progress_container.addWidget(progress_label)
+        # Progress label - hide on small screens to save space
+        self.progress_label = QLabel("Progress")
+        if not self.is_small_screen:
+            self.progress_label.setFont(QFont("Inter", 9, QFont.Weight.Medium))
+            self.progress_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            progress_container.addWidget(self.progress_label)
+        else:
+            # Hide on small screens
+            self.progress_label.hide()
         
         # Progress bar (horizontal, on the right)
         self.progress_bar = QProgressBar()
         self.progress_bar.setRange(0, 100)  # Changed back to 100 for percentage
         self.progress_bar.setValue(0)
-        self.progress_bar.setMinimumHeight(16)
-        self.progress_bar.setMinimumWidth(150)
+        
+        # Smaller progress bar for small screens
+        if self.is_small_screen:
+            self.progress_bar.setMinimumHeight(12)
+            self.progress_bar.setMinimumWidth(120)
+        else:
+            self.progress_bar.setMinimumHeight(16)
+            self.progress_bar.setMinimumWidth(150)
+        
         progress_container.addWidget(self.progress_bar)
         
         layout.addLayout(progress_container)
         
-        # Set fixed height for consistent sizing
-        self.setFixedHeight(70)
-        self.setMinimumWidth(350)
+        # Set initial height constraints - will be updated dynamically
+        if self.is_small_screen:
+            self.setMaximumHeight(self.compact_height)
+            self.setMinimumHeight(self.compact_height)
+            self.setMinimumWidth(280)
+        else:
+            self.setMaximumHeight(self.standard_height)
+            self.setMinimumHeight(self.standard_height)
+            self.setMinimumWidth(350)
+        
+        # Store references for dynamic layout updates
+        self.name_label = name_label
+        self.host_icon = host_icon
     
     def apply_theme(self):
         """Apply theme-based styling with card-style containers"""
@@ -191,7 +354,9 @@ class PlayerProgressWidget(QWidget):
         self.completion_time = completion_time
         
         # Update both UI elements with identical data
-        self.page_label.setText(current_page)
+        # Only update page label if it's visible (not hidden on small screens)
+        if self.page_label.isVisible():
+            self.page_label.setText(current_page)
         self.links_label.setText(f"Links: {links_used}")
         
         # Progress bar shows exact same count as sidebar
@@ -250,6 +415,179 @@ class MultiplayerGamePage(QWidget):
         # Connect to theme changes
         theme_manager.theme_changed.connect(self.apply_theme)
     
+    def _is_small_screen(self):
+        """Detect if we're on a smaller screen (like 1920x1080p)"""
+        try:
+            app = QApplication.instance()
+            if app:
+                screen = app.primaryScreen()
+                if screen:
+                    geometry = screen.availableGeometry()
+                    # Consider screens with height <= 1080 as small
+                    return geometry.height() <= 1080
+        except Exception:
+            pass
+        return False
+    
+    def eventFilter(self, obj, event):
+        """Handle resize events for dynamic sizing"""
+        if obj == self and event.type() == event.Type.Resize:
+            # Update all player widgets when the main widget is resized
+            print(f"🔧 MAIN WINDOW RESIZE: {self.width()}x{self.height()}")
+            self._update_all_player_widgets()
+        return super().eventFilter(obj, event)
+    
+    def _on_splitter_moved(self, pos, index):
+        """Handle splitter movement to update player widget sizing"""
+        # Update all player widgets when splitter is moved
+        self._update_all_player_widgets()
+    
+    def _update_all_player_widgets(self):
+        """Update all player widgets for dynamic sizing"""
+        print(f"🔧 UPDATING ALL PLAYER WIDGETS: {len(self.players)} players")
+        
+        # Calculate optimal height for the entire progress container
+        self._update_progress_container_height()
+        
+        for player_widget in self.players.values():
+            if hasattr(player_widget, '_update_dynamic_layout'):
+                player_widget._update_dynamic_layout()
+        
+        # Force layout update
+        self.players_widget.update()
+        self.players_widget.repaint()
+        
+        # Force parent layout to recalculate
+        if hasattr(self, 'players_layout'):
+            self.players_layout.update()
+            self.players_layout.invalidate()
+    
+    def _update_progress_container_height(self):
+        """Dynamically resize the progress container based on available space"""
+        if not hasattr(self, 'progress_frame'):
+            return
+        
+        # Get total available height
+        total_height = self.height()
+        num_players = len(self.players)
+        
+        if num_players == 0:
+            return
+        
+        # Calculate optimal height for progress container
+        # Use a maximum of 30% of total height for progress area
+        max_progress_height = int(total_height * 0.30)
+        
+        # Calculate height per player
+        height_per_player = max_progress_height / num_players
+        
+        # Determine container height based on space per player
+        if height_per_player < 40:  # Very cramped
+            container_height = 25 * num_players  # 25px per player
+        elif height_per_player < 60:  # Cramped
+            container_height = 35 * num_players  # 35px per player
+        else:  # Normal
+            container_height = 50 * num_players  # 50px per player
+        
+        # Ensure we don't exceed the maximum
+        container_height = min(container_height, max_progress_height)
+        
+        # Set the container height
+        self.progress_frame.setMaximumHeight(container_height)
+        self.progress_frame.setMinimumHeight(container_height)
+        
+        print(f"🔧 PROGRESS CONTAINER: {total_height}px total -> {container_height}px for {num_players} players")
+        print(f"🔧 PROGRESS CONTAINER: {height_per_player:.1f}px per player")
+    
+    def _monitor_container_size(self):
+        """Continuously monitor and update container size"""
+        if not hasattr(self, 'progress_frame'):
+            return
+        
+        # Check if we need to update the container size
+        current_height = self.progress_frame.height()
+        total_height = self.height()
+        num_players = len(self.players)
+        
+        if num_players == 0:
+            return
+        
+        # Calculate what the height should be
+        max_progress_height = int(total_height * 0.30)
+        height_per_player = max_progress_height / num_players
+        
+        if height_per_player < 40:
+            target_height = 25 * num_players
+        elif height_per_player < 60:
+            target_height = 35 * num_players
+        else:
+            target_height = 50 * num_players
+        
+        target_height = min(target_height, max_progress_height)
+        
+        # Update if height has changed significantly
+        if abs(current_height - target_height) > 5:
+            print(f"🔧 MONITOR: Updating container from {current_height}px to {target_height}px")
+            self.progress_frame.setMaximumHeight(target_height)
+            self.progress_frame.setMinimumHeight(target_height)
+            self.progress_frame.updateGeometry()
+            self.progress_frame.update()
+    
+    def _monitor_splitter_proportions(self):
+        """Monitor and adjust splitter proportions to maximize game area"""
+        if not hasattr(self, 'splitter'):
+            return
+        
+        # Get current splitter sizes
+        current_sizes = self.splitter.sizes()
+        total_height = self.height()
+        
+        if total_height == 0:
+            return
+        
+        # Calculate optimal progress area height (max 30% of total)
+        max_progress_height = int(total_height * 0.30)
+        num_players = len(self.players)
+        
+        if num_players == 0:
+            return
+        
+        # Calculate required progress height
+        if num_players == 1:
+            required_height = 50
+        elif num_players == 2:
+            required_height = 80
+        else:
+            required_height = 100
+        
+        # Use the smaller of required height or max allowed
+        optimal_progress_height = min(required_height, max_progress_height)
+        optimal_game_height = total_height - optimal_progress_height
+        
+        # Update splitter if proportions are off
+        current_progress = current_sizes[0]
+        if abs(current_progress - optimal_progress_height) > 20:
+            print(f"🔧 SPLITTER: Updating from {current_progress}px to {optimal_progress_height}px progress area")
+            self.splitter.setSizes([optimal_progress_height, optimal_game_height])
+    
+    def _force_dynamic_update(self):
+        """Force a dynamic layout update"""
+        print("🔧 FORCING DYNAMIC UPDATE")
+        self._update_all_player_widgets()
+    
+    def trigger_dynamic_resize(self):
+        """Manually trigger dynamic resizing - can be called externally"""
+        print("🔧 MANUAL DYNAMIC RESIZE TRIGGERED")
+        self._update_all_player_widgets()
+    
+    def debug_player_sizes(self):
+        """Debug method to check current player widget sizes"""
+        print("🔍 PLAYER WIDGET SIZES DEBUG:")
+        for name, widget in self.players.items():
+            print(f"  {name}: {widget.width()}x{widget.height()}px")
+            if hasattr(widget, 'min_height'):
+                print(f"    Min: {widget.min_height}px, Compact: {widget.compact_height}px, Standard: {widget.standard_height}px")
+    
     def connect_network_signals(self):
         """Connect to network manager signals"""
         self.network_manager.game_starting.connect(self.on_game_starting)
@@ -274,32 +612,62 @@ class MultiplayerGamePage(QWidget):
         # Create main game area
         self.create_game_area()
         
-        # Set splitter proportions (20% progress, 80% game)
-        self.splitter.setSizes([200, 800])
+        # Set splitter proportions - much more aggressive about game area
+        if self._is_small_screen():
+            # Very small progress area for small screens (10% progress, 90% game)
+            self.splitter.setSizes([100, 900])
+        else:
+            # Small progress area for normal screens (15% progress, 85% game)
+            self.splitter.setSizes([150, 850])
+        
         self.splitter.setStretchFactor(0, 0)  # Progress bar is fixed height
         self.splitter.setStretchFactor(1, 1)  # Game area is stretchable
+        
+        # Connect to splitter resize events for dynamic player widget sizing
+        self.splitter.splitterMoved.connect(self._on_splitter_moved)
+        
+        # Install event filter for window resize events
+        self.installEventFilter(self)
+    
+    def resizeEvent(self, event):
+        """Handle resize events directly"""
+        super().resizeEvent(event)
+        print(f"🔧 RESIZE EVENT: {self.width()}x{self.height()}")
+        # Update all player widgets when the main widget is resized
+        self._update_all_player_widgets()
     
     def create_progress_bar(self):
         """Create the multiplayer progress bar at the top"""
         # Progress bar container
-        progress_frame = QFrame()
-        progress_frame.setFrameStyle(QFrame.Shape.Box)
-        progress_frame.setLineWidth(1)
+        self.progress_frame = QFrame()
+        self.progress_frame.setFrameStyle(QFrame.Shape.Box)
+        self.progress_frame.setLineWidth(1)
         # Simple vertical layout for players
-        progress_layout = QVBoxLayout(progress_frame)
-        progress_layout.setContentsMargins(20, 12, 20, 12)
-        progress_layout.setSpacing(8)
+        progress_layout = QVBoxLayout(self.progress_frame)
+        
+        # Very aggressive margins for maximum space efficiency
+        if self._is_small_screen():
+            progress_layout.setContentsMargins(6, 3, 6, 3)
+            progress_layout.setSpacing(2)
+        else:
+            progress_layout.setContentsMargins(10, 5, 10, 5)
+            progress_layout.setSpacing(4)
         
         # Players container - vertical layout as requested
         self.players_widget = QWidget()
         self.players_layout = QVBoxLayout(self.players_widget)
         self.players_layout.setContentsMargins(0, 0, 0, 0)
-        self.players_layout.setSpacing(8)
+        
+        # Adjust spacing based on screen size
+        if self._is_small_screen():
+            self.players_layout.setSpacing(4)
+        else:
+            self.players_layout.setSpacing(8)
         
         progress_layout.addWidget(self.players_widget)
         
         # Add progress bar to splitter
-        self.splitter.addWidget(progress_frame)
+        self.splitter.addWidget(self.progress_frame)
         
         # Initialize with game data
         self.update_game_info()
@@ -361,6 +729,23 @@ class MultiplayerGamePage(QWidget):
             self.players_layout.addWidget(player_widget)
         
         print(f"🎮 DEBUG: Initialized {len(self.players)} players: {list(self.players.keys())}")
+        
+        # Update all player widgets for dynamic sizing
+        self._update_all_player_widgets()
+        
+        # Force initial dynamic layout after a short delay to ensure proper sizing
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(100, self._force_dynamic_update)
+        
+        # Set up continuous monitoring timer
+        self.monitor_timer = QTimer()
+        self.monitor_timer.timeout.connect(self._monitor_container_size)
+        self.monitor_timer.start(500)  # Check every 500ms
+        
+        # Set up splitter monitoring
+        self.splitter_timer = QTimer()
+        self.splitter_timer.timeout.connect(self._monitor_splitter_proportions)
+        self.splitter_timer.start(1000)  # Check every 1 second
     
     def apply_theme(self):
         """Apply theme-based styling"""
