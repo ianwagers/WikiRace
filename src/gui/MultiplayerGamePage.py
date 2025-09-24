@@ -408,7 +408,6 @@ class MultiplayerGamePage(QWidget):
         self.game_finished = False  # Reset game finished flag for new race
         self.start_time = time.time()
         self.initial_page_loaded = False  # Flag to prevent initial page from counting as navigation
-        self.first_link_clicked = False  # Reset first link flag for new game
         
         # Re-enable navigation in solo game
         self.solo_game.setEnabled(True)
@@ -418,6 +417,16 @@ class MultiplayerGamePage(QWidget):
         
         # Start the solo game immediately
         self.solo_game.startGame()
+        
+        # Send the starting page as the first progress update to server
+        # This ensures server and client are in sync from the beginning
+        if self.network_manager.connected_to_server:
+            start_url = self.game_data.get('start_url', '')
+            start_title = self.game_data.get('start_title', 'Starting...')
+            print(f"📊 INITIAL PROGRESS: Sending starting page to server: {start_title}")
+            print(f"📊 INITIAL PROGRESS: URL: {start_url}")
+            print(f"📊 INITIAL PROGRESS: Local linksUsed: {self.solo_game.linksUsed}")
+            self.network_manager.send_player_progress(start_url, start_title)
         
         # Set flag after a short delay to allow initial page load
         from PyQt6.QtCore import QTimer
@@ -438,10 +447,6 @@ class MultiplayerGamePage(QWidget):
         if not self.game_started:
             return
         
-        # Skip the initial page load to prevent duplicate starting page
-        if not getattr(self, 'initial_page_loaded', False):
-            return
-        
         # Get current page title
         current_title = self.solo_game.getTitleFromUrlPath(url)
         
@@ -456,31 +461,53 @@ class MultiplayerGamePage(QWidget):
                 None
             )
             print(f"📊 LOCAL PROGRESS: Updated {local_player_name} to {self.solo_game.linksUsed} links")
-            
-            # DOUBLE UPDATE on first link click to fix local progress bar syncing issue
-            if not self.first_link_clicked:
-                self.first_link_clicked = True
-                # Update local progress bar again to ensure proper sync (LOCAL ONLY)
-                self.players[local_player_name].update_progress(
-                    current_title, 
-                    self.solo_game.linksUsed, 
-                    False, 
-                    None
-                )
-                print(f"📊 FIRST CLICK SYNC: Double updated LOCAL progress bar for {local_player_name} to {self.solo_game.linksUsed} links")
         
         # SERVER COMMUNICATION: Send to server for other players (separate from local updates)
         if not self.network_manager.connected_to_server:
             return
         
+        # Skip sending the starting page since we already sent it in start_game()
+        start_url = self.game_data.get('start_url', '')
+        # Check if this is the starting page (with or without query parameters)
+        is_starting_page = (url == start_url or 
+                          (start_url in url and 'wikipedia.org' in url and 
+                           url.split('?')[0] == start_url.split('?')[0]))
+        
+        if is_starting_page:
+            print(f"📊 SKIPPING: Starting page already sent to server")
+            print(f"📊 SKIPPING: URL: {url}")
+            print(f"📊 SKIPPING: Start URL: {start_url}")
+            print(f"📊 SKIPPING: Local linksUsed: {self.solo_game.linksUsed}")
+            return
+        
         # Send to server for other players (this is independent of local progress bar)
         print(f"📊 NAVIGATION: Sending {current_title} to server")
+        print(f"📊 NAVIGATION: URL: {url}")
+        print(f"📊 NAVIGATION: Local linksUsed: {self.solo_game.linksUsed}")
         self.network_manager.send_player_progress(url, current_title)
     
-    def on_link_clicked(self):
+    def on_link_clicked(self, url, links_used):
         """Handle link clicks from SoloGamePage"""
-        # This is handled by on_url_changed, but we can add additional logic here if needed
-        pass
+        if not self.game_started:
+            return
+
+        # Get current page title
+        current_title = self.solo_game.getTitleFromUrlPath(url)
+
+        # LOCAL PROGRESS VALIDATION: Make sure the local progress bar is always correct
+        local_player_name = self.network_manager.player_name
+        if local_player_name in self.players:
+            # Update local player progress bar directly from SoloGamePage
+            self.players[local_player_name].update_progress(
+                current_title, 
+                links_used, 
+                False, 
+                None
+            )
+            print(f"📊 LOCAL PROGRESS: Updated {local_player_name} to {self.solo_game.linksUsed} links")
+        
+        # Update local player progress bar
+        
     
     def on_solo_game_completed(self):
         """Handle solo game completion"""
@@ -534,6 +561,8 @@ class MultiplayerGamePage(QWidget):
     def on_player_progress(self, player_name, current_page, links_used):
         """SERVER UPDATE PATH: Updates for other players, skips local player to avoid conflicts"""
         print(f"📊 PROGRESS UPDATE: {player_name} -> {current_page} ({links_used} links)")
+        print(f"📊 PROGRESS UPDATE: Local player: {self.network_manager.player_name}")
+        print(f"📊 PROGRESS UPDATE: Local linksUsed: {self.solo_game.linksUsed}")
         
         # Validate player exists
         if player_name not in self.players:
@@ -547,6 +576,7 @@ class MultiplayerGamePage(QWidget):
             return
         
         # Update progress widget for other players only
+        print(f"📊 PROGRESS UPDATE: Updating {player_name} widget with {links_used} links")
         self.players[player_name].update_progress(current_page, links_used)
         
         # Emit signal for parent components

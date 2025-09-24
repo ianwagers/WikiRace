@@ -534,12 +534,11 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     game_start_time = datetime.utcnow()
                     room.game_started_at = game_start_time
                     
-                    # Initialize all players' game start times and add start page to navigation history
+                    # Initialize all players' game start times
+                    # NOTE: Do NOT add starting page to navigation history here
+                    # The client will send the starting page as the first progress update
                     for player in room.players.values():
                         player.game_start_time = game_start_time
-                        # Add the starting page as the first navigation entry
-                        if room.start_url and room.start_title:
-                            player.add_navigation_entry(room.start_url, room.start_title)
                     
                     logger.info(f"DEBUG: Sending game_started event to room {room.room_code}")
                     # Notify all players that game has started
@@ -628,12 +627,22 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             # Update player progress in room
             player = room.get_player_by_name(player_name)
             if player:
+                # DEBUG: Log before adding entry
+                print(f"📊 DEBUG: Before adding entry for {player_name}:")
+                print(f"📊 DEBUG:   - Current navigation_history length: {len(player.navigation_history)}")
+                print(f"📊 DEBUG:   - Current links_clicked: {player.links_clicked}")
+                print(f"📊 DEBUG:   - Adding: {page_title} ({page_url})")
+                
                 # Check if this is a duplicate of the last navigation entry
                 should_add_entry = True
                 if player.navigation_history:
                     last_entry = player.navigation_history[-1]
-                    if last_entry.page_url == page_url and last_entry.page_title == page_title:
+                    # Check if it's the same page (ignoring query parameters)
+                    last_url_base = last_entry.page_url.split('?')[0]
+                    current_url_base = page_url.split('?')[0]
+                    if last_url_base == current_url_base and last_entry.page_title == page_title:
                         should_add_entry = False  # Skip duplicate entry
+                        print(f"📊 DEBUG: Skipping duplicate entry for {player_name}")
                 
                 # Add navigation entry only if it's not a duplicate
                 if should_add_entry:
@@ -641,6 +650,14 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 else:
                     # Use the existing last entry for broadcasting
                     navigation_entry = player.navigation_history[-1]
+                
+                # DEBUG: Log after adding entry
+                print(f"📊 DEBUG: After adding entry for {player_name}:")
+                print(f"📊 DEBUG:   - New navigation_history length: {len(player.navigation_history)}")
+                print(f"📊 DEBUG:   - New links_clicked: {player.links_clicked}")
+                print(f"📊 DEBUG:   - Navigation entries:")
+                for i, entry in enumerate(player.navigation_history):
+                    print(f"📊 DEBUG:     {i}: {entry.page_title} (link #{entry.link_number})")
                 
                 # Broadcast progress to ALL players in the room (including sender for sync)
                 await sio.emit('player_progress', {

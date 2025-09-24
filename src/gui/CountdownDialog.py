@@ -208,8 +208,8 @@ class CountdownDialog(QDialog):
             parent_geo = QApplication.primaryScreen().geometry()
         
         # Calculate base center position
-        base_x = parent_geo.x() + (parent_geo.width() - self.dialog_width) // 2
-        base_y = parent_geo.y() + (parent_geo.height() - self.dialog_height) // 2
+        base_x = parent_geo.x() + (parent_geo.width()) // 2
+        base_y = parent_geo.y() + (parent_geo.height()) // 2
         
         # Add offset for multiple dialogs (stagger them)
         offset_x = (int(self.dialog_id.split('_')[1]) % 5) * 50  # Offset based on dialog ID

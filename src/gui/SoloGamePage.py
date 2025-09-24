@@ -18,7 +18,7 @@ class SoloGamePage(QWidget):
     
     # Signals for multiplayer integration
     urlChanged = pyqtSignal(str)  # Emitted when URL changes (for multiplayer progress tracking)
-    linkClicked = pyqtSignal()    # Emitted when a link is clicked
+    linkClicked = pyqtSignal(str, int)    # Emitted when a link is clicked
     gameCompleted = pyqtSignal()  # Emitted when game is completed
 
     def __init__(self, tabWidget, start_url, end_url, start_title=None, end_title=None, parent=None, is_multiplayer=False):
@@ -217,10 +217,6 @@ class SoloGamePage(QWidget):
         self.confetti_widget = ConfettiWidget(self)
         self.confetti_widget.hide()
         
-        # CRITICAL: Connect to theme changes - DO NOT REMOVE
-        # This connection is ESSENTIAL for theme switching functionality
-        # Without this, solo game pages won't update when theme changes
-        # REGRESSION PREVENTION: This MUST remain connected for theme switching to work
         theme_manager.theme_changed.connect(self.on_theme_changed)
 
     def onLoadStarted(self):
@@ -358,7 +354,7 @@ class SoloGamePage(QWidget):
                 print(f"🔗 WikiRace: [{time.time():.3f}] Link navigation detected - Links used: {self.linksUsed}")
                 
                 # Emit link clicked signal for multiplayer integration
-                self.linkClicked.emit()
+                self.linkClicked.emit(url_str, self.linksUsed)
                 
                 # OPTIMIZED: Use fast URL path parser to get page title
                 titleString = self.getTitleFromUrlPath(url_str)

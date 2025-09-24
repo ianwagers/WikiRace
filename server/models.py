@@ -85,14 +85,17 @@ class Player(BaseModel):
         # Update current page info
         self.current_page = page_url
         self.current_page_title = page_title
-        # Links clicked should be the number of actual link clicks (excluding the start page)
-        # If this is the first entry (start page), links_clicked remains 0
-        # Otherwise, links_clicked = total entries - 1 (to exclude start page)
+        
+        # FIXED: Links clicked should match client-side logic
+        # The client starts at 0 and increments only on actual link clicks
+        # The server should count only actual link clicks, not the starting page
+        # If this is the first entry (starting page), links_clicked = 0
+        # Otherwise, links_clicked = number of entries after the starting page
         if len(self.navigation_history) == 1:
-            # This is the start page, no links clicked yet
+            # This is the starting page, no links clicked yet
             self.links_clicked = 0
         else:
-            # This is a link click, count all entries after the start page
+            # This is a link click, count all entries after the starting page
             self.links_clicked = len(self.navigation_history) - 1
         self.last_activity = datetime.utcnow()
         

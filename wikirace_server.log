@@ -1348,3 +1348,985 @@ OSError: [Errno 22] Invalid argument
 2025-09-23 07:29:27,583 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
 2025-09-23 07:29:31,673 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
 2025-09-23 07:29:31,674 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-23 11:44:09,901 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-23 11:44:09,904 - socket_handlers - INFO - Client connected: 8BHjK8ejJUlS0ssaAAAB
+2025-09-23 11:44:10,420 - room_manager - INFO - Created room VABK with host A
+2025-09-23 11:44:10,420 - socket_handlers - INFO - Room VABK created by A
+2025-09-23 11:44:16,253 - socket_handlers - INFO - Client connected: UKiFNZtta6SFTL0vAAAD
+2025-09-23 11:44:22,745 - room_manager - INFO - Player B joined room VABK
+2025-09-23 11:44:22,746 - socket_handlers - INFO - Player B joined room VABK
+2025-09-23 11:44:27,070 - socket_handlers - INFO - Game configuration updated in room VABK: Custom -> Animals
+2025-09-23 11:44:28,444 - socket_handlers - INFO - Game configuration updated in room VABK: Custom -> Custom
+2025-09-23 11:44:30,852 - socket_handlers - INFO - Game configuration updated in room VABK: Custom -> Custom
+2025-09-23 11:44:35,829 - socket_handlers - INFO - Game configuration updated in room VABK: Custom -> Custom
+2025-09-23 11:44:39,250 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 11:44:39,251 - socket_handlers - INFO - DEBUG: Received start_game request from 8BHjK8ejJUlS0ssaAAAB with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-23 11:44:39,252 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'8BHjK8ejJUlS0ssaAAAB': 'VABK', 'UKiFNZtta6SFTL0vAAAD': 'VABK'}
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: Found room VABK for player 8BHjK8ejJUlS0ssaAAAB
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: Checking if player 8BHjK8ejJUlS0ssaAAAB is host in room VABK
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: Player 8BHjK8ejJUlS0ssaAAAB is host, checking player count
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: Config - start: Custom, end: Custom, custom_start: YouTube, custom_end: YouTube Music
+2025-09-23 11:44:39,252 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 11:44:39,254 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 11:44:40,377 - game_logic - INFO - Found Wikipedia page for 'YouTube': https://en.wikipedia.org/?curid=3524766
+2025-09-23 11:44:41,109 - game_logic - INFO - Found Wikipedia page for 'YouTube Music': https://en.wikipedia.org/?curid=52135003
+2025-09-23 11:44:41,891 - game_logic - INFO - Selected game pages - Start: YouTube (https://en.wikipedia.org/?curid=3524766), End: YouTube Music (https://en.wikipedia.org/?curid=52135003)
+2025-09-23 11:44:41,891 - socket_handlers - INFO - DEBUG: Page selection completed - start: YouTube, end: YouTube Music
+2025-09-23 11:44:41,892 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 11:44:41,892 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 11:44:41,892 - socket_handlers - INFO - DEBUG: About to send game_starting event to room VABK
+2025-09-23 11:44:41,892 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 11:44:41,892 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/?curid=3524766, end_url=https://en.wikipedia.org/?curid=52135003
+2025-09-23 11:44:41,893 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 11:44:41,893 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room VABK
+2025-09-23 11:44:41,893 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room VABK
+2025-09-23 11:44:41,893 - socket_handlers - INFO - DEBUG: start_game handler exiting for 8BHjK8ejJUlS0ssaAAAB
+2025-09-23 11:44:41,894 - socket_handlers - INFO - DEBUG: Starting countdown for room VABK
+2025-09-23 11:44:46,906 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room VABK
+2025-09-23 11:44:46,907 - socket_handlers - INFO - DEBUG: Sending game_started event to room VABK
+2025-09-23 11:44:46,908 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 11:44:51,160 - socket_handlers - INFO - Player A navigation: Online video platform (Link #1, 4.3s)
+2025-09-23 11:44:55,904 - socket_handlers - INFO - Player A navigation: Do it yourself (Link #2, 9.0s)
+2025-09-23 11:44:57,796 - socket_handlers - INFO - Player A navigation: Raw material (Link #3, 10.9s)
+2025-09-23 11:45:00,423 - socket_handlers - INFO - Player A navigation: Intermediate good (Link #4, 13.5s)
+2025-09-23 11:45:01,881 - socket_handlers - INFO - Player A navigation: Final good (Link #5, 15.0s)
+2025-09-23 11:45:03,543 - socket_handlers - INFO - Player A navigation: Measures of national income and output (Link #6, 16.6s)
+2025-09-23 11:45:04,946 - socket_handlers - INFO - Player A navigation: Economy (Link #7, 18.0s)
+2025-09-23 11:45:13,286 - socket_handlers - INFO - Player B navigation: YouTube Music (Link #1, 26.4s)
+2025-09-23 11:45:13,288 - socket_handlers - INFO - Game ended in room VABK, winner: B
+2025-09-23 11:45:13,288 - socket_handlers - INFO - Player B completed game in 26.22s with 1 links
+2025-09-23 11:45:33,340 - socket_handlers - INFO - Game configuration updated in room VABK: Custom -> Custom
+2025-09-23 11:45:36,417 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 11:45:36,418 - socket_handlers - INFO - DEBUG: Received start_game request from 8BHjK8ejJUlS0ssaAAAB with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-23 11:45:36,418 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 11:45:36,418 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 11:45:36,418 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'8BHjK8ejJUlS0ssaAAAB': 'VABK', 'UKiFNZtta6SFTL0vAAAD': 'VABK'}
+2025-09-23 11:45:36,419 - socket_handlers - INFO - DEBUG: Found room VABK for player 8BHjK8ejJUlS0ssaAAAB
+2025-09-23 11:45:36,419 - socket_handlers - INFO - DEBUG: Checking if player 8BHjK8ejJUlS0ssaAAAB is host in room VABK
+2025-09-23 11:45:36,419 - socket_handlers - INFO - DEBUG: Player 8BHjK8ejJUlS0ssaAAAB is host, checking player count
+2025-09-23 11:45:36,419 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 11:45:36,419 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-23 11:45:36,419 - socket_handlers - INFO - DEBUG: Config - start: Custom, end: Custom, custom_start: YouTube, custom_end: YouTube Music
+2025-09-23 11:45:36,419 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 11:45:36,419 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 11:45:37,187 - game_logic - INFO - Found Wikipedia page for 'YouTube': https://en.wikipedia.org/?curid=3524766
+2025-09-23 11:45:38,307 - game_logic - INFO - Found Wikipedia page for 'YouTube Music': https://en.wikipedia.org/?curid=52135003
+2025-09-23 11:45:39,177 - game_logic - INFO - Selected game pages - Start: YouTube (https://en.wikipedia.org/?curid=3524766), End: YouTube Music (https://en.wikipedia.org/?curid=52135003)
+2025-09-23 11:45:39,177 - socket_handlers - INFO - DEBUG: Page selection completed - start: YouTube, end: YouTube Music
+2025-09-23 11:45:39,177 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 11:45:39,177 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 11:45:39,177 - socket_handlers - INFO - DEBUG: About to send game_starting event to room VABK
+2025-09-23 11:45:39,178 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 11:45:39,178 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/?curid=3524766, end_url=https://en.wikipedia.org/?curid=52135003
+2025-09-23 11:45:39,179 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 11:45:39,179 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room VABK
+2025-09-23 11:45:39,179 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room VABK
+2025-09-23 11:45:39,179 - socket_handlers - INFO - DEBUG: start_game handler exiting for 8BHjK8ejJUlS0ssaAAAB
+2025-09-23 11:45:39,179 - socket_handlers - INFO - DEBUG: Starting countdown for room VABK
+2025-09-23 11:45:44,185 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room VABK
+2025-09-23 11:45:44,185 - socket_handlers - INFO - DEBUG: Sending game_started event to room VABK
+2025-09-23 11:45:44,186 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 11:45:50,565 - socket_handlers - INFO - Player A navigation: Google Search (Link #9, 6.4s)
+2025-09-23 11:45:54,375 - socket_handlers - INFO - Player A navigation: Search engine (Link #10, 10.2s)
+2025-09-23 11:45:56,730 - socket_handlers - INFO - Player A navigation: Web query (Link #11, 12.5s)
+2025-09-23 11:45:58,664 - socket_handlers - INFO - Player A navigation: Command language (Link #12, 14.5s)
+2025-09-23 11:46:00,245 - socket_handlers - INFO - Player A navigation: Interpreted language (Link #13, 16.1s)
+2025-09-23 11:46:00,597 - socket_handlers - INFO - Player A navigation: Interpreter (computing) (Link #14, 16.4s)
+2025-09-23 11:46:01,683 - socket_handlers - INFO - Player A navigation: Source code (Link #15, 17.5s)
+2025-09-23 11:46:03,374 - socket_handlers - INFO - Player A navigation: Machine code (Link #16, 19.2s)
+2025-09-23 11:46:13,511 - socket_handlers - INFO - Player B navigation: YouTube Music (Link #3, 29.3s)
+2025-09-23 11:46:13,512 - socket_handlers - INFO - Game ended in room VABK, winner: B
+2025-09-23 11:46:13,512 - socket_handlers - INFO - Player B completed game in 29.18s with 1 links
+2025-09-23 11:46:19,334 - room_manager - INFO - Player A left room VABK
+2025-09-23 11:46:19,334 - room_manager - INFO - Closed room VABK
+2025-09-23 11:46:19,334 - room_manager - INFO - Closed empty room VABK
+2025-09-23 11:46:19,334 - socket_handlers - INFO - Room VABK was deleted - last player left
+2025-09-23 11:46:19,334 - socket_handlers - INFO - Player A left room VABK
+2025-09-23 11:47:12,044 - socket_handlers - INFO - Client disconnected: 8BHjK8ejJUlS0ssaAAAB
+2025-09-23 11:47:22,049 - socket_handlers - INFO - Client disconnected: UKiFNZtta6SFTL0vAAAD
+2025-09-23 18:15:51,672 - socket_handlers - INFO - Client connected: 07wFfjQXgglKNuXpAAAF
+2025-09-23 18:15:52,189 - room_manager - INFO - Created room TALO with host Ian
+2025-09-23 18:15:52,190 - socket_handlers - INFO - Room TALO created by Ian
+2025-09-23 18:15:57,144 - socket_handlers - INFO - Client connected: D-HBQfKjbOPaaewnAAAH
+2025-09-23 18:16:01,796 - room_manager - INFO - Player IAN2 joined room TALO
+2025-09-23 18:16:01,798 - socket_handlers - INFO - Player IAN2 joined room TALO
+2025-09-23 18:16:06,590 - socket_handlers - INFO - Game configuration updated in room TALO: Custom -> Animals
+2025-09-23 18:16:07,993 - socket_handlers - INFO - Game configuration updated in room TALO: Custom -> Custom
+2025-09-23 18:16:09,938 - socket_handlers - INFO - Game configuration updated in room TALO: Custom -> Custom
+2025-09-23 18:16:14,724 - socket_handlers - INFO - Game configuration updated in room TALO: Custom -> Custom
+2025-09-23 18:16:19,340 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 18:16:19,341 - socket_handlers - INFO - DEBUG: Received start_game request from 07wFfjQXgglKNuXpAAAF with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-23 18:16:19,342 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 18:16:19,342 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 18:16:19,342 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'07wFfjQXgglKNuXpAAAF': 'TALO', 'D-HBQfKjbOPaaewnAAAH': 'TALO'}
+2025-09-23 18:16:19,342 - socket_handlers - INFO - DEBUG: Found room TALO for player 07wFfjQXgglKNuXpAAAF
+2025-09-23 18:16:19,342 - socket_handlers - INFO - DEBUG: Checking if player 07wFfjQXgglKNuXpAAAF is host in room TALO
+2025-09-23 18:16:19,342 - socket_handlers - INFO - DEBUG: Player 07wFfjQXgglKNuXpAAAF is host, checking player count
+2025-09-23 18:16:19,342 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 18:16:19,342 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-23 18:16:19,342 - socket_handlers - INFO - DEBUG: Config - start: Custom, end: Custom, custom_start: YouTube, custom_end: YouTube Music
+2025-09-23 18:16:19,343 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 18:16:19,343 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 18:16:19,974 - game_logic - INFO - Found Wikipedia page for 'YouTube': https://en.wikipedia.org/?curid=3524766
+2025-09-23 18:16:20,626 - game_logic - INFO - Found Wikipedia page for 'YouTube Music': https://en.wikipedia.org/?curid=52135003
+2025-09-23 18:16:21,440 - game_logic - INFO - Selected game pages - Start: YouTube (https://en.wikipedia.org/?curid=3524766), End: YouTube Music (https://en.wikipedia.org/?curid=52135003)
+2025-09-23 18:16:21,440 - socket_handlers - INFO - DEBUG: Page selection completed - start: YouTube, end: YouTube Music
+2025-09-23 18:16:21,440 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 18:16:21,440 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 18:16:21,441 - socket_handlers - INFO - DEBUG: About to send game_starting event to room TALO
+2025-09-23 18:16:21,441 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 18:16:21,441 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/?curid=3524766, end_url=https://en.wikipedia.org/?curid=52135003
+2025-09-23 18:16:21,442 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 18:16:21,442 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room TALO
+2025-09-23 18:16:21,442 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room TALO
+2025-09-23 18:16:21,442 - socket_handlers - INFO - DEBUG: start_game handler exiting for 07wFfjQXgglKNuXpAAAF
+2025-09-23 18:16:21,442 - socket_handlers - INFO - DEBUG: Starting countdown for room TALO
+2025-09-23 18:16:26,454 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room TALO
+2025-09-23 18:16:26,454 - socket_handlers - INFO - DEBUG: Sending game_started event to room TALO
+2025-09-23 18:16:26,455 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 18:16:31,066 - socket_handlers - INFO - Player Ian navigation: Jawed Karim (Link #1, 4.6s)
+2025-09-23 18:16:33,194 - socket_handlers - INFO - Player Ian navigation: YouTube (Link #2, 6.7s)
+2025-09-23 18:16:35,529 - socket_handlers - INFO - Player Ian navigation: Steve Chen (Link #3, 9.1s)
+2025-09-23 18:16:37,904 - socket_handlers - INFO - Player Ian navigation: Internet entrepreneur (Link #4, 11.4s)
+2025-09-23 18:16:38,469 - socket_handlers - INFO - Player Ian navigation: List of Internet entrepreneurs (Link #5, 12.0s)
+2025-09-23 18:16:56,333 - socket_handlers - INFO - Player Ian navigation: List of Internet pioneers (Link #6, 29.9s)
+2025-09-23 18:17:05,483 - socket_handlers - INFO - Player IAN2 navigation: YouTube Music (Link #1, 39.0s)
+2025-09-23 18:17:05,484 - socket_handlers - INFO - Game ended in room TALO, winner: IAN2
+2025-09-23 18:17:05,484 - socket_handlers - INFO - Player IAN2 completed game in 38.88s with 1 links
+2025-09-23 18:17:26,463 - room_manager - INFO - Player IAN2 left room TALO
+2025-09-23 18:17:26,464 - socket_handlers - INFO - Player IAN2 left room TALO
+2025-09-23 18:17:50,686 - room_manager - WARNING - Room TALO is not in lobby state, cannot join
+2025-09-23 18:18:03,622 - room_manager - WARNING - Room TALO is not in lobby state, cannot join
+2025-09-23 18:18:51,533 - socket_handlers - INFO - Client disconnected: D-HBQfKjbOPaaewnAAAH
+2025-09-23 18:19:01,544 - socket_handlers - INFO - Client disconnected: 07wFfjQXgglKNuXpAAAF
+2025-09-23 18:19:01,545 - socket_handlers - INFO - Player Ian disconnected from room TALO
+2025-09-23 18:19:01,545 - room_manager - INFO - Player Ian left room TALO
+2025-09-23 18:19:01,545 - room_manager - INFO - Closed room TALO
+2025-09-23 18:19:01,545 - room_manager - INFO - Closed empty room TALO
+2025-09-23 18:19:01,545 - socket_handlers - INFO - Room TALO was deleted - last player disconnected
+2025-09-23 18:28:11,307 - socket_handlers - INFO - Client connected: Bxr8--odWzyUV-p7AAAJ
+2025-09-23 18:28:11,829 - room_manager - INFO - Created room WWPI with host T
+2025-09-23 18:28:11,830 - socket_handlers - INFO - Room WWPI created by T
+2025-09-23 18:28:16,608 - socket_handlers - INFO - Client connected: I93d3E6cEpZI89-gAAAL
+2025-09-23 18:28:20,458 - room_manager - INFO - Player GS joined room WWPI
+2025-09-23 18:28:20,459 - socket_handlers - INFO - Player GS joined room WWPI
+2025-09-23 18:28:25,189 - socket_handlers - INFO - Game configuration updated in room WWPI: Custom -> Animals
+2025-09-23 18:28:26,618 - socket_handlers - INFO - Game configuration updated in room WWPI: Custom -> Custom
+2025-09-23 18:28:30,109 - socket_handlers - INFO - Game configuration updated in room WWPI: Custom -> Custom
+2025-09-23 18:28:34,838 - socket_handlers - INFO - Game configuration updated in room WWPI: Custom -> Custom
+2025-09-23 18:28:36,852 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 18:28:36,853 - socket_handlers - INFO - DEBUG: Received start_game request from Bxr8--odWzyUV-p7AAAJ with data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-23 18:28:36,853 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 18:28:36,853 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 18:28:36,853 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'Bxr8--odWzyUV-p7AAAJ': 'WWPI', 'I93d3E6cEpZI89-gAAAL': 'WWPI'}
+2025-09-23 18:28:36,853 - socket_handlers - INFO - DEBUG: Found room WWPI for player Bxr8--odWzyUV-p7AAAJ
+2025-09-23 18:28:36,854 - socket_handlers - INFO - DEBUG: Checking if player Bxr8--odWzyUV-p7AAAJ is host in room WWPI
+2025-09-23 18:28:36,854 - socket_handlers - INFO - DEBUG: Player Bxr8--odWzyUV-p7AAAJ is host, checking player count
+2025-09-23 18:28:36,854 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 18:28:36,854 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Custom', 'end_page': 'Custom', 'custom_start': 'YouTube', 'custom_end': 'YouTube Music'}
+2025-09-23 18:28:36,854 - socket_handlers - INFO - DEBUG: Config - start: Custom, end: Custom, custom_start: YouTube, custom_end: YouTube Music
+2025-09-23 18:28:36,854 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 18:28:36,854 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 18:28:37,456 - game_logic - INFO - Found Wikipedia page for 'YouTube': https://en.wikipedia.org/?curid=3524766
+2025-09-23 18:28:38,103 - game_logic - INFO - Found Wikipedia page for 'YouTube Music': https://en.wikipedia.org/?curid=52135003
+2025-09-23 18:28:38,897 - game_logic - INFO - Selected game pages - Start: YouTube (https://en.wikipedia.org/?curid=3524766), End: YouTube Music (https://en.wikipedia.org/?curid=52135003)
+2025-09-23 18:28:38,897 - socket_handlers - INFO - DEBUG: Page selection completed - start: YouTube, end: YouTube Music
+2025-09-23 18:28:38,897 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 18:28:38,898 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 18:28:38,898 - socket_handlers - INFO - DEBUG: About to send game_starting event to room WWPI
+2025-09-23 18:28:38,898 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 18:28:38,898 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/?curid=3524766, end_url=https://en.wikipedia.org/?curid=52135003
+2025-09-23 18:28:38,899 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 18:28:38,899 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room WWPI
+2025-09-23 18:28:38,899 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room WWPI
+2025-09-23 18:28:38,899 - socket_handlers - INFO - DEBUG: start_game handler exiting for Bxr8--odWzyUV-p7AAAJ
+2025-09-23 18:28:38,899 - socket_handlers - INFO - DEBUG: Starting countdown for room WWPI
+2025-09-23 18:28:43,915 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room WWPI
+2025-09-23 18:28:43,916 - socket_handlers - INFO - DEBUG: Sending game_started event to room WWPI
+2025-09-23 18:28:43,916 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 18:29:21,790 - socket_handlers - INFO - Client disconnected: Bxr8--odWzyUV-p7AAAJ
+2025-09-23 18:29:21,790 - socket_handlers - INFO - Player T disconnected from room WWPI
+2025-09-23 18:29:21,790 - room_manager - INFO - Player T left room WWPI
+2025-09-23 18:29:21,790 - room_manager - INFO - Closed room WWPI
+2025-09-23 18:29:21,790 - room_manager - INFO - Closed empty room WWPI
+2025-09-23 18:29:21,791 - socket_handlers - INFO - Room WWPI was deleted - last player disconnected
+2025-09-23 18:29:31,800 - socket_handlers - INFO - Client disconnected: I93d3E6cEpZI89-gAAAL
+2025-09-23 18:42:31,335 - socket_handlers - INFO - Client connected: ZJXuyXqN3gkRvbX_AAAN
+2025-09-23 18:42:31,852 - room_manager - INFO - Created room UQRR with host TEST
+2025-09-23 18:42:31,852 - socket_handlers - INFO - Room UQRR created by TEST
+2025-09-23 18:42:45,062 - socket_handlers - INFO - Client connected: HGG9X3Zvy2W-1BXCAAAP
+2025-09-23 18:42:55,401 - room_manager - INFO - Player GERFA joined room UQRR
+2025-09-23 18:42:55,402 - socket_handlers - INFO - Player GERFA joined room UQRR
+2025-09-23 18:43:00,567 - socket_handlers - INFO - Game configuration updated in room UQRR: Countries -> Animals
+2025-09-23 18:43:03,831 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 18:43:03,832 - socket_handlers - INFO - DEBUG: Received start_game request from ZJXuyXqN3gkRvbX_AAAN with data: {'start_page': 'Countries', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 18:43:03,832 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 18:43:03,832 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 18:43:03,832 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'ZJXuyXqN3gkRvbX_AAAN': 'UQRR', 'HGG9X3Zvy2W-1BXCAAAP': 'UQRR'}
+2025-09-23 18:43:03,832 - socket_handlers - INFO - DEBUG: Found room UQRR for player ZJXuyXqN3gkRvbX_AAAN
+2025-09-23 18:43:03,832 - socket_handlers - INFO - DEBUG: Checking if player ZJXuyXqN3gkRvbX_AAAN is host in room UQRR
+2025-09-23 18:43:03,832 - socket_handlers - INFO - DEBUG: Player ZJXuyXqN3gkRvbX_AAAN is host, checking player count
+2025-09-23 18:43:03,833 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 18:43:03,833 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Countries', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 18:43:03,833 - socket_handlers - INFO - DEBUG: Config - start: Countries, end: Animals, custom_start: None, custom_end: None
+2025-09-23 18:43:03,833 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 18:43:03,833 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 18:43:03,833 - game_logic - INFO - Selected game pages - Start: Canada (https://en.wikipedia.org/wiki/Canada), End: Shark (https://en.wikipedia.org/wiki/Shark)
+2025-09-23 18:43:03,833 - socket_handlers - INFO - DEBUG: Page selection completed - start: Canada, end: Shark
+2025-09-23 18:43:03,833 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 18:43:03,833 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 18:43:03,834 - socket_handlers - INFO - DEBUG: About to send game_starting event to room UQRR
+2025-09-23 18:43:03,834 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 18:43:03,834 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Canada, end_url=https://en.wikipedia.org/wiki/Shark
+2025-09-23 18:43:03,835 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 18:43:03,835 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room UQRR
+2025-09-23 18:43:03,835 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room UQRR
+2025-09-23 18:43:03,835 - socket_handlers - INFO - DEBUG: start_game handler exiting for ZJXuyXqN3gkRvbX_AAAN
+2025-09-23 18:43:03,835 - socket_handlers - INFO - DEBUG: Starting countdown for room UQRR
+2025-09-23 18:43:08,847 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room UQRR
+2025-09-23 18:43:08,847 - socket_handlers - INFO - DEBUG: Sending game_started event to room UQRR
+2025-09-23 18:43:08,848 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 18:43:19,196 - socket_handlers - INFO - Player TEST navigation: North America (Link #1, 10.3s)
+2025-09-23 18:44:22,212 - socket_handlers - INFO - Client disconnected: ZJXuyXqN3gkRvbX_AAAN
+2025-09-23 18:44:22,213 - socket_handlers - INFO - Player TEST disconnected from room UQRR
+2025-09-23 18:44:22,213 - room_manager - INFO - Player TEST left room UQRR
+2025-09-23 18:44:22,213 - room_manager - INFO - Closed room UQRR
+2025-09-23 18:44:22,213 - room_manager - INFO - Closed empty room UQRR
+2025-09-23 18:44:22,213 - socket_handlers - INFO - Room UQRR was deleted - last player disconnected
+2025-09-23 18:44:32,226 - socket_handlers - INFO - Client disconnected: HGG9X3Zvy2W-1BXCAAAP
+2025-09-23 18:46:29,277 - socket_handlers - INFO - Client connected: Cl5EdUHejg2UR2QTAAAR
+2025-09-23 18:46:29,794 - room_manager - INFO - Created room UYPJ with host A12
+2025-09-23 18:46:29,794 - socket_handlers - INFO - Room UYPJ created by A12
+2025-09-23 18:46:36,989 - socket_handlers - INFO - Client connected: HfT4O9ph23M2JQlLAAAT
+2025-09-23 18:46:40,431 - room_manager - INFO - Player GWDAf joined room UYPJ
+2025-09-23 18:46:40,432 - socket_handlers - INFO - Player GWDAf joined room UYPJ
+2025-09-23 18:46:44,208 - socket_handlers - INFO - Game configuration updated in room UYPJ: Gaming -> Animals
+2025-09-23 18:46:44,473 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 18:46:44,475 - socket_handlers - INFO - DEBUG: Received start_game request from Cl5EdUHejg2UR2QTAAAR with data: {'start_page': 'Gaming', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 18:46:44,475 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 18:46:44,475 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 18:46:44,475 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'Cl5EdUHejg2UR2QTAAAR': 'UYPJ', 'HfT4O9ph23M2JQlLAAAT': 'UYPJ'}
+2025-09-23 18:46:44,475 - socket_handlers - INFO - DEBUG: Found room UYPJ for player Cl5EdUHejg2UR2QTAAAR
+2025-09-23 18:46:44,475 - socket_handlers - INFO - DEBUG: Checking if player Cl5EdUHejg2UR2QTAAAR is host in room UYPJ
+2025-09-23 18:46:44,475 - socket_handlers - INFO - DEBUG: Player Cl5EdUHejg2UR2QTAAAR is host, checking player count
+2025-09-23 18:46:44,476 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 18:46:44,476 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Gaming', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 18:46:44,476 - socket_handlers - INFO - DEBUG: Config - start: Gaming, end: Animals, custom_start: None, custom_end: None
+2025-09-23 18:46:44,476 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 18:46:44,476 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 18:46:44,476 - game_logic - INFO - Selected game pages - Start: Call of Duty (https://en.wikipedia.org/wiki/Call_of_Duty), End: Shark (https://en.wikipedia.org/wiki/Shark)
+2025-09-23 18:46:44,477 - socket_handlers - INFO - DEBUG: Page selection completed - start: Call of Duty, end: Shark
+2025-09-23 18:46:44,477 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 18:46:44,477 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 18:46:44,477 - socket_handlers - INFO - DEBUG: About to send game_starting event to room UYPJ
+2025-09-23 18:46:44,477 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 18:46:44,477 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Call_of_Duty, end_url=https://en.wikipedia.org/wiki/Shark
+2025-09-23 18:46:44,478 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 18:46:44,478 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room UYPJ
+2025-09-23 18:46:44,478 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room UYPJ
+2025-09-23 18:46:44,479 - socket_handlers - INFO - DEBUG: start_game handler exiting for Cl5EdUHejg2UR2QTAAAR
+2025-09-23 18:46:44,479 - socket_handlers - INFO - DEBUG: Starting countdown for room UYPJ
+2025-09-23 18:46:49,482 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room UYPJ
+2025-09-23 18:46:49,483 - socket_handlers - INFO - DEBUG: Sending game_started event to room UYPJ
+2025-09-23 18:46:49,484 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 18:46:56,014 - socket_handlers - INFO - Player A12 navigation: Infinity Ward (Link #1, 6.5s)
+2025-09-23 18:46:59,580 - socket_handlers - INFO - Player A12 navigation: Call of Duty (Link #2, 10.1s)
+2025-09-23 18:47:01,720 - socket_handlers - INFO - Player A12 navigation: Infinity Ward (Link #3, 12.2s)
+2025-09-23 18:47:03,603 - socket_handlers - INFO - Player GWDAf navigation: Activision (Link #1, 14.1s)
+2025-09-23 18:47:05,417 - socket_handlers - INFO - Player A12 navigation: Call of Duty (Link #4, 15.9s)
+2025-09-23 18:47:15,409 - socket_handlers - INFO - Player A12 navigation: Infinity Ward (Link #5, 25.9s)
+2025-09-23 18:47:18,352 - socket_handlers - INFO - Player A12 navigation: Call of Duty (Link #6, 28.9s)
+2025-09-23 18:47:20,483 - socket_handlers - INFO - Player A12 navigation: Sledgehammer Games (Link #7, 31.0s)
+2025-09-23 18:47:21,981 - socket_handlers - INFO - Player A12 navigation: Call of Duty (Link #8, 32.5s)
+2025-09-23 18:47:31,931 - socket_handlers - INFO - Player GWDAf navigation: Video game publisher (Link #2, 42.4s)
+2025-09-23 18:47:35,699 - socket_handlers - INFO - Player GWDAf navigation: Activision (Link #3, 46.2s)
+2025-09-23 18:47:37,238 - socket_handlers - INFO - Player GWDAf navigation: Call of Duty (Link #4, 47.8s)
+2025-09-23 18:47:39,473 - socket_handlers - INFO - Player GWDAf navigation: Activision (Link #5, 50.0s)
+2025-09-23 18:47:41,232 - socket_handlers - INFO - Player GWDAf navigation: Call of Duty (Link #6, 51.7s)
+2025-09-23 18:47:54,768 - socket_handlers - INFO - Player A12 navigation: Infinity Ward (Link #9, 65.3s)
+2025-09-23 18:47:55,960 - socket_handlers - INFO - Player A12 navigation: Call of Duty (Link #10, 66.5s)
+2025-09-23 18:47:57,407 - socket_handlers - INFO - Player A12 navigation: Infinity Ward (Link #11, 67.9s)
+2025-09-23 18:47:59,166 - socket_handlers - INFO - Player A12 navigation: Call of Duty (Link #12, 69.7s)
+2025-09-23 18:48:10,629 - socket_handlers - INFO - Player A12 navigation: Infinity Ward (Link #13, 81.1s)
+2025-09-23 18:48:12,241 - socket_handlers - INFO - Player A12 navigation: Call of Duty (video game) (Link #14, 82.8s)
+2025-09-23 18:48:14,297 - socket_handlers - INFO - Player A12 navigation: Call of Duty (Link #15, 84.8s)
+2025-09-23 18:48:16,094 - socket_handlers - INFO - Player A12 navigation: Infinity Ward (Link #16, 86.6s)
+2025-09-23 18:48:18,870 - socket_handlers - INFO - Player A12 navigation: Call of Duty (video game) (Link #17, 89.4s)
+2025-09-23 18:48:20,424 - socket_handlers - INFO - Player A12 navigation: Infinity Ward (Link #18, 90.9s)
+2025-09-23 18:49:02,404 - socket_handlers - INFO - Client disconnected: Cl5EdUHejg2UR2QTAAAR
+2025-09-23 18:49:02,405 - socket_handlers - INFO - Player A12 disconnected from room UYPJ
+2025-09-23 18:49:02,405 - room_manager - INFO - Player A12 left room UYPJ
+2025-09-23 18:49:02,405 - room_manager - INFO - Closed room UYPJ
+2025-09-23 18:49:02,405 - room_manager - INFO - Closed empty room UYPJ
+2025-09-23 18:49:02,405 - socket_handlers - INFO - Room UYPJ was deleted - last player disconnected
+2025-09-23 18:49:12,414 - socket_handlers - INFO - Client disconnected: HfT4O9ph23M2JQlLAAAT
+2025-09-23 21:32:45,098 - socket_handlers - INFO - Client connected: wGaMd0QMWrAFYDmxAAAV
+2025-09-23 21:32:45,614 - room_manager - INFO - Created room DOTI with host TES
+2025-09-23 21:32:45,615 - socket_handlers - INFO - Room DOTI created by TES
+2025-09-23 21:32:54,051 - socket_handlers - INFO - Client connected: 6rFJHh3omFhLUsgNAAAX
+2025-09-23 21:32:57,506 - room_manager - INFO - Player T joined room DOTI
+2025-09-23 21:32:57,507 - socket_handlers - INFO - Player T joined room DOTI
+2025-09-23 21:33:03,484 - socket_handlers - INFO - Game configuration updated in room DOTI: Countries -> Animals
+2025-09-23 21:33:04,568 - socket_handlers - INFO - Game configuration updated in room DOTI: Countries -> Gaming
+2025-09-23 21:33:06,427 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 21:33:06,428 - socket_handlers - INFO - DEBUG: Received start_game request from wGaMd0QMWrAFYDmxAAAV with data: {'start_page': 'Countries', 'end_page': 'Gaming', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:33:06,428 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 21:33:06,428 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 21:33:06,429 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'wGaMd0QMWrAFYDmxAAAV': 'DOTI', '6rFJHh3omFhLUsgNAAAX': 'DOTI'}
+2025-09-23 21:33:06,429 - socket_handlers - INFO - DEBUG: Found room DOTI for player wGaMd0QMWrAFYDmxAAAV
+2025-09-23 21:33:06,429 - socket_handlers - INFO - DEBUG: Checking if player wGaMd0QMWrAFYDmxAAAV is host in room DOTI
+2025-09-23 21:33:06,429 - socket_handlers - INFO - DEBUG: Player wGaMd0QMWrAFYDmxAAAV is host, checking player count
+2025-09-23 21:33:06,429 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 21:33:06,429 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Countries', 'end_page': 'Gaming', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:33:06,430 - socket_handlers - INFO - DEBUG: Config - start: Countries, end: Gaming, custom_start: None, custom_end: None
+2025-09-23 21:33:06,430 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 21:33:06,430 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 21:33:06,430 - game_logic - INFO - Selected game pages - Start: Germany (https://en.wikipedia.org/wiki/Germany), End: League of Legends (https://en.wikipedia.org/wiki/League_of_Legends)
+2025-09-23 21:33:06,430 - socket_handlers - INFO - DEBUG: Page selection completed - start: Germany, end: League of Legends
+2025-09-23 21:33:06,430 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 21:33:06,430 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 21:33:06,431 - socket_handlers - INFO - DEBUG: About to send game_starting event to room DOTI
+2025-09-23 21:33:06,431 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 21:33:06,431 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Germany, end_url=https://en.wikipedia.org/wiki/League_of_Legends
+2025-09-23 21:33:06,432 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 21:33:06,432 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room DOTI
+2025-09-23 21:33:06,432 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room DOTI
+2025-09-23 21:33:06,432 - socket_handlers - INFO - DEBUG: start_game handler exiting for wGaMd0QMWrAFYDmxAAAV
+2025-09-23 21:33:06,432 - socket_handlers - INFO - DEBUG: Starting countdown for room DOTI
+2025-09-23 21:33:11,444 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room DOTI
+2025-09-23 21:33:11,445 - socket_handlers - INFO - DEBUG: Sending game_started event to room DOTI
+2025-09-23 21:33:11,445 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 21:33:11,614 - socket_handlers - INFO - Player TES navigation: Germany (Link #1, 0.2s)
+2025-09-23 21:33:11,618 - socket_handlers - INFO - Player T navigation: Germany (Link #1, 0.2s)
+2025-09-23 21:33:24,721 - socket_handlers - INFO - Player TES navigation: Central Europe (Link #2, 13.3s)
+2025-09-23 21:34:06,394 - socket_handlers - INFO - Client disconnected: wGaMd0QMWrAFYDmxAAAV
+2025-09-23 21:34:06,394 - socket_handlers - INFO - Player TES disconnected from room DOTI
+2025-09-23 21:34:06,394 - room_manager - INFO - Player TES left room DOTI
+2025-09-23 21:34:06,394 - room_manager - INFO - Closed room DOTI
+2025-09-23 21:34:06,395 - room_manager - INFO - Closed empty room DOTI
+2025-09-23 21:34:06,395 - socket_handlers - INFO - Room DOTI was deleted - last player disconnected
+2025-09-23 21:34:16,403 - socket_handlers - INFO - Client disconnected: 6rFJHh3omFhLUsgNAAAX
+2025-09-23 21:35:03,886 - socket_handlers - INFO - Client connected: rFDxyJYvOwe8m2uwAAAZ
+2025-09-23 21:35:04,403 - room_manager - INFO - Created room TDDS with host TWAED
+2025-09-23 21:35:04,403 - socket_handlers - INFO - Room TDDS created by TWAED
+2025-09-23 21:35:10,441 - socket_handlers - INFO - Client connected: oLIIFgmChXp6zIHMAAAb
+2025-09-23 21:35:13,643 - room_manager - INFO - Player GESF joined room TDDS
+2025-09-23 21:35:13,644 - socket_handlers - INFO - Player GESF joined room TDDS
+2025-09-23 21:35:19,312 - socket_handlers - INFO - Game configuration updated in room TDDS: Custom -> Animals
+2025-09-23 21:35:21,706 - socket_handlers - INFO - Game configuration updated in room TDDS: Custom -> Custom
+2025-09-23 21:35:23,264 - socket_handlers - INFO - Game configuration updated in room TDDS: Custom -> Custom
+2025-09-23 21:35:25,663 - socket_handlers - INFO - Game configuration updated in room TDDS: Gaming -> Custom
+2025-09-23 21:35:26,765 - socket_handlers - INFO - Game configuration updated in room TDDS: Gaming -> Literature
+2025-09-23 21:35:27,738 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 21:35:27,740 - socket_handlers - INFO - DEBUG: Received start_game request from rFDxyJYvOwe8m2uwAAAZ with data: {'start_page': 'Gaming', 'end_page': 'Literature', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:35:27,740 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 21:35:27,740 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 21:35:27,740 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'rFDxyJYvOwe8m2uwAAAZ': 'TDDS', 'oLIIFgmChXp6zIHMAAAb': 'TDDS'}
+2025-09-23 21:35:27,740 - socket_handlers - INFO - DEBUG: Found room TDDS for player rFDxyJYvOwe8m2uwAAAZ
+2025-09-23 21:35:27,740 - socket_handlers - INFO - DEBUG: Checking if player rFDxyJYvOwe8m2uwAAAZ is host in room TDDS
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: Player rFDxyJYvOwe8m2uwAAAZ is host, checking player count
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Gaming', 'end_page': 'Literature', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: Config - start: Gaming, end: Literature, custom_start: None, custom_end: None
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 21:35:27,741 - game_logic - INFO - Selected game pages - Start: Grand Theft Auto (https://en.wikipedia.org/wiki/Grand_Theft_Auto), End: Shakespeare (https://en.wikipedia.org/wiki/Shakespeare)
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: Page selection completed - start: Grand Theft Auto, end: Shakespeare
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 21:35:27,741 - socket_handlers - INFO - DEBUG: About to send game_starting event to room TDDS
+2025-09-23 21:35:27,742 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 21:35:27,742 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Grand_Theft_Auto, end_url=https://en.wikipedia.org/wiki/Shakespeare
+2025-09-23 21:35:27,742 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 21:35:27,743 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room TDDS
+2025-09-23 21:35:27,743 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room TDDS
+2025-09-23 21:35:27,743 - socket_handlers - INFO - DEBUG: start_game handler exiting for rFDxyJYvOwe8m2uwAAAZ
+2025-09-23 21:35:27,743 - socket_handlers - INFO - DEBUG: Starting countdown for room TDDS
+2025-09-23 21:35:32,745 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room TDDS
+2025-09-23 21:35:32,745 - socket_handlers - INFO - DEBUG: Sending game_started event to room TDDS
+2025-09-23 21:35:32,746 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 21:35:56,451 - socket_handlers - INFO - Client disconnected: oLIIFgmChXp6zIHMAAAb
+2025-09-23 21:35:56,451 - socket_handlers - INFO - Player GESF disconnected from room TDDS
+2025-09-23 21:35:56,451 - room_manager - INFO - Player GESF left room TDDS
+2025-09-23 21:36:26,478 - socket_handlers - INFO - Client disconnected: rFDxyJYvOwe8m2uwAAAZ
+2025-09-23 21:36:26,478 - socket_handlers - INFO - Player TWAED disconnected from room TDDS
+2025-09-23 21:36:26,478 - room_manager - INFO - Player TWAED left room TDDS
+2025-09-23 21:36:26,478 - room_manager - INFO - Closed room TDDS
+2025-09-23 21:36:26,479 - room_manager - INFO - Closed empty room TDDS
+2025-09-23 21:36:26,479 - socket_handlers - INFO - Room TDDS was deleted - last player disconnected
+2025-09-23 21:36:40,828 - socket_handlers - INFO - Client connected: qyEMKxALAIeeoRsvAAAd
+2025-09-23 21:36:41,333 - room_manager - INFO - Created room UJCT with host gf
+2025-09-23 21:36:41,333 - socket_handlers - INFO - Room UJCT created by gf
+2025-09-23 21:36:49,708 - socket_handlers - INFO - Client connected: wg4X48bzVbptXdpHAAAf
+2025-09-23 21:36:53,327 - room_manager - INFO - Player uio joined room UJCT
+2025-09-23 21:36:53,328 - socket_handlers - INFO - Player uio joined room UJCT
+2025-09-23 21:36:58,226 - socket_handlers - INFO - Game configuration updated in room UJCT: Animals -> Literature
+2025-09-23 21:37:01,346 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 21:37:01,347 - socket_handlers - INFO - DEBUG: Received start_game request from qyEMKxALAIeeoRsvAAAd with data: {'start_page': 'Animals', 'end_page': 'Literature', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:37:01,348 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 21:37:01,348 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 21:37:01,348 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'qyEMKxALAIeeoRsvAAAd': 'UJCT', 'wg4X48bzVbptXdpHAAAf': 'UJCT'}
+2025-09-23 21:37:01,348 - socket_handlers - INFO - DEBUG: Found room UJCT for player qyEMKxALAIeeoRsvAAAd
+2025-09-23 21:37:01,348 - socket_handlers - INFO - DEBUG: Checking if player qyEMKxALAIeeoRsvAAAd is host in room UJCT
+2025-09-23 21:37:01,348 - socket_handlers - INFO - DEBUG: Player qyEMKxALAIeeoRsvAAAd is host, checking player count
+2025-09-23 21:37:01,348 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 21:37:01,348 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Animals', 'end_page': 'Literature', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:37:01,348 - socket_handlers - INFO - DEBUG: Config - start: Animals, end: Literature, custom_start: None, custom_end: None
+2025-09-23 21:37:01,349 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 21:37:01,349 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 21:37:01,349 - game_logic - INFO - Selected game pages - Start: Lion (https://en.wikipedia.org/wiki/Lion), End: Shakespeare (https://en.wikipedia.org/wiki/Shakespeare)
+2025-09-23 21:37:01,349 - socket_handlers - INFO - DEBUG: Page selection completed - start: Lion, end: Shakespeare
+2025-09-23 21:37:01,349 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 21:37:01,349 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 21:37:01,349 - socket_handlers - INFO - DEBUG: About to send game_starting event to room UJCT
+2025-09-23 21:37:01,349 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 21:37:01,349 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Lion, end_url=https://en.wikipedia.org/wiki/Shakespeare
+2025-09-23 21:37:01,350 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 21:37:01,350 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room UJCT
+2025-09-23 21:37:01,350 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room UJCT
+2025-09-23 21:37:01,350 - socket_handlers - INFO - DEBUG: start_game handler exiting for qyEMKxALAIeeoRsvAAAd
+2025-09-23 21:37:01,351 - socket_handlers - INFO - DEBUG: Starting countdown for room UJCT
+2025-09-23 21:37:06,356 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room UJCT
+2025-09-23 21:37:06,357 - socket_handlers - INFO - DEBUG: Sending game_started event to room UJCT
+2025-09-23 21:37:06,357 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 21:37:31,897 - socket_handlers - INFO - Client connected: GKNi9ioEJ5cH8kkXAAAh
+2025-09-23 21:37:32,411 - room_manager - INFO - Created room BEGY with host fae
+2025-09-23 21:37:32,412 - socket_handlers - INFO - Room BEGY created by fae
+2025-09-23 21:37:36,515 - socket_handlers - INFO - Client disconnected: wg4X48bzVbptXdpHAAAf
+2025-09-23 21:37:36,515 - socket_handlers - INFO - Player uio disconnected from room UJCT
+2025-09-23 21:37:36,515 - room_manager - INFO - Player uio left room UJCT
+2025-09-23 21:37:37,679 - socket_handlers - INFO - Client connected: X0SBc1ApolhLYAn1AAAj
+2025-09-23 21:37:40,634 - room_manager - INFO - Player faew joined room BEGY
+2025-09-23 21:37:40,635 - socket_handlers - INFO - Player faew joined room BEGY
+2025-09-23 21:37:45,918 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: Received start_game request from GKNi9ioEJ5cH8kkXAAAh with data: {'start_page': 'US Presidents', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:37:45,920 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: Room manager has 2 rooms
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'qyEMKxALAIeeoRsvAAAd': 'UJCT', 'GKNi9ioEJ5cH8kkXAAAh': 'BEGY', 'X0SBc1ApolhLYAn1AAAj': 'BEGY'}
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: Found room BEGY for player GKNi9ioEJ5cH8kkXAAAh
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: Checking if player GKNi9ioEJ5cH8kkXAAAh is host in room BEGY
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: Player GKNi9ioEJ5cH8kkXAAAh is host, checking player count
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'US Presidents', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:37:45,920 - socket_handlers - INFO - DEBUG: Config - start: US Presidents, end: Animals, custom_start: None, custom_end: None
+2025-09-23 21:37:45,921 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 21:37:45,921 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 21:37:45,921 - game_logic - WARNING - Unknown category: US Presidents
+2025-09-23 21:37:46,725 - game_logic - INFO - Selected game pages - Start: Kathryn Ptacek (https://en.wikipedia.org/?curid=7050269), End: Lion (https://en.wikipedia.org/wiki/Lion)
+2025-09-23 21:37:46,726 - socket_handlers - INFO - DEBUG: Page selection completed - start: Kathryn Ptacek, end: Lion
+2025-09-23 21:37:46,726 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 21:37:46,726 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 21:37:46,726 - socket_handlers - INFO - DEBUG: About to send game_starting event to room BEGY
+2025-09-23 21:37:46,726 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 21:37:46,726 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/?curid=7050269, end_url=https://en.wikipedia.org/wiki/Lion
+2025-09-23 21:37:46,727 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 21:37:46,727 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room BEGY
+2025-09-23 21:37:46,727 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room BEGY
+2025-09-23 21:37:46,728 - socket_handlers - INFO - DEBUG: start_game handler exiting for GKNi9ioEJ5cH8kkXAAAh
+2025-09-23 21:37:46,728 - socket_handlers - INFO - DEBUG: Starting countdown for room BEGY
+2025-09-23 21:37:46,729 - socket_handlers - INFO - Game configuration updated in room BEGY: US Presidents -> Animals
+2025-09-23 21:37:51,729 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room BEGY
+2025-09-23 21:37:51,729 - socket_handlers - INFO - DEBUG: Sending game_started event to room BEGY
+2025-09-23 21:37:51,730 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 21:38:06,763 - socket_handlers - INFO - Client disconnected: qyEMKxALAIeeoRsvAAAd
+2025-09-23 21:38:06,763 - socket_handlers - INFO - Player gf disconnected from room UJCT
+2025-09-23 21:38:06,763 - room_manager - INFO - Player gf left room UJCT
+2025-09-23 21:38:06,763 - room_manager - INFO - Closed room UJCT
+2025-09-23 21:38:06,764 - room_manager - INFO - Closed empty room UJCT
+2025-09-23 21:38:06,764 - socket_handlers - INFO - Room UJCT was deleted - last player disconnected
+2025-09-23 21:38:46,806 - socket_handlers - INFO - Client disconnected: GKNi9ioEJ5cH8kkXAAAh
+2025-09-23 21:38:46,806 - socket_handlers - INFO - Player fae disconnected from room BEGY
+2025-09-23 21:38:46,807 - room_manager - INFO - Player fae left room BEGY
+2025-09-23 21:38:46,807 - room_manager - INFO - Closed room BEGY
+2025-09-23 21:38:46,807 - room_manager - INFO - Closed empty room BEGY
+2025-09-23 21:38:46,807 - socket_handlers - INFO - Room BEGY was deleted - last player disconnected
+2025-09-23 21:38:56,818 - socket_handlers - INFO - Client disconnected: X0SBc1ApolhLYAn1AAAj
+2025-09-23 21:38:59,416 - socket_handlers - INFO - Client connected: PK-oINodC8VtWrKSAAAl
+2025-09-23 21:38:59,929 - room_manager - INFO - Created room NQSP with host FAW
+2025-09-23 21:38:59,930 - socket_handlers - INFO - Room NQSP created by FAW
+2025-09-23 21:39:07,956 - socket_handlers - INFO - Client connected: CE6WsoZdG9cd2G16AAAn
+2025-09-23 21:39:10,679 - room_manager - INFO - Player fge joined room NQSP
+2025-09-23 21:39:10,680 - socket_handlers - INFO - Player fge joined room NQSP
+2025-09-23 21:39:14,329 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 21:39:14,331 - socket_handlers - INFO - DEBUG: Received start_game request from PK-oINodC8VtWrKSAAAl with data: {'start_page': 'Gaming', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:39:14,331 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 21:39:14,331 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 21:39:14,331 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'PK-oINodC8VtWrKSAAAl': 'NQSP', 'CE6WsoZdG9cd2G16AAAn': 'NQSP'}
+2025-09-23 21:39:14,331 - socket_handlers - INFO - DEBUG: Found room NQSP for player PK-oINodC8VtWrKSAAAl
+2025-09-23 21:39:14,331 - socket_handlers - INFO - DEBUG: Checking if player PK-oINodC8VtWrKSAAAl is host in room NQSP
+2025-09-23 21:39:14,331 - socket_handlers - INFO - DEBUG: Player PK-oINodC8VtWrKSAAAl is host, checking player count
+2025-09-23 21:39:14,331 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 21:39:14,331 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Gaming', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:39:14,332 - socket_handlers - INFO - DEBUG: Config - start: Gaming, end: Animals, custom_start: None, custom_end: None
+2025-09-23 21:39:14,332 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 21:39:14,332 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 21:39:14,332 - game_logic - INFO - Selected game pages - Start: Grand Theft Auto (https://en.wikipedia.org/wiki/Grand_Theft_Auto), End: Lion (https://en.wikipedia.org/wiki/Lion)
+2025-09-23 21:39:14,332 - socket_handlers - INFO - DEBUG: Page selection completed - start: Grand Theft Auto, end: Lion
+2025-09-23 21:39:14,332 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 21:39:14,332 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 21:39:14,332 - socket_handlers - INFO - DEBUG: About to send game_starting event to room NQSP
+2025-09-23 21:39:14,332 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 21:39:14,333 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Grand_Theft_Auto, end_url=https://en.wikipedia.org/wiki/Lion
+2025-09-23 21:39:14,333 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 21:39:14,333 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room NQSP
+2025-09-23 21:39:14,333 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room NQSP
+2025-09-23 21:39:14,334 - socket_handlers - INFO - DEBUG: start_game handler exiting for PK-oINodC8VtWrKSAAAl
+2025-09-23 21:39:14,334 - socket_handlers - INFO - Game configuration updated in room NQSP: Gaming -> Animals
+2025-09-23 21:39:14,334 - socket_handlers - INFO - DEBUG: Starting countdown for room NQSP
+2025-09-23 21:39:19,338 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room NQSP
+2025-09-23 21:39:19,338 - socket_handlers - INFO - DEBUG: Sending game_started event to room NQSP
+2025-09-23 21:39:19,339 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 21:40:35,801 - socket_handlers - INFO - Client connected: aEptR4k44-FVLMfnAAAp
+2025-09-23 21:40:36,305 - room_manager - INFO - Created room EYOX with host f
+2025-09-23 21:40:36,306 - socket_handlers - INFO - Room EYOX created by f
+2025-09-23 21:40:43,823 - socket_handlers - INFO - Client connected: JERsbVo7t1RH--qpAAAr
+2025-09-23 21:40:49,928 - room_manager - INFO - Player fgfff joined room EYOX
+2025-09-23 21:40:49,929 - socket_handlers - INFO - Player fgfff joined room EYOX
+2025-09-23 21:40:51,937 - socket_handlers - INFO - Client disconnected: CE6WsoZdG9cd2G16AAAn
+2025-09-23 21:40:51,938 - socket_handlers - INFO - Player fge disconnected from room NQSP
+2025-09-23 21:40:51,938 - room_manager - INFO - Player fge left room NQSP
+2025-09-23 21:40:53,607 - socket_handlers - INFO - Game configuration updated in room EYOX: Celebrities -> Animals
+2025-09-23 21:40:55,201 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 21:40:55,203 - socket_handlers - INFO - DEBUG: Received start_game request from aEptR4k44-FVLMfnAAAp with data: {'start_page': 'Celebrities', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:40:55,203 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 21:40:55,203 - socket_handlers - INFO - DEBUG: Room manager has 2 rooms
+2025-09-23 21:40:55,203 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'PK-oINodC8VtWrKSAAAl': 'NQSP', 'aEptR4k44-FVLMfnAAAp': 'EYOX', 'JERsbVo7t1RH--qpAAAr': 'EYOX'}
+2025-09-23 21:40:55,203 - socket_handlers - INFO - DEBUG: Found room EYOX for player aEptR4k44-FVLMfnAAAp
+2025-09-23 21:40:55,204 - socket_handlers - INFO - DEBUG: Checking if player aEptR4k44-FVLMfnAAAp is host in room EYOX
+2025-09-23 21:40:55,204 - socket_handlers - INFO - DEBUG: Player aEptR4k44-FVLMfnAAAp is host, checking player count
+2025-09-23 21:40:55,204 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 21:40:55,204 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Celebrities', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:40:55,204 - socket_handlers - INFO - DEBUG: Config - start: Celebrities, end: Animals, custom_start: None, custom_end: None
+2025-09-23 21:40:55,204 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 21:40:55,204 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 21:40:55,205 - game_logic - INFO - Selected game pages - Start: Tom Hanks (https://en.wikipedia.org/wiki/Tom_Hanks), End: Lion (https://en.wikipedia.org/wiki/Lion)
+2025-09-23 21:40:55,205 - socket_handlers - INFO - DEBUG: Page selection completed - start: Tom Hanks, end: Lion
+2025-09-23 21:40:55,205 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 21:40:55,205 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 21:40:55,205 - socket_handlers - INFO - DEBUG: About to send game_starting event to room EYOX
+2025-09-23 21:40:55,205 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 21:40:55,205 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Tom_Hanks, end_url=https://en.wikipedia.org/wiki/Lion
+2025-09-23 21:40:55,206 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 21:40:55,206 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room EYOX
+2025-09-23 21:40:55,207 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room EYOX
+2025-09-23 21:40:55,207 - socket_handlers - INFO - DEBUG: start_game handler exiting for aEptR4k44-FVLMfnAAAp
+2025-09-23 21:40:55,207 - socket_handlers - INFO - DEBUG: Starting countdown for room EYOX
+2025-09-23 21:41:00,217 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room EYOX
+2025-09-23 21:41:00,217 - socket_handlers - INFO - DEBUG: Sending game_started event to room EYOX
+2025-09-23 21:41:00,218 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 21:41:00,407 - socket_handlers - INFO - Player f navigation: Tom Hanks (Link #1, 0.2s)
+2025-09-23 21:41:00,416 - socket_handlers - INFO - Player fgfff navigation: Tom Hanks (Link #1, 0.2s)
+2025-09-23 21:41:05,850 - socket_handlers - INFO - Player f navigation: List of highest-grossing actors (Link #2, 5.6s)
+2025-09-23 21:41:06,967 - socket_handlers - INFO - Client disconnected: PK-oINodC8VtWrKSAAAl
+2025-09-23 21:41:06,968 - socket_handlers - INFO - Player FAW disconnected from room NQSP
+2025-09-23 21:41:06,968 - room_manager - INFO - Player FAW left room NQSP
+2025-09-23 21:41:06,968 - room_manager - INFO - Closed room NQSP
+2025-09-23 21:41:06,968 - room_manager - INFO - Closed empty room NQSP
+2025-09-23 21:41:06,968 - socket_handlers - INFO - Room NQSP was deleted - last player disconnected
+2025-09-23 21:41:15,458 - socket_handlers - INFO - Player f navigation: Box office (Link #3, 15.2s)
+2025-09-23 21:41:18,637 - socket_handlers - INFO - Player fgfff navigation: List of highest-grossing actors (Link #2, 18.4s)
+2025-09-23 21:41:20,955 - socket_handlers - INFO - Player fgfff navigation: Inflation (Link #3, 20.7s)
+2025-09-23 21:41:22,627 - socket_handlers - INFO - Player f navigation: Countertop (Link #4, 22.4s)
+2025-09-23 21:41:25,382 - socket_handlers - INFO - Player f navigation: New Zealand English (Link #5, 25.2s)
+2025-09-23 21:41:26,936 - socket_handlers - INFO - Player f navigation: First language (Link #6, 26.7s)
+2025-09-23 21:41:28,487 - socket_handlers - INFO - Player fgfff navigation: Consumer price index (Link #4, 28.3s)
+2025-09-23 21:41:30,357 - socket_handlers - INFO - Player f navigation: Critical period hypothesis (Link #7, 30.1s)
+2025-09-23 21:41:32,716 - socket_handlers - INFO - Player f navigation: Eric Lenneberg (Link #8, 32.5s)
+2025-09-23 21:41:39,292 - socket_handlers - INFO - Player fgfff navigation: Market basket (Link #5, 39.1s)
+2025-09-23 21:41:44,377 - socket_handlers - INFO - Player fgfff navigation: Purchasing price parity (Link #6, 44.2s)
+2025-09-23 21:41:44,742 - socket_handlers - INFO - Player fgfff navigation: Purchasing power parity (Link #7, 44.5s)
+2025-09-23 21:43:07,098 - socket_handlers - INFO - Client disconnected: aEptR4k44-FVLMfnAAAp
+2025-09-23 21:43:07,098 - socket_handlers - INFO - Player f disconnected from room EYOX
+2025-09-23 21:43:07,098 - room_manager - INFO - Player f left room EYOX
+2025-09-23 21:43:07,098 - room_manager - INFO - Closed room EYOX
+2025-09-23 21:43:07,098 - room_manager - INFO - Closed empty room EYOX
+2025-09-23 21:43:07,099 - socket_handlers - INFO - Room EYOX was deleted - last player disconnected
+2025-09-23 21:43:17,104 - socket_handlers - INFO - Client disconnected: JERsbVo7t1RH--qpAAAr
+2025-09-23 21:45:58,589 - redis_manager - INFO - Disconnected from Redis
+2025-09-23 21:46:01,763 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-23 21:46:02,008 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-23 21:46:02,009 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-23 21:46:02,316 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-23 21:46:06,401 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-23 21:46:06,401 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-23 21:47:09,814 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-23 21:47:09,816 - socket_handlers - INFO - Client connected: L1S7TNV8XTpyOCLXAAAB
+2025-09-23 21:47:10,321 - room_manager - INFO - Created room ACUQ with host TAT
+2025-09-23 21:47:10,321 - socket_handlers - INFO - Room ACUQ created by TAT
+2025-09-23 21:47:19,679 - socket_handlers - INFO - Client connected: Gs0lh80HQ2CSjyjiAAAD
+2025-09-23 21:47:23,785 - room_manager - INFO - Player GGG joined room ACUQ
+2025-09-23 21:47:23,785 - socket_handlers - INFO - Player GGG joined room ACUQ
+2025-09-23 21:47:26,164 - socket_handlers - INFO - Client connected: p1EuJqu8t7_ebXUcAAAF
+2025-09-23 21:47:31,708 - room_manager - INFO - Player DSFG joined room ACUQ
+2025-09-23 21:47:31,709 - socket_handlers - INFO - Player DSFG joined room ACUQ
+2025-09-23 21:47:35,966 - socket_handlers - INFO - Game configuration updated in room ACUQ: Countries -> Animals
+2025-09-23 21:47:37,485 - socket_handlers - INFO - Game configuration updated in room ACUQ: Gaming -> Animals
+2025-09-23 21:47:39,259 - socket_handlers - INFO - Game configuration updated in room ACUQ: Gaming -> Buildings
+2025-09-23 21:47:46,165 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 21:47:46,167 - socket_handlers - INFO - DEBUG: Received start_game request from L1S7TNV8XTpyOCLXAAAB with data: {'start_page': 'Gaming', 'end_page': 'Buildings', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:47:46,167 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 21:47:46,167 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 21:47:46,167 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'L1S7TNV8XTpyOCLXAAAB': 'ACUQ', 'Gs0lh80HQ2CSjyjiAAAD': 'ACUQ', 'p1EuJqu8t7_ebXUcAAAF': 'ACUQ'}
+2025-09-23 21:47:46,167 - socket_handlers - INFO - DEBUG: Found room ACUQ for player L1S7TNV8XTpyOCLXAAAB
+2025-09-23 21:47:46,167 - socket_handlers - INFO - DEBUG: Checking if player L1S7TNV8XTpyOCLXAAAB is host in room ACUQ
+2025-09-23 21:47:46,167 - socket_handlers - INFO - DEBUG: Player L1S7TNV8XTpyOCLXAAAB is host, checking player count
+2025-09-23 21:47:46,167 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 21:47:46,167 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Gaming', 'end_page': 'Buildings', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:47:46,168 - socket_handlers - INFO - DEBUG: Config - start: Gaming, end: Buildings, custom_start: None, custom_end: None
+2025-09-23 21:47:46,168 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 21:47:46,169 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 21:47:46,169 - game_logic - INFO - Selected game pages - Start: Super Mario (https://en.wikipedia.org/wiki/Super_Mario), End: Burj Khalifa (https://en.wikipedia.org/wiki/Burj_Khalifa)
+2025-09-23 21:47:46,169 - socket_handlers - INFO - DEBUG: Page selection completed - start: Super Mario, end: Burj Khalifa
+2025-09-23 21:47:46,169 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 21:47:46,169 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 21:47:46,169 - socket_handlers - INFO - DEBUG: About to send game_starting event to room ACUQ
+2025-09-23 21:47:46,169 - socket_handlers - INFO - DEBUG: Room has 3 players
+2025-09-23 21:47:46,169 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Super_Mario, end_url=https://en.wikipedia.org/wiki/Burj_Khalifa
+2025-09-23 21:47:46,170 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 21:47:46,170 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room ACUQ
+2025-09-23 21:47:46,170 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room ACUQ
+2025-09-23 21:47:46,171 - socket_handlers - INFO - DEBUG: start_game handler exiting for L1S7TNV8XTpyOCLXAAAB
+2025-09-23 21:47:46,171 - socket_handlers - INFO - DEBUG: Starting countdown for room ACUQ
+2025-09-23 21:47:51,171 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room ACUQ
+2025-09-23 21:47:51,172 - socket_handlers - INFO - DEBUG: Sending game_started event to room ACUQ
+2025-09-23 21:47:51,172 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 21:47:51,348 - socket_handlers - INFO - Player TAT navigation: Super Mario (Link #1, 0.2s)
+2025-09-23 21:47:51,363 - socket_handlers - INFO - Player GGG navigation: Super Mario (Link #1, 0.2s)
+2025-09-23 21:47:51,363 - socket_handlers - INFO - Player DSFG navigation: Super Mario (Link #1, 0.2s)
+2025-09-23 21:47:51,382 - socket_handlers - INFO - Player TAT navigation: Super Mario (Link #2, 0.2s)
+2025-09-23 21:47:51,400 - socket_handlers - INFO - Player DSFG navigation: Super Mario (Link #2, 0.2s)
+2025-09-23 21:47:51,401 - socket_handlers - INFO - Player GGG navigation: Super Mario (Link #2, 0.2s)
+2025-09-23 21:47:58,175 - socket_handlers - INFO - Player TAT navigation: Mario (franchise) (Link #3, 7.0s)
+2025-09-23 21:48:02,491 - socket_handlers - INFO - Player TAT navigation: Video game (Link #4, 11.3s)
+2025-09-23 21:48:09,524 - socket_handlers - INFO - Player GGG navigation: Mario (franchise) (Link #3, 18.4s)
+2025-09-23 21:48:11,086 - socket_handlers - INFO - Player GGG navigation: Video game (Link #4, 19.9s)
+2025-09-23 21:48:16,647 - socket_handlers - INFO - Player GGG navigation: Electronic game (Link #5, 25.5s)
+2025-09-23 21:48:17,658 - socket_handlers - INFO - Player GGG navigation: Electronics (Link #6, 26.5s)
+2025-09-23 21:48:18,863 - socket_handlers - INFO - Player GGG navigation: Physics (Link #7, 27.7s)
+2025-09-23 21:49:09,951 - socket_handlers - INFO - Client disconnected: L1S7TNV8XTpyOCLXAAAB
+2025-09-23 21:49:09,951 - socket_handlers - INFO - Player TAT disconnected from room ACUQ
+2025-09-23 21:49:09,951 - room_manager - INFO - Player TAT left room ACUQ
+2025-09-23 21:49:09,952 - room_manager - INFO - Transferred host to GGG in room ACUQ
+2025-09-23 21:49:36,658 - socket_handlers - INFO - Client disconnected: Gs0lh80HQ2CSjyjiAAAD
+2025-09-23 21:49:36,658 - socket_handlers - INFO - Player GGG disconnected from room ACUQ
+2025-09-23 21:49:36,658 - room_manager - INFO - Player GGG left room ACUQ
+2025-09-23 21:49:36,659 - room_manager - INFO - Closed room ACUQ
+2025-09-23 21:49:36,659 - room_manager - INFO - Closed empty room ACUQ
+2025-09-23 21:49:36,659 - socket_handlers - INFO - Room ACUQ was deleted - last player disconnected
+2025-09-23 21:49:43,331 - socket_handlers - INFO - Client disconnected: p1EuJqu8t7_ebXUcAAAF
+2025-09-23 21:57:39,800 - redis_manager - INFO - Disconnected from Redis
+2025-09-23 21:57:42,153 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-23 21:57:42,363 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-23 21:57:42,363 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-23 21:57:42,650 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-23 21:57:46,725 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-23 21:57:46,726 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-23 21:58:17,087 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-23 21:58:17,090 - socket_handlers - INFO - Client connected: IqnE72KkPQy3qJgnAAAB
+2025-09-23 21:58:17,594 - room_manager - INFO - Created room EWMI with host TAWE
+2025-09-23 21:58:17,595 - socket_handlers - INFO - Room EWMI created by TAWE
+2025-09-23 21:58:29,404 - socket_handlers - INFO - Client connected: oRW9tFmfF0Cxo6C2AAAD
+2025-09-23 21:58:32,016 - room_manager - INFO - Player GFAE joined room EWMI
+2025-09-23 21:58:32,017 - socket_handlers - INFO - Player GFAE joined room EWMI
+2025-09-23 21:58:37,552 - socket_handlers - INFO - Client connected: _c5e5bNQzmO9YrASAAAF
+2025-09-23 21:58:40,372 - room_manager - INFO - Player GGG joined room EWMI
+2025-09-23 21:58:40,373 - socket_handlers - INFO - Player GGG joined room EWMI
+2025-09-23 21:58:46,247 - socket_handlers - INFO - Game configuration updated in room EWMI: Buildings -> Animals
+2025-09-23 21:58:49,127 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 21:58:49,128 - socket_handlers - INFO - DEBUG: Received start_game request from IqnE72KkPQy3qJgnAAAB with data: {'start_page': 'Buildings', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:58:49,129 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 21:58:49,129 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 21:58:49,129 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'IqnE72KkPQy3qJgnAAAB': 'EWMI', 'oRW9tFmfF0Cxo6C2AAAD': 'EWMI', '_c5e5bNQzmO9YrASAAAF': 'EWMI'}
+2025-09-23 21:58:49,129 - socket_handlers - INFO - DEBUG: Found room EWMI for player IqnE72KkPQy3qJgnAAAB
+2025-09-23 21:58:49,129 - socket_handlers - INFO - DEBUG: Checking if player IqnE72KkPQy3qJgnAAAB is host in room EWMI
+2025-09-23 21:58:49,129 - socket_handlers - INFO - DEBUG: Player IqnE72KkPQy3qJgnAAAB is host, checking player count
+2025-09-23 21:58:49,129 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 21:58:49,129 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Buildings', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 21:58:49,130 - socket_handlers - INFO - DEBUG: Config - start: Buildings, end: Animals, custom_start: None, custom_end: None
+2025-09-23 21:58:49,130 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 21:58:49,131 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 21:58:49,131 - game_logic - INFO - Selected game pages - Start: Empire State Building (https://en.wikipedia.org/wiki/Empire_State_Building), End: Shark (https://en.wikipedia.org/wiki/Shark)
+2025-09-23 21:58:49,131 - socket_handlers - INFO - DEBUG: Page selection completed - start: Empire State Building, end: Shark
+2025-09-23 21:58:49,131 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 21:58:49,131 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 21:58:49,131 - socket_handlers - INFO - DEBUG: About to send game_starting event to room EWMI
+2025-09-23 21:58:49,131 - socket_handlers - INFO - DEBUG: Room has 3 players
+2025-09-23 21:58:49,131 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Empire_State_Building, end_url=https://en.wikipedia.org/wiki/Shark
+2025-09-23 21:58:49,132 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 21:58:49,133 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room EWMI
+2025-09-23 21:58:49,133 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room EWMI
+2025-09-23 21:58:49,133 - socket_handlers - INFO - DEBUG: start_game handler exiting for IqnE72KkPQy3qJgnAAAB
+2025-09-23 21:58:49,133 - socket_handlers - INFO - DEBUG: Starting countdown for room EWMI
+2025-09-23 21:58:54,146 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room EWMI
+2025-09-23 21:58:54,146 - socket_handlers - INFO - DEBUG: Sending game_started event to room EWMI
+2025-09-23 21:58:54,147 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 21:58:54,341 - socket_handlers - INFO - Player GFAE navigation: Empire State Building (Link #1, 0.2s)
+2025-09-23 21:58:54,341 - socket_handlers - INFO - Player TAWE navigation: Empire State Building (Link #1, 0.2s)
+2025-09-23 21:58:54,352 - socket_handlers - INFO - Player GGG navigation: Empire State Building (Link #1, 0.2s)
+2025-09-23 21:58:54,363 - socket_handlers - INFO - Player TAWE navigation: Empire State Building (Link #2, 0.2s)
+2025-09-23 21:58:54,376 - socket_handlers - INFO - Player GFAE navigation: Empire State Building (Link #2, 0.2s)
+2025-09-23 21:58:54,376 - socket_handlers - INFO - Player GGG navigation: Empire State Building (Link #2, 0.2s)
+2025-09-23 21:59:02,585 - socket_handlers - INFO - Player TAWE navigation: Midtown South (Link #3, 8.4s)
+2025-09-23 21:59:08,969 - socket_handlers - INFO - Player GFAE navigation: Antenna (radio) (Link #3, 14.8s)
+2025-09-23 21:59:50,491 - socket_handlers - INFO - Client disconnected: _c5e5bNQzmO9YrASAAAF
+2025-09-23 21:59:50,491 - socket_handlers - INFO - Player GGG disconnected from room EWMI
+2025-09-23 21:59:50,491 - room_manager - INFO - Player GGG left room EWMI
+2025-09-23 21:59:57,167 - socket_handlers - INFO - Client disconnected: IqnE72KkPQy3qJgnAAAB
+2025-09-23 21:59:57,168 - socket_handlers - INFO - Player TAWE disconnected from room EWMI
+2025-09-23 21:59:57,168 - room_manager - INFO - Player TAWE left room EWMI
+2025-09-23 21:59:57,168 - room_manager - INFO - Closed room EWMI
+2025-09-23 21:59:57,168 - room_manager - INFO - Closed empty room EWMI
+2025-09-23 21:59:57,168 - socket_handlers - INFO - Room EWMI was deleted - last player disconnected
+2025-09-23 22:00:27,191 - socket_handlers - INFO - Client disconnected: oRW9tFmfF0Cxo6C2AAAD
+2025-09-23 22:02:22,233 - socket_handlers - INFO - Client connected: uFA5mFnMAibP7pH9AAAH
+2025-09-23 22:02:22,738 - room_manager - INFO - Created room NCSR with host FAT
+2025-09-23 22:02:22,739 - socket_handlers - INFO - Room NCSR created by FAT
+2025-09-23 22:02:27,029 - socket_handlers - INFO - Game configuration updated in room NCSR: Custom -> Animals
+2025-09-23 22:02:31,683 - socket_handlers - INFO - Client connected: HtSjPQY5tdd5neSWAAAJ
+2025-09-23 22:02:43,867 - room_manager - INFO - Player AHHH joined room NCSR
+2025-09-23 22:02:43,868 - socket_handlers - INFO - Player AHHH joined room NCSR
+2025-09-23 22:02:49,402 - socket_handlers - INFO - Client connected: R2cd44BstCgTQhDWAAAL
+2025-09-23 22:02:53,100 - room_manager - INFO - Player GA joined room NCSR
+2025-09-23 22:02:53,102 - socket_handlers - INFO - Player GA joined room NCSR
+2025-09-23 22:02:57,452 - socket_handlers - INFO - Game configuration updated in room NCSR: Music -> Animals
+2025-09-23 22:02:58,330 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 22:02:58,332 - socket_handlers - INFO - DEBUG: Received start_game request from uFA5mFnMAibP7pH9AAAH with data: {'start_page': 'Music', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 22:02:58,332 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 22:02:58,332 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 22:02:58,332 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'uFA5mFnMAibP7pH9AAAH': 'NCSR', 'HtSjPQY5tdd5neSWAAAJ': 'NCSR', 'R2cd44BstCgTQhDWAAAL': 'NCSR'}
+2025-09-23 22:02:58,332 - socket_handlers - INFO - DEBUG: Found room NCSR for player uFA5mFnMAibP7pH9AAAH
+2025-09-23 22:02:58,332 - socket_handlers - INFO - DEBUG: Checking if player uFA5mFnMAibP7pH9AAAH is host in room NCSR
+2025-09-23 22:02:58,332 - socket_handlers - INFO - DEBUG: Player uFA5mFnMAibP7pH9AAAH is host, checking player count
+2025-09-23 22:02:58,332 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 22:02:58,333 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Music', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 22:02:58,333 - socket_handlers - INFO - DEBUG: Config - start: Music, end: Animals, custom_start: None, custom_end: None
+2025-09-23 22:02:58,333 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 22:02:58,333 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 22:02:58,333 - game_logic - INFO - Selected game pages - Start: Led Zeppelin (https://en.wikipedia.org/wiki/Led_Zeppelin), End: Elephant (https://en.wikipedia.org/wiki/Elephant)
+2025-09-23 22:02:58,333 - socket_handlers - INFO - DEBUG: Page selection completed - start: Led Zeppelin, end: Elephant
+2025-09-23 22:02:58,333 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 22:02:58,333 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 22:02:58,334 - socket_handlers - INFO - DEBUG: About to send game_starting event to room NCSR
+2025-09-23 22:02:58,334 - socket_handlers - INFO - DEBUG: Room has 3 players
+2025-09-23 22:02:58,334 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Led_Zeppelin, end_url=https://en.wikipedia.org/wiki/Elephant
+2025-09-23 22:02:58,335 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 22:02:58,335 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room NCSR
+2025-09-23 22:02:58,335 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room NCSR
+2025-09-23 22:02:58,335 - socket_handlers - INFO - DEBUG: start_game handler exiting for uFA5mFnMAibP7pH9AAAH
+2025-09-23 22:02:58,335 - socket_handlers - INFO - DEBUG: Starting countdown for room NCSR
+2025-09-23 22:03:03,338 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room NCSR
+2025-09-23 22:03:03,338 - socket_handlers - INFO - DEBUG: Sending game_started event to room NCSR
+2025-09-23 22:03:03,340 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 22:03:03,519 - socket_handlers - INFO - Player FAT navigation: Led Zeppelin (Link #1, 0.2s)
+2025-09-23 22:03:03,529 - socket_handlers - INFO - Player GA navigation: Led Zeppelin (Link #1, 0.2s)
+2025-09-23 22:03:03,530 - socket_handlers - INFO - Player AHHH navigation: Led Zeppelin (Link #1, 0.2s)
+2025-09-23 22:03:03,534 - socket_handlers - INFO - Player FAT navigation: Led Zeppelin (Link #2, 0.2s)
+2025-09-23 22:03:03,562 - socket_handlers - INFO - Player AHHH navigation: Led Zeppelin (Link #2, 0.2s)
+2025-09-23 22:03:03,563 - socket_handlers - INFO - Player GA navigation: Led Zeppelin (Link #2, 0.2s)
+2025-09-23 22:05:17,422 - socket_handlers - INFO - Client disconnected: uFA5mFnMAibP7pH9AAAH
+2025-09-23 22:05:17,422 - socket_handlers - INFO - Player FAT disconnected from room NCSR
+2025-09-23 22:05:17,422 - room_manager - INFO - Player FAT left room NCSR
+2025-09-23 22:05:17,422 - room_manager - INFO - Transferred host to AHHH in room NCSR
+2025-09-23 22:05:17,422 - socket_handlers - INFO - Client disconnected: R2cd44BstCgTQhDWAAAL
+2025-09-23 22:05:17,422 - socket_handlers - INFO - Player GA disconnected from room NCSR
+2025-09-23 22:05:17,423 - room_manager - INFO - Player GA left room NCSR
+2025-09-23 22:05:18,365 - socket_handlers - INFO - Client connected: g9VCJpNLnNFGqaq7AAAN
+2025-09-23 22:05:18,870 - room_manager - INFO - Created room GEMK with host G
+2025-09-23 22:05:18,870 - socket_handlers - INFO - Room GEMK created by G
+2025-09-23 22:05:24,092 - socket_handlers - INFO - Client disconnected: HtSjPQY5tdd5neSWAAAJ
+2025-09-23 22:05:24,092 - socket_handlers - INFO - Player AHHH disconnected from room NCSR
+2025-09-23 22:05:24,092 - room_manager - INFO - Player AHHH left room NCSR
+2025-09-23 22:05:24,092 - room_manager - INFO - Closed room NCSR
+2025-09-23 22:05:24,092 - room_manager - INFO - Closed empty room NCSR
+2025-09-23 22:05:24,092 - socket_handlers - INFO - Room NCSR was deleted - last player disconnected
+2025-09-23 22:05:26,705 - socket_handlers - INFO - Client connected: MykQ2c5QuQ4YV0DNAAAP
+2025-09-23 22:05:29,996 - room_manager - INFO - Player H joined room GEMK
+2025-09-23 22:05:29,997 - socket_handlers - INFO - Player H joined room GEMK
+2025-09-23 22:05:38,770 - socket_handlers - INFO - Client connected: AnryIkdHcUWpj6r4AAAR
+2025-09-23 22:05:42,775 - room_manager - INFO - Player V joined room GEMK
+2025-09-23 22:05:42,776 - socket_handlers - INFO - Player V joined room GEMK
+2025-09-23 22:05:47,074 - socket_handlers - INFO - Game configuration updated in room GEMK: Music -> Animals
+2025-09-23 22:05:49,865 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 22:05:49,866 - socket_handlers - INFO - DEBUG: Received start_game request from g9VCJpNLnNFGqaq7AAAN with data: {'start_page': 'Music', 'end_page': 'Gaming', 'custom_start': None, 'custom_end': None}
+2025-09-23 22:05:49,866 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 22:05:49,866 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 22:05:49,866 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'g9VCJpNLnNFGqaq7AAAN': 'GEMK', 'MykQ2c5QuQ4YV0DNAAAP': 'GEMK', 'AnryIkdHcUWpj6r4AAAR': 'GEMK'}
+2025-09-23 22:05:49,866 - socket_handlers - INFO - DEBUG: Found room GEMK for player g9VCJpNLnNFGqaq7AAAN
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: Checking if player g9VCJpNLnNFGqaq7AAAN is host in room GEMK
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: Player g9VCJpNLnNFGqaq7AAAN is host, checking player count
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Music', 'end_page': 'Gaming', 'custom_start': None, 'custom_end': None}
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: Config - start: Music, end: Gaming, custom_start: None, custom_end: None
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 22:05:49,867 - game_logic - INFO - Selected game pages - Start: Led Zeppelin (https://en.wikipedia.org/wiki/Led_Zeppelin), End: Minecraft (https://en.wikipedia.org/wiki/Minecraft)
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: Page selection completed - start: Led Zeppelin, end: Minecraft
+2025-09-23 22:05:49,867 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 22:05:49,868 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 22:05:49,868 - socket_handlers - INFO - DEBUG: About to send game_starting event to room GEMK
+2025-09-23 22:05:49,868 - socket_handlers - INFO - DEBUG: Room has 3 players
+2025-09-23 22:05:49,868 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Led_Zeppelin, end_url=https://en.wikipedia.org/wiki/Minecraft
+2025-09-23 22:05:49,869 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 22:05:49,869 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room GEMK
+2025-09-23 22:05:49,869 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room GEMK
+2025-09-23 22:05:49,869 - socket_handlers - INFO - DEBUG: start_game handler exiting for g9VCJpNLnNFGqaq7AAAN
+2025-09-23 22:05:49,869 - socket_handlers - INFO - DEBUG: Starting countdown for room GEMK
+2025-09-23 22:05:49,920 - socket_handlers - INFO - Game configuration updated in room GEMK: Music -> Gaming
+2025-09-23 22:05:54,876 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room GEMK
+2025-09-23 22:05:54,877 - socket_handlers - INFO - DEBUG: Sending game_started event to room GEMK
+2025-09-23 22:05:54,878 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 22:05:55,080 - socket_handlers - INFO - Player G navigation: Led Zeppelin (Link #1, 0.2s)
+2025-09-23 22:05:55,084 - socket_handlers - INFO - Player H navigation: Led Zeppelin (Link #1, 0.2s)
+2025-09-23 22:05:55,085 - socket_handlers - INFO - Player V navigation: Led Zeppelin (Link #1, 0.2s)
+2025-09-23 22:05:55,099 - socket_handlers - INFO - Player G navigation: Led Zeppelin (Link #2, 0.2s)
+2025-09-23 22:05:55,124 - socket_handlers - INFO - Player H navigation: Led Zeppelin (Link #2, 0.2s)
+2025-09-23 22:05:55,124 - socket_handlers - INFO - Player V navigation: Led Zeppelin (Link #2, 0.2s)
+2025-09-23 22:06:45,198 - socket_handlers - INFO - Client disconnected: AnryIkdHcUWpj6r4AAAR
+2025-09-23 22:06:45,199 - socket_handlers - INFO - Player V disconnected from room GEMK
+2025-09-23 22:06:45,199 - room_manager - INFO - Player V left room GEMK
+2025-09-23 22:06:45,199 - redis_manager - INFO - Disconnected from Redis
+2025-09-23 22:06:46,843 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-23 22:06:47,045 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-23 22:06:47,045 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-23 22:06:47,330 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-23 22:06:51,423 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-23 22:06:51,423 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-23 22:07:05,274 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-23 22:07:05,276 - socket_handlers - INFO - Client connected: DbaJhTO6aGwhD2ezAAAB
+2025-09-23 22:07:05,781 - room_manager - INFO - Created room BDAK with host G
+2025-09-23 22:07:05,782 - socket_handlers - INFO - Room BDAK created by G
+2025-09-23 22:07:13,508 - socket_handlers - INFO - Client connected: n8cM6lwbUGWGcRqlAAAD
+2025-09-23 22:07:17,891 - room_manager - INFO - Player BBF joined room BDAK
+2025-09-23 22:07:17,891 - socket_handlers - INFO - Player BBF joined room BDAK
+2025-09-23 22:07:21,332 - socket_handlers - INFO - Game configuration updated in room BDAK: Buildings -> Animals
+2025-09-23 22:07:21,893 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 22:07:21,894 - socket_handlers - INFO - DEBUG: Received start_game request from DbaJhTO6aGwhD2ezAAAB with data: {'start_page': 'Buildings', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 22:07:21,894 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 22:07:21,894 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 22:07:21,895 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'DbaJhTO6aGwhD2ezAAAB': 'BDAK', 'n8cM6lwbUGWGcRqlAAAD': 'BDAK'}
+2025-09-23 22:07:21,895 - socket_handlers - INFO - DEBUG: Found room BDAK for player DbaJhTO6aGwhD2ezAAAB
+2025-09-23 22:07:21,895 - socket_handlers - INFO - DEBUG: Checking if player DbaJhTO6aGwhD2ezAAAB is host in room BDAK
+2025-09-23 22:07:21,895 - socket_handlers - INFO - DEBUG: Player DbaJhTO6aGwhD2ezAAAB is host, checking player count
+2025-09-23 22:07:21,895 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 22:07:21,895 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Buildings', 'end_page': 'Animals', 'custom_start': None, 'custom_end': None}
+2025-09-23 22:07:21,895 - socket_handlers - INFO - DEBUG: Config - start: Buildings, end: Animals, custom_start: None, custom_end: None
+2025-09-23 22:07:21,895 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 22:07:21,896 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 22:07:21,896 - game_logic - INFO - Selected game pages - Start: Pyramids of Giza (https://en.wikipedia.org/wiki/Pyramids_of_Giza), End: Tiger (https://en.wikipedia.org/wiki/Tiger)
+2025-09-23 22:07:21,896 - socket_handlers - INFO - DEBUG: Page selection completed - start: Pyramids of Giza, end: Tiger
+2025-09-23 22:07:21,896 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 22:07:21,896 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 22:07:21,896 - socket_handlers - INFO - DEBUG: About to send game_starting event to room BDAK
+2025-09-23 22:07:21,896 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 22:07:21,897 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Pyramids_of_Giza, end_url=https://en.wikipedia.org/wiki/Tiger
+2025-09-23 22:07:21,897 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 22:07:21,897 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room BDAK
+2025-09-23 22:07:21,897 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room BDAK
+2025-09-23 22:07:21,898 - socket_handlers - INFO - DEBUG: start_game handler exiting for DbaJhTO6aGwhD2ezAAAB
+2025-09-23 22:07:21,898 - socket_handlers - INFO - DEBUG: Starting countdown for room BDAK
+2025-09-23 22:07:26,898 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room BDAK
+2025-09-23 22:07:26,899 - socket_handlers - INFO - DEBUG: Sending game_started event to room BDAK
+2025-09-23 22:07:26,900 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 22:07:27,040 - socket_handlers - INFO - Player G navigation: Pyramids of Giza (Link #0, 0.1s)
+2025-09-23 22:07:27,049 - socket_handlers - INFO - Player BBF navigation: Pyramids of Giza (Link #0, 0.1s)
+2025-09-23 22:07:27,069 - socket_handlers - INFO - Player BBF navigation: Pyramids of Giza (Link #1, 0.2s)
+2025-09-23 22:07:27,069 - socket_handlers - INFO - Player G navigation: Pyramids of Giza (Link #1, 0.2s)
+2025-09-23 22:07:27,875 - socket_handlers - INFO - Player G navigation: Giza pyramid complex (Link #2, 1.0s)
+2025-09-23 22:07:27,898 - socket_handlers - INFO - Player BBF navigation: Giza pyramid complex (Link #2, 1.0s)
+2025-09-23 22:11:47,422 - socket_handlers - WARNING - Removing inactive player G from room BDAK
+2025-09-23 22:11:47,423 - socket_handlers - WARNING - DEBUG: Player G (sid: DbaJhTO6aGwhD2ezAAAB) was inactive for 259.5 seconds
+2025-09-23 22:11:47,423 - room_manager - INFO - Player G left room BDAK
+2025-09-23 22:11:47,423 - room_manager - INFO - Closed room BDAK
+2025-09-23 22:11:47,423 - room_manager - INFO - Closed empty room BDAK
+2025-09-23 22:11:47,423 - socket_handlers - WARNING - Removing inactive player BBF from room BDAK
+2025-09-23 22:11:47,423 - socket_handlers - WARNING - DEBUG: Player BBF (sid: n8cM6lwbUGWGcRqlAAAD) was inactive for 259.5 seconds
+2025-09-23 22:11:55,473 - socket_handlers - INFO - Client disconnected: n8cM6lwbUGWGcRqlAAAD
+2025-09-23 22:11:59,663 - redis_manager - INFO - Disconnected from Redis
+2025-09-23 22:12:02,968 - __main__ - INFO - Starting WikiRace Multiplayer Server...
+2025-09-23 22:12:03,180 - __main__ - INFO - Server will start on 0.0.0.0:8001
+2025-09-23 22:12:03,180 - __main__ - INFO - Press Ctrl+C to stop the server
+2025-09-23 22:12:03,467 - socket_handlers - ERROR - FORCE LOG: Socket handlers being registered!
+2025-09-23 22:12:07,552 - redis_manager - ERROR - Failed to connect to Redis: Error 22 connecting to localhost:6379. The remote computer refused the network connection.
+2025-09-23 22:12:07,552 - room_manager - WARNING - Redis connection failed, using in-memory storage only
+2025-09-23 22:12:23,984 - engineio.server - ERROR - http://127.0.0.1:8001 is not an accepted origin. (further occurrences of this error will be logged with level INFO)
+2025-09-23 22:12:23,987 - socket_handlers - INFO - Client connected: rp0O8CPvnTLRG8pIAAAB
+2025-09-23 22:12:24,503 - room_manager - INFO - Created room ZGBT with host GDE
+2025-09-23 22:12:24,503 - socket_handlers - INFO - Room ZGBT created by GDE
+2025-09-23 22:12:31,246 - socket_handlers - INFO - Client connected: 3wm84hPzy-93JNA6AAAD
+2025-09-23 22:12:35,059 - room_manager - INFO - Player LLL joined room ZGBT
+2025-09-23 22:12:35,060 - socket_handlers - INFO - Player LLL joined room ZGBT
+2025-09-23 22:12:39,599 - socket_handlers - INFO - Game configuration updated in room ZGBT: Buildings -> Animals
+2025-09-23 22:12:42,016 - socket_handlers - INFO - Game configuration updated in room ZGBT: Buildings -> Historical Events
+2025-09-23 22:12:42,679 - socket_handlers - ERROR - FORCE LOG: TEST EVENT RECEIVED!
+2025-09-23 22:12:42,680 - socket_handlers - INFO - DEBUG: Received start_game request from rp0O8CPvnTLRG8pIAAAB with data: {'start_page': 'Buildings', 'end_page': 'Historical Events', 'custom_start': None, 'custom_end': None}
+2025-09-23 22:12:42,680 - socket_handlers - ERROR - FORCE ERROR LOG: start_game handler was definitely called!
+2025-09-23 22:12:42,680 - socket_handlers - INFO - DEBUG: Room manager has 1 rooms
+2025-09-23 22:12:42,680 - socket_handlers - INFO - DEBUG: Player-to-room mapping: {'rp0O8CPvnTLRG8pIAAAB': 'ZGBT', '3wm84hPzy-93JNA6AAAD': 'ZGBT'}
+2025-09-23 22:12:42,681 - socket_handlers - INFO - DEBUG: Found room ZGBT for player rp0O8CPvnTLRG8pIAAAB
+2025-09-23 22:12:42,681 - socket_handlers - INFO - DEBUG: Checking if player rp0O8CPvnTLRG8pIAAAB is host in room ZGBT
+2025-09-23 22:12:42,681 - socket_handlers - INFO - DEBUG: Player rp0O8CPvnTLRG8pIAAAB is host, checking player count
+2025-09-23 22:12:42,681 - socket_handlers - INFO - DEBUG: All validations passed, proceeding with game start
+2025-09-23 22:12:42,681 - socket_handlers - INFO - DEBUG: Extracting game configuration from data: {'start_page': 'Buildings', 'end_page': 'Historical Events', 'custom_start': None, 'custom_end': None}
+2025-09-23 22:12:42,681 - socket_handlers - INFO - DEBUG: Config - start: Buildings, end: Historical Events, custom_start: None, custom_end: None
+2025-09-23 22:12:42,681 - socket_handlers - INFO - DEBUG: Starting page selection process...
+2025-09-23 22:12:42,682 - socket_handlers - INFO - DEBUG: Imported game_logic successfully
+2025-09-23 22:12:42,682 - game_logic - WARNING - Unknown category: Historical Events
+2025-09-23 22:12:43,515 - game_logic - INFO - Selected game pages - Start: Colosseum (https://en.wikipedia.org/wiki/Colosseum), End: The Glass of Truth (https://en.wikipedia.org/?curid=45417920)
+2025-09-23 22:12:43,515 - socket_handlers - INFO - DEBUG: Page selection completed - start: Colosseum, end: The Glass of Truth
+2025-09-23 22:12:43,515 - socket_handlers - INFO - DEBUG: Room URLs set successfully
+2025-09-23 22:12:43,515 - socket_handlers - INFO - DEBUG: Setting room state to STARTING
+2025-09-23 22:12:43,515 - socket_handlers - INFO - DEBUG: About to send game_starting event to room ZGBT
+2025-09-23 22:12:43,516 - socket_handlers - INFO - DEBUG: Room has 2 players
+2025-09-23 22:12:43,516 - socket_handlers - INFO - DEBUG: Event data: start_url=https://en.wikipedia.org/wiki/Colosseum, end_url=https://en.wikipedia.org/?curid=45417920
+2025-09-23 22:12:43,517 - socket_handlers - INFO - DEBUG: game_starting emit completed successfully
+2025-09-23 22:12:43,517 - socket_handlers - INFO - DEBUG: Countdown task created successfully for room ZGBT
+2025-09-23 22:12:43,517 - socket_handlers - INFO - DEBUG: Game start handler completed successfully for room ZGBT
+2025-09-23 22:12:43,517 - socket_handlers - INFO - DEBUG: start_game handler exiting for rp0O8CPvnTLRG8pIAAAB
+2025-09-23 22:12:43,517 - socket_handlers - INFO - DEBUG: Starting countdown for room ZGBT
+2025-09-23 22:12:48,530 - socket_handlers - INFO - DEBUG: Countdown finished, starting game for room ZGBT
+2025-09-23 22:12:48,531 - socket_handlers - INFO - DEBUG: Sending game_started event to room ZGBT
+2025-09-23 22:12:48,532 - socket_handlers - INFO - DEBUG: game_started emit completed successfully
+2025-09-23 22:12:48,688 - socket_handlers - INFO - Player GDE navigation: Colosseum (Link #0, 0.2s)
+2025-09-23 22:12:48,706 - socket_handlers - INFO - Player LLL navigation: Colosseum (Link #0, 0.2s)
+2025-09-23 22:12:53,512 - socket_handlers - INFO - Player GDE navigation: Ellipse (Link #1, 5.0s)
+2025-09-23 22:12:56,645 - socket_handlers - INFO - Player LLL navigation: Roman Forum (Link #1, 8.1s)
+2025-09-23 22:12:58,313 - socket_handlers - INFO - Player GDE navigation: Circle (Link #2, 9.8s)
+2025-09-23 22:13:00,013 - socket_handlers - INFO - Player GDE navigation: Centre (geometry) (Link #3, 11.5s)
+2025-09-23 22:13:01,786 - socket_handlers - INFO - Player GDE navigation: Geometry (Link #4, 13.3s)
+2025-09-23 22:13:03,300 - socket_handlers - INFO - Player GDE navigation: Mathematics (Link #5, 14.8s)
+2025-09-23 22:13:05,439 - socket_handlers - INFO - Player GDE navigation: Empirical sciences (Link #6, 16.9s)
+2025-09-23 22:13:06,839 - socket_handlers - INFO - Player GDE navigation: Science (Link #7, 18.3s)
+2025-09-23 22:13:07,936 - socket_handlers - INFO - Player GDE navigation: Natural sciences (Link #8, 19.4s)
+2025-09-23 22:13:08,536 - socket_handlers - INFO - Player GDE navigation: Natural science (Link #9, 20.0s)
+2025-09-23 22:13:15,169 - socket_handlers - INFO - Player LLL navigation: Roman triumph (Link #2, 26.6s)
+2025-09-23 22:13:16,792 - socket_handlers - INFO - Player LLL navigation: Religion in ancient Rome (Link #3, 28.3s)
+2025-09-23 22:13:18,505 - socket_handlers - INFO - Player LLL navigation: Roman people (Link #4, 30.0s)
+2025-09-23 22:13:22,327 - socket_handlers - INFO - Player LLL navigation: Latins (Italic tribe) (Link #5, 33.8s)
+2025-09-23 22:13:28,150 - socket_handlers - INFO - Player LLL navigation: Italic peoples (Link #6, 39.6s)
+2025-09-23 22:13:29,631 - socket_handlers - INFO - Player LLL navigation: Historiography (Link #7, 41.1s)
+2025-09-23 22:13:38,897 - socket_handlers - INFO - Player LLL navigation: historiography (Link #8, 50.4s)
+2025-09-23 22:13:41,673 - socket_handlers - INFO - Player LLL navigation: historio- (Link #9, 53.1s)
+2025-09-23 22:13:43,385 - socket_handlers - INFO - Player LLL navigation: historió (Link #10, 54.9s)
+2025-09-23 22:13:45,107 - socket_handlers - INFO - Player LLL navigation: historio (Link #11, 56.6s)
+2025-09-23 22:13:45,891 - socket_handlers - INFO - Player LLL navigation: historió (Link #12, 57.4s)
+2025-09-23 22:13:46,687 - socket_handlers - INFO - Player LLL navigation: historio (Link #13, 58.2s)
+2025-09-23 22:14:00,283 - socket_handlers - INFO - Player LLL navigation: history (Link #14, 71.7s)
+2025-09-23 22:14:04,200 - socket_handlers - INFO - Player LLL navigation: hystory (Link #15, 75.7s)
+2025-09-23 22:14:06,509 - socket_handlers - INFO - Player LLL navigation: his (Link #16, 78.0s)
+2025-09-23 22:14:08,084 - socket_handlers - INFO - Player LLL navigation: Middle English (Link #17, 79.6s)
+2025-09-23 22:14:42,379 - socket_handlers - INFO - Player LLL navigation: English language (Link #18, 113.8s)
+2025-09-23 22:14:46,282 - socket_handlers - INFO - Player LLL navigation: Germanic peoples (Link #19, 117.7s)
+2025-09-23 22:14:47,905 - socket_handlers - INFO - Player LLL navigation: Roman Empire (Link #20, 119.4s)
+2025-09-23 22:14:56,036 - socket_handlers - INFO - Player LLL navigation: Ancient Rome (Link #21, 127.5s)
+2025-09-23 22:14:58,303 - socket_handlers - INFO - Player LLL navigation: Historiography (Link #22, 129.8s)
+2025-09-23 22:15:24,112 - socket_handlers - INFO - Client disconnected: rp0O8CPvnTLRG8pIAAAB
+2025-09-23 22:15:24,112 - socket_handlers - INFO - Player GDE disconnected from room ZGBT
+2025-09-23 22:15:24,112 - room_manager - INFO - Player GDE left room ZGBT
+2025-09-23 22:15:24,113 - room_manager - INFO - Closed room ZGBT
+2025-09-23 22:15:24,113 - room_manager - INFO - Closed empty room ZGBT
+2025-09-23 22:15:24,113 - socket_handlers - INFO - Room ZGBT was deleted - last player disconnected
+2025-09-23 22:15:51,413 - redis_manager - INFO - Disconnected from Redis
