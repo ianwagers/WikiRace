@@ -1057,6 +1057,19 @@ class MultiplayerPage(QWidget):
         # Reset to initial state
         self.on_leave_room_clicked()
     
+    def cleanup_countdown_dialogs(self):
+        """Clean up any existing countdown dialogs"""
+        for dialog in self.countdown_dialogs:
+            try:
+                if hasattr(dialog, 'close'):
+                    dialog.close()
+                if hasattr(dialog, 'deleteLater'):
+                    dialog.deleteLater()
+            except:
+                pass
+        self.countdown_dialogs.clear()
+        print(f"🎬 DEBUG: Cleaned up {len(self.countdown_dialogs)} countdown dialogs")
+    
     def show_debug_countdown_info(self):
         """Debug method to show information about active countdown dialogs"""
         print(f"🎬 DEBUG: Active countdown dialogs: {len(self.countdown_dialogs)}")
@@ -1069,6 +1082,10 @@ class MultiplayerPage(QWidget):
     def on_game_starting(self, countdown_data):
         """Handle game starting countdown event"""
         print(f"🎬 DEBUG: Received game_starting event with data: {countdown_data}")
+        
+        # Clean up any existing countdown dialogs first
+        self.cleanup_countdown_dialogs()
+        
         try:
             from src.gui.CountdownDialog import CountdownDialog
             
@@ -1080,14 +1097,14 @@ class MultiplayerPage(QWidget):
                 parent=self
             )
             
-            # Add to list for debugging (keep multiple dialogs visible)
+            # Add to list for debugging
             self.countdown_dialogs.append(countdown_dialog)
             print(f"🎬 DEBUG: Added dialog to list. Total dialogs: {len(self.countdown_dialogs)}")
             
             # Show debug info about all dialogs
             self.show_debug_countdown_info()
             
-            # Store reference to prevent garbage collection (keep latest)
+            # Store reference to prevent garbage collection
             self.countdown_dialog = countdown_dialog
             
             print(f"🎬 DEBUG: Showing countdown dialog...")
@@ -1095,11 +1112,6 @@ class MultiplayerPage(QWidget):
             countdown_dialog.exec()  # Use exec() to make it modal and blocking
             
             print(f"✅ Countdown completed: {countdown_data.get('message', 'Game starting...')}")
-            
-            # Clean up completed dialogs (keep only last 3 for debugging)
-            if len(self.countdown_dialogs) > 3:
-                old_dialog = self.countdown_dialogs.pop(0)
-                print(f"🎬 DEBUG: Cleaned up old dialog, remaining: {len(self.countdown_dialogs)}")
             
         except ImportError as e:
             print(f"❌ DEBUG: CountdownDialog import failed: {e}")
@@ -1143,12 +1155,33 @@ class MultiplayerPage(QWidget):
         
         print(f"🎮 DEBUG: Players in game: {game_data['players']}")
         
-        # Create and open multiplayer game tab
+        # CRITICAL: Clean up ALL existing game tabs first to prevent multiple instances
+        print(f"🧹 DEBUG: Cleaning up ALL existing game tabs before creating new one...")
+        game_tabs_to_remove = []
+        
+        for i in range(self.tabWidget.count()):
+            widget = self.tabWidget.widget(i)
+            if hasattr(widget, '__class__') and 'MultiplayerGamePage' in str(widget.__class__):
+                game_tabs_to_remove.append(i)
+                print(f"🧹 DEBUG: Found existing game tab at index {i} - marking for removal")
+        
+        # Remove all existing game tabs (in reverse order to maintain indices)
+        for i in reversed(game_tabs_to_remove):
+            widget = self.tabWidget.widget(i)
+            # Disconnect signals from old instances before removing
+            if hasattr(widget, 'disconnect_network_signals'):
+                widget.disconnect_network_signals()
+            print(f"🧹 DEBUG: Removing existing game tab at index {i}")
+            self.tabWidget.removeTab(i)
+        
+        print(f"🧹 DEBUG: Cleaned up {len(game_tabs_to_remove)} existing game tabs")
+        
+        # Create new multiplayer game tab if no existing one or reuse failed
         try:
             print(f"🎮 DEBUG: Importing MultiplayerGamePage...")
             from src.gui.MultiplayerGamePage import MultiplayerGamePage
             
-            print(f"🎮 DEBUG: Creating multiplayer game page...")
+            print(f"🎮 DEBUG: Creating new multiplayer game page...")
             # Create the multiplayer game page
             multiplayer_game = MultiplayerGamePage(
                 self.tabWidget,

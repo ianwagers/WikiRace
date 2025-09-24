@@ -402,6 +402,7 @@ class MultiplayerGamePage(QWidget):
         self.players = {}  # player_name -> PlayerProgressWidget
         self.game_started = False
         self.game_finished = False  # Changed variable name to avoid conflict with signal
+        self.results_dialog_shown = False  # Prevent duplicate dialogs
         self.start_time = None
         self.first_link_clicked = False  # Track if first link has been clicked
         
@@ -595,6 +596,26 @@ class MultiplayerGamePage(QWidget):
         self.network_manager.player_progress.connect(self.on_player_progress)
         self.network_manager.game_ended.connect(self.on_game_ended)
         self.network_manager.player_completed.connect(self.on_player_completed)
+        self.network_manager.player_left.connect(self.on_player_left)
+    
+    def disconnect_network_signals(self):
+        """Disconnect from network manager signals to prevent multiple dialogs"""
+        try:
+            self.network_manager.game_starting.disconnect(self.on_game_starting)
+            self.network_manager.game_started.disconnect(self.on_game_started)
+            self.network_manager.player_progress.disconnect(self.on_player_progress)
+            self.network_manager.game_ended.disconnect(self.on_game_ended)
+            self.network_manager.player_completed.disconnect(self.on_player_completed)
+            self.network_manager.player_left.disconnect(self.on_player_left)
+            print(f"🔌 DEBUG: Disconnected network signals for instance {id(self)}")
+        except Exception as e:
+            print(f"⚠️ DEBUG: Error disconnecting network signals: {e}")
+    
+    def closeEvent(self, event):
+        """Handle widget close event - disconnect signals to prevent memory leaks"""
+        print(f"🔌 DEBUG: MultiplayerGamePage closing, disconnecting signals for instance {id(self)}")
+        self.disconnect_network_signals()
+        super().closeEvent(event)
     
     def initUI(self):
         """Initialize the multiplayer game UI"""
@@ -914,30 +935,27 @@ class MultiplayerGamePage(QWidget):
                 print(f"🏆 LOCAL COMPLETION: Updated {local_player_name} progress bar to completed")
             
             # Notify server of completion
-            self.network_manager.send_game_completion(completion_time, self.solo_game.linksUsed)
+            # Use the actual links used from the solo game
+            actual_links_used = self.solo_game.linksUsed
+            print(f"🏆 COMPLETION: Sending completion with {actual_links_used} links (solo_game.linksUsed)")
+            print(f"🏆 COMPLETION: Solo game linksUsedLabel: {self.solo_game.linksUsedLabel.text()}")
+            print(f"🏆 COMPLETION: Solo game previousLinksList count: {self.solo_game.previousLinksList.count()}")
+            self.network_manager.send_game_completion(completion_time, actual_links_used)
     
     def on_game_starting(self, countdown_data):
         """Handle game starting countdown event from server"""
         print(f"🎬 DEBUG: MultiplayerGamePage received game_starting event: {countdown_data}")
-        
-        # Show countdown dialog if available
-        try:
-            from src.gui.CountdownDialog import CountdownDialog
-            countdown_dialog = CountdownDialog(
-                countdown_data.get('countdown_seconds', 5),
-                countdown_data.get('message', 'Get ready!'),
-                parent=self
-            )
-            countdown_dialog.exec()
-        except Exception as e:
-            print(f"❌ Failed to show countdown dialog: {e}")
-            # Continue without countdown dialog
+        # Note: Countdown dialog is handled by MultiplayerPage, not here
+        # This prevents duplicate countdown dialogs
     
     def on_game_started(self, game_data):
         """Handle game start event from server"""
         print(f"🎮 DEBUG: MultiplayerGamePage received game_started event: {game_data}")
         print(f"🎮 DEBUG: Current game_started state: {self.game_started}")
         print(f"🎮 DEBUG: Current game_finished state: {self.game_finished}")
+        
+        # Reset complete game state for new game
+        self.reset_game_state()
         
         # Start the multiplayer game
         self.start_game()
@@ -981,6 +999,121 @@ class MultiplayerGamePage(QWidget):
             # Stop all progress bars when any player wins
             self.stop_all_progress_bars()
     
+    def reset_all_player_progress(self):
+        """Reset all player progress for new game"""
+        print(f"🔄 DEBUG: Resetting all player progress for new game")
+        print(f"🔄 DEBUG: Current players dict: {list(self.players.keys())}")
+        print(f"🔄 DEBUG: Current players count: {len(self.players)}")
+        
+        for player_name, player_widget in self.players.items():
+            print(f"🔄 DEBUG: Resetting {player_name} widget...")
+            player_widget.update_progress(
+                "Starting...", 
+                0, 
+                False, 
+                None
+            )
+            print(f"🔄 DEBUG: Reset {player_name} to starting state")
+        
+        print(f"🔄 DEBUG: All player progress reset complete")
+    
+    def reset_game_state(self):
+        """Reset all game state for a new game"""
+        print(f"🔄 DEBUG: Resetting complete game state for new game")
+        
+        # Reset all flags
+        self.game_started = False
+        self.game_finished = False
+        self.results_dialog_shown = False
+        self.first_link_clicked = False
+        self.start_time = None
+        
+        # Reset all player progress
+        self.reset_all_player_progress()
+        
+        # Re-enable solo game
+        self.solo_game.setEnabled(True)
+        
+        print(f"🔄 DEBUG: Game state reset complete")
+    
+    def update_game_data(self, new_game_data):
+        """Update the game data for a new game in the same tab"""
+        print(f"🔄 DEBUG: Updating game data for new game")
+        
+        # Update the stored game data
+        self.game_data = new_game_data
+        
+        # Update the solo game with new URLs
+        start_url = new_game_data.get('start_url', '')
+        end_url = new_game_data.get('end_url', '')
+        start_title = new_game_data.get('start_title', '')
+        end_title = new_game_data.get('end_title', '')
+        
+        # Update the solo game page with new URLs
+        if hasattr(self.solo_game, 'start_url'):
+            self.solo_game.start_url = start_url
+        if hasattr(self.solo_game, 'end_url'):
+            self.solo_game.end_url = end_url
+        if hasattr(self.solo_game, 'start_title'):
+            self.solo_game.start_title = start_title
+        if hasattr(self.solo_game, 'end_title'):
+            self.solo_game.end_title = end_title
+        
+        # Reset the game state
+        self.reset_game_state()
+        
+        print(f"🔄 DEBUG: Game data updated successfully")
+    
+    def on_player_left(self, player_name, players_list):
+        """Handle player disconnection during active game"""
+        print(f"🔄 Player {player_name} disconnected during game. Remaining players: {[p['display_name'] for p in players_list]}")
+        
+        # Update the disconnected player's progress to show disconnection status
+        if player_name in self.players:
+            player_widget = self.players[player_name]
+            
+            # Update the player widget to show disconnection
+            player_widget.update_progress(
+                "❌ DISCONNECTED", 
+                player_widget.links_used,  # Keep current progress
+                False,  # Not completed
+                None
+            )
+            
+            # Disable the progress bar and change its appearance
+            player_widget.progress_bar.setEnabled(False)
+            player_widget.progress_bar.setStyleSheet("""
+                QProgressBar {
+                    border: 2px solid #666666;
+                    border-radius: 10px;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 11px;
+                    color: #666666;
+                    background-color: #2a2a2a;
+                    margin: 4px 0px;
+                }
+                QProgressBar::chunk {
+                    background-color: #666666;
+                    border-radius: 8px;
+                    margin: 1px;
+                }
+            """)
+            
+            # Update the player name label to show disconnection
+            if hasattr(player_widget, 'name_label'):
+                player_widget.name_label.setText(f"{player_name} (Disconnected)")
+                player_widget.name_label.setStyleSheet("color: #666666; text-decoration: line-through;")
+            
+            print(f"🔄 Updated {player_name} widget to show disconnection status")
+        
+        # Update our local player list with the server's authoritative list
+        remaining_players = [p['display_name'] for p in players_list]
+        print(f"🔄 Remaining active players: {remaining_players}")
+        
+        # Emit signal for parent components
+        self.player_progress_updated.emit(player_name, "DISCONNECTED", 0)
+    
     def stop_all_progress_bars(self):
         """Stop progress tracking for all players when game ends"""
         for player_widget in self.players.values():
@@ -993,12 +1126,39 @@ class MultiplayerGamePage(QWidget):
     
     def on_game_ended(self, results):
         """Handle game end event from server"""
+        print(f"🏆 DEBUG: Received game_ended event: {results}")
+        print(f"🏆 DEBUG: Current results_dialog_shown state: {self.results_dialog_shown}")
+        print(f"🏆 DEBUG: Current game_finished state: {self.game_finished}")
+        print(f"🏆 DEBUG: Current instance ID: {id(self)}")
+        
+        # Check if this instance is still the current active tab
+        current_tab_index = self.tabWidget.currentIndex()
+        current_widget = self.tabWidget.widget(current_tab_index)
+        is_current_tab = (current_widget == self)
+        
+        print(f"🏆 DEBUG: Is current active tab: {is_current_tab}")
+        print(f"🏆 DEBUG: Current tab index: {current_tab_index}, This widget index: {self.tabWidget.indexOf(self)}")
+        
+        # Only show dialog if this is the current active tab
+        if not is_current_tab:
+            print(f"🏆 DEBUG: Not current active tab, skipping dialog for instance {id(self)}")
+            return
+        
+        # Prevent duplicate dialogs
+        if self.results_dialog_shown:
+            print(f"🏆 DEBUG: Results dialog already shown, skipping duplicate")
+            return
+            
+        self.results_dialog_shown = True
         self.game_finished = True  # Use the boolean variable
+        
+        print(f"🏆 DEBUG: Setting results_dialog_shown to True for instance {id(self)}")
         
         # Disable navigation in solo game
         self.solo_game.setEnabled(False)
         
         # Show results dialog
+        print(f"🏆 DEBUG: About to show results dialog for instance {id(self)}")
         self.show_results_dialog(results)
         
         # Emit completion signal with results
@@ -1009,6 +1169,9 @@ class MultiplayerGamePage(QWidget):
         try:
             from src.gui.MultiplayerResultsDialog import MultiplayerResultsDialog
             
+            # Set flag to prevent duplicates
+            self.results_dialog_shown = True
+            
             # Create and show results dialog
             dialog = MultiplayerResultsDialog(results, parent=self)
             
@@ -1016,7 +1179,12 @@ class MultiplayerGamePage(QWidget):
             dialog.play_again_requested.connect(self.on_play_again_requested)
             dialog.exit_to_home_requested.connect(self.on_exit_to_home_requested)
             
+            # Actually show the dialog
+            print(f"🏆 DEBUG: Showing results dialog with {len(results.get('results', []))} players")
+            print(f"🏆 DEBUG: Dialog instance ID: {id(self)}")
+            print(f"🏆 DEBUG: Results data: {results}")
             dialog.exec()
+            print(f"🏆 DEBUG: Dialog execution completed for instance {id(self)}")
             
         except Exception as e:
             print(f"❌ Failed to show results dialog: {e}")
@@ -1032,8 +1200,36 @@ class MultiplayerGamePage(QWidget):
     def on_play_again_requested(self):
         """Handle play again request - return to multiplayer room"""
         print("🔄 Player requested to play again - returning to room")
+        
+        # Clean up any old game tabs to prevent multiple dialogs
+        self.cleanup_old_game_tabs()
+        
         # Close the current game tab and return to multiplayer page
         self.close_game_tab()
+    
+    def cleanup_old_game_tabs(self):
+        """Clean up old game tabs to prevent multiple dialogs"""
+        print("🧹 DEBUG: Cleaning up old game tabs...")
+        
+        # Find and remove old game tabs (keep only the current one)
+        game_tabs_to_remove = []
+        current_tab_index = self.tabWidget.indexOf(self)
+        
+        for i in range(self.tabWidget.count()):
+            widget = self.tabWidget.widget(i)
+            if hasattr(widget, '__class__') and 'MultiplayerGamePage' in str(widget.__class__):
+                if i != current_tab_index:  # Keep only the current tab
+                    # Disconnect signals from old instances before removing
+                    if hasattr(widget, 'disconnect_network_signals'):
+                        widget.disconnect_network_signals()
+                    game_tabs_to_remove.append(i)
+        
+        # Remove extra game tabs (in reverse order to maintain indices)
+        for i in reversed(game_tabs_to_remove):
+            print(f"🧹 DEBUG: Removing old game tab at index {i}")
+            self.tabWidget.removeTab(i)
+        
+        print(f"🧹 DEBUG: Cleaned up {len(game_tabs_to_remove)} old game tabs")
     
     def on_exit_to_home_requested(self):
         """Handle exit to home request - leave room and go to home page"""

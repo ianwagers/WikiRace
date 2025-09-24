@@ -49,7 +49,6 @@ async def check_inactive_players(sio, room_manager: RoomManager):
             await asyncio.sleep(30)  # Check every 30 seconds (less frequent)
             
             current_time = datetime.utcnow()
-            inactive_threshold = timedelta(minutes=4)  # 4 minutes of inactivity (realistic for players)
             
             # Check all rooms for inactive players
             for room_code, room in list(room_manager.rooms.items()):
@@ -57,8 +56,19 @@ async def check_inactive_players(sio, room_manager: RoomManager):
                 
                 for socket_id, player in list(room.players.items()):
                     time_since_activity = current_time - player.last_activity
+                    
+                    # Different inactivity thresholds based on game state
+                    if room.game_state == GameState.IN_PROGRESS:
+                        # During active games, be more lenient - only disconnect after 5+ minutes
+                        inactive_threshold = timedelta(minutes=5)
+                        logger.debug(f"Player {player.display_name} in active game - threshold: 5 minutes")
+                    else:
+                        # In lobby or other states, use shorter threshold
+                        inactive_threshold = timedelta(minutes=4)
+                        logger.debug(f"Player {player.display_name} in {room.game_state.value} - threshold: 4 minutes")
+                    
                     if time_since_activity > inactive_threshold:
-                        logger.debug(f"Player {player.display_name} inactive for {time_since_activity.total_seconds():.1f} seconds")
+                        logger.warning(f"Player {player.display_name} inactive for {time_since_activity.total_seconds():.1f} seconds (threshold: {inactive_threshold.total_seconds():.1f}s)")
                         inactive_players.append((socket_id, player))
                     else:
                         logger.debug(f"Player {player.display_name} active (last activity: {time_since_activity.total_seconds():.1f}s ago)")
@@ -82,6 +92,9 @@ async def check_inactive_players(sio, room_manager: RoomManager):
                                 'is_host': p.is_host
                             } for p in updated_room.players.values()]
                         }, room=room_code, skip_sid=socket_id)
+                        
+                        # Broadcast updated room progress to all remaining players
+                        await broadcast_room_progress(sio, updated_room, skip_sid=socket_id)
                         
                         # If host was inactive, notify about new host
                         if player.is_host and updated_room.host_id:
@@ -150,6 +163,9 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                             'is_host': p.is_host
                         } for p in updated_room.players.values()]
                     }, room=room_code, skip_sid=sid)
+                    
+                    # Broadcast updated room progress to all remaining players
+                    await broadcast_room_progress(sio, updated_room, skip_sid=sid)
                     
                     # If host left and room still exists, notify about new host
                     if was_host and updated_room.host_id:
@@ -299,6 +315,9 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         'is_host': p.is_host
                     } for p in updated_room.players.values()]
                 }, room=room_code, skip_sid=sid)
+                
+                # Broadcast updated room progress to all remaining players
+                await broadcast_room_progress(sio, updated_room, skip_sid=sid)
                 
                 # If host left and room still exists, notify about new host
                 if was_host and updated_room.host_id:
@@ -534,11 +553,39 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     game_start_time = datetime.utcnow()
                     room.game_started_at = game_start_time
                     
-                    # Initialize all players' game start times
-                    # NOTE: Do NOT add starting page to navigation history here
-                    # The client will send the starting page as the first progress update
+                    # RESET ALL PLAYER DATA FOR NEW GAME
+                    logger.info(f"🔄 SERVER DEBUG: Starting player data reset for {len(room.players)} players")
                     for player in room.players.values():
+                        logger.info(f"🔄 SERVER DEBUG: Before reset - {player.display_name}: links_clicked={player.links_clicked}, history_count={len(player.navigation_history)}")
+                        
+                        # Reset game state
+                        player.game_completed = False
+                        player.completion_time = None
                         player.game_start_time = game_start_time
+                        
+                        # Clear navigation history
+                        player.navigation_history.clear()
+                        player.links_clicked = 0
+                        player.current_page = None
+                        player.current_page_title = None
+                        
+                        # Reset activity tracking
+                        player.last_activity = datetime.utcnow()
+                        
+                        logger.info(f"🔄 SERVER DEBUG: After reset - {player.display_name}: links_clicked={player.links_clicked}, history_count={len(player.navigation_history)}")
+                        logger.info(f"DEBUG: Reset player {player.display_name} data for new game")
+                    
+                    # CRITICAL: Wait a moment to ensure all previous progress updates are processed
+                    await asyncio.sleep(0.1)
+                    
+                    # Broadcast initial progress reset to all players to ensure synchronization
+                    logger.info(f"📊 SERVER DEBUG: Broadcasting initial progress reset to {len(room.players)} players")
+                    await broadcast_room_progress(sio, room, skip_sid=None)
+                    
+                    # Additional broadcast to ensure all clients receive the reset
+                    await asyncio.sleep(0.05)
+                    logger.info(f"📊 SERVER DEBUG: Broadcasting second progress reset to {len(room.players)} players")
+                    await broadcast_room_progress(sio, room, skip_sid=None)
                     
                     logger.info(f"DEBUG: Sending game_started event to room {room.room_code}")
                     # Notify all players that game has started

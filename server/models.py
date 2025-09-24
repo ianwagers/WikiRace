@@ -97,6 +97,7 @@ class Player(BaseModel):
         else:
             # This is a link click, count all entries after the starting page
             self.links_clicked = len(self.navigation_history) - 1
+        
         self.last_activity = datetime.utcnow()
         
         return entry
