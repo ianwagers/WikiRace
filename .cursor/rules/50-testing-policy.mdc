@@ -1,0 +1,117 @@
+---
+alwaysApply: false
+---
+
+# Testing Policy
+
+## Core Principle
+**DO NOT generate broad, artificial test suites. Only write focused, runnable tests that hit real app code and critical paths.**
+
+## Forbidden Test Output
+- **NO** placeholder tests or snapshot dumps
+- **NO** broad, artificial test suites
+- **NO** tests that don't run on first attempt
+- **NO** brittle tests that break frequently
+- **NO** tests that don't test real functionality
+
+## Required Test Standards
+- Tests must run under the existing environment
+- Tests must pass on first run
+- Tests must hit real app code and critical paths
+- Tests must be focused and deterministic
+
+## Acceptable Test Types
+- **Smoke Tests**: One focused test for FastAPI routes
+- **Event Flow Tests**: One test for Socket.IO event flow
+- **Critical Path Tests**: Tests that verify core functionality
+- **Integration Tests**: Tests that verify end-to-end workflows
+
+## Test Structure
+- Use existing test infrastructure if available
+- If no reliable harness exists, add a tiny, deterministic smoke test
+- Focus on CLI scripts or simple verification tools
+- Avoid complex test frameworks unless necessary
+
+## Testing Strategy
+- **Manual Testing**: Use multiple clients for multiplayer testing
+- **Server Testing**: Stress test with max players (10)
+- **Code Fixes**: Focus on fixing issues directly in codebase
+- **Debugging**: Use existing functionality to debug problems
+
+## Test Checklist
+- [ ] Test runs on first attempt
+- [ ] Test hits real app code
+- [ ] Test verifies critical functionality
+- [ ] Test is focused and deterministic
+- [ ] Test doesn't require complex setup
+- [ ] Test provides useful feedback
+
+## When to Add Tests
+- Only when explicitly requested
+- Only for critical functionality
+- Only when tests are runnable and useful
+- Only when tests provide real value
+
+## Test Location
+- Place tests in `tests/` directory if it exists
+- Use descriptive test names
+- Keep tests simple and focused
+- Avoid over-engineering test infrastructure
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.# Testing Policy
+
+## Core Principle
+**DO NOT generate broad, artificial test suites. Only write focused, runnable tests that hit real app code and critical paths.**
+
+## Forbidden Test Output
+- **NO** placeholder tests or snapshot dumps
+- **NO** broad, artificial test suites
+- **NO** tests that don't run on first attempt
+- **NO** brittle tests that break frequently
+- **NO** tests that don't test real functionality
+
+## Required Test Standards
+- Tests must run under the existing environment
+- Tests must pass on first run
+- Tests must hit real app code and critical paths
+- Tests must be focused and deterministic
+
+## Acceptable Test Types
+- **Smoke Tests**: One focused test for FastAPI routes
+- **Event Flow Tests**: One test for Socket.IO event flow
+- **Critical Path Tests**: Tests that verify core functionality
+- **Integration Tests**: Tests that verify end-to-end workflows
+
+## Test Structure
+- Use existing test infrastructure if available
+- If no reliable harness exists, add a tiny, deterministic smoke test
+- Focus on CLI scripts or simple verification tools
+- Avoid complex test frameworks unless necessary
+
+## Testing Strategy
+- **Manual Testing**: Use multiple clients for multiplayer testing
+- **Server Testing**: Stress test with max players (10)
+- **Code Fixes**: Focus on fixing issues directly in codebase
+- **Debugging**: Use existing functionality to debug problems
+
+## Test Checklist
+- [ ] Test runs on first attempt
+- [ ] Test hits real app code
+- [ ] Test verifies critical functionality
+- [ ] Test is focused and deterministic
+- [ ] Test doesn't require complex setup
+- [ ] Test provides useful feedback
+
+## When to Add Tests
+- Only when explicitly requested
+- Only for critical functionality
+- Only when tests are runnable and useful
+- Only when tests provide real value
+
+## Test Location
+- Place tests in `tests/` directory if it exists
+- Use descriptive test names
+- Keep tests simple and focused
+- Avoid over-engineering test infrastructure
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

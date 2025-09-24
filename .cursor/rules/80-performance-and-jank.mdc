@@ -1,0 +1,165 @@
+---
+alwaysApply: false
+---
+
+# Performance and Jank Prevention
+
+## Non-Blocking UI Requirements
+- **NEVER** block the Qt main thread
+- Defer heavy work to background threads
+- Use QThread/QThreadPool for CPU-intensive tasks
+- Use signals/slots for cross-thread communication
+- Avoid `sleep()` calls in UI code
+
+## WebView Performance
+- Batch DOM/CSS injection to QWebEngine
+- Avoid repeated reflows
+- Minimize CSS/JS modifications
+- Use efficient URL interception
+- Cache frequently accessed content
+
+## Animation Performance
+- Ensure countdown animations are smooth
+- Use efficient rendering for confetti effects
+- Minimize widget creation/destruction
+- Use appropriate timer intervals
+- Avoid excessive repaints
+
+## Memory Management
+- Avoid memory leaks in long-running applications
+- Properly dispose of resources
+- Use appropriate data structures
+- Minimize object creation
+- Implement proper cleanup
+
+## Network Performance
+- Use efficient Socket.IO event handling
+- Minimize API calls
+- Cache frequently accessed data
+- Use appropriate timeouts
+- Implement connection pooling
+
+## Performance Checklist
+- [ ] Verify page load times are acceptable
+- [ ] Check for stutter after CSS injection
+- [ ] Ensure countdown animation is smooth
+- [ ] Test navigation performance
+- [ ] Verify memory usage is reasonable
+- [ ] Check for UI blocking operations
+
+## Common Performance Issues
+- **Blocking Operations**: Avoid blocking calls in UI slots
+- **Excessive Repaints**: Minimize widget updates
+- **Memory Leaks**: Properly dispose of resources
+- **Network Bottlenecks**: Optimize API calls
+- **Threading Issues**: Use proper thread safety
+
+## Optimization Strategies
+- Use lazy loading for heavy components
+- Implement efficient caching
+- Minimize DOM manipulation
+- Use appropriate data structures
+- Optimize rendering performance
+
+## Performance Monitoring
+- Monitor page load times
+- Check for UI stutter
+- Verify animation smoothness
+- Monitor memory usage
+- Track network performance
+
+## WebView Specific Optimizations
+- Use efficient URL interception
+- Minimize CSS/JS injection
+- Cache rendered content
+- Optimize page transitions
+- Use appropriate loading strategies
+
+## Threading Best Practices
+- Use QThread for CPU-intensive tasks
+- Use QThreadPool for concurrent operations
+- Use signals/slots for thread communication
+- Avoid cross-thread widget access
+- Implement proper thread cleanup
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.# Performance and Jank Prevention
+
+## Non-Blocking UI Requirements
+- **NEVER** block the Qt main thread
+- Defer heavy work to background threads
+- Use QThread/QThreadPool for CPU-intensive tasks
+- Use signals/slots for cross-thread communication
+- Avoid `sleep()` calls in UI code
+
+## WebView Performance
+- Batch DOM/CSS injection to QWebEngine
+- Avoid repeated reflows
+- Minimize CSS/JS modifications
+- Use efficient URL interception
+- Cache frequently accessed content
+
+## Animation Performance
+- Ensure countdown animations are smooth
+- Use efficient rendering for confetti effects
+- Minimize widget creation/destruction
+- Use appropriate timer intervals
+- Avoid excessive repaints
+
+## Memory Management
+- Avoid memory leaks in long-running applications
+- Properly dispose of resources
+- Use appropriate data structures
+- Minimize object creation
+- Implement proper cleanup
+
+## Network Performance
+- Use efficient Socket.IO event handling
+- Minimize API calls
+- Cache frequently accessed data
+- Use appropriate timeouts
+- Implement connection pooling
+
+## Performance Checklist
+- [ ] Verify page load times are acceptable
+- [ ] Check for stutter after CSS injection
+- [ ] Ensure countdown animation is smooth
+- [ ] Test navigation performance
+- [ ] Verify memory usage is reasonable
+- [ ] Check for UI blocking operations
+
+## Common Performance Issues
+- **Blocking Operations**: Avoid blocking calls in UI slots
+- **Excessive Repaints**: Minimize widget updates
+- **Memory Leaks**: Properly dispose of resources
+- **Network Bottlenecks**: Optimize API calls
+- **Threading Issues**: Use proper thread safety
+
+## Optimization Strategies
+- Use lazy loading for heavy components
+- Implement efficient caching
+- Minimize DOM manipulation
+- Use appropriate data structures
+- Optimize rendering performance
+
+## Performance Monitoring
+- Monitor page load times
+- Check for UI stutter
+- Verify animation smoothness
+- Monitor memory usage
+- Track network performance
+
+## WebView Specific Optimizations
+- Use efficient URL interception
+- Minimize CSS/JS injection
+- Cache rendered content
+- Optimize page transitions
+- Use appropriate loading strategies
+
+## Threading Best Practices
+- Use QThread for CPU-intensive tasks
+- Use QThreadPool for concurrent operations
+- Use signals/slots for thread communication
+- Avoid cross-thread widget access
+- Implement proper thread cleanup
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

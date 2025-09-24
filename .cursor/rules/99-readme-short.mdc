@@ -1,0 +1,149 @@
+---
+alwaysApply: true
+---
+
+# README Documentation Guidelines
+
+## Documentation Philosophy
+**Keep documentation short, current, and actionable. Avoid long narrative documentation.**
+
+## Required Content
+- **Getting Started**: Quick setup and run instructions
+- **Entry Points**: Clear paths to main executables
+- **Dependencies**: Essential requirements only
+- **Quick Commands**: Copy-paste ready commands
+
+## Forbidden Documentation
+- **NO** long narrative documentation
+- **NO** extensive setup guides
+- **NO** detailed architecture explanations
+- **NO** comprehensive feature lists
+- **NO** verbose troubleshooting guides
+
+## Documentation Standards
+- Use bullet points and short sentences
+- Include copy-paste ready commands
+- Point to built-in FastAPI docs at `/docs`
+- Reference in-app settings/help
+- Keep content current and accurate
+
+## Quick Start Template
+```markdown
+# WikiRace
+
+Wikipedia navigation game with solo and multiplayer modes.
+
+## Quick Start
+```bash
+# Client only
+python bin/main.py
+
+# Server only  
+cd server && python start_server.py
+
+# Both
+python bin/start_all.py
+```
+
+## Requirements
+- Python 3.13+
+- PyQt6, FastAPI, Socket.IO
+
+## Documentation
+- API docs: http://localhost:8000/docs
+- In-app help: Settings → Help
+```
+
+## Documentation Maintenance
+- Update when entry points change
+- Keep commands current
+- Remove outdated information
+- Focus on essential information only
+
+## Reference Points
+- **FastAPI Docs**: Built-in at `/docs` endpoint
+- **In-App Help**: Settings → Help menu
+- **Server Docs**: `server/README.md` for server-specific info
+- **Deployment**: `server/DEPLOYMENT.md` for production setup
+
+## Documentation Checklist
+- [ ] Getting started is clear and concise
+- [ ] Commands are copy-paste ready
+- [ ] Entry points are correct
+- [ ] Dependencies are minimal
+- [ ] No unnecessary details
+- [ ] Points to built-in docs
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.# README Documentation Guidelines
+
+## Documentation Philosophy
+**Keep documentation short, current, and actionable. Avoid long narrative documentation.**
+
+## Required Content
+- **Getting Started**: Quick setup and run instructions
+- **Entry Points**: Clear paths to main executables
+- **Dependencies**: Essential requirements only
+- **Quick Commands**: Copy-paste ready commands
+
+## Forbidden Documentation
+- **NO** long narrative documentation
+- **NO** extensive setup guides
+- **NO** detailed architecture explanations
+- **NO** comprehensive feature lists
+- **NO** verbose troubleshooting guides
+
+## Documentation Standards
+- Use bullet points and short sentences
+- Include copy-paste ready commands
+- Point to built-in FastAPI docs at `/docs`
+- Reference in-app settings/help
+- Keep content current and accurate
+
+## Quick Start Template
+```markdown
+# WikiRace
+
+Wikipedia navigation game with solo and multiplayer modes.
+
+## Quick Start
+```bash
+# Client only
+python bin/main.py
+
+# Server only  
+cd server && python start_server.py
+
+# Both
+python bin/start_all.py
+```
+
+## Requirements
+- Python 3.13+
+- PyQt6, FastAPI, Socket.IO
+
+## Documentation
+- API docs: http://localhost:8000/docs
+- In-app help: Settings → Help
+```
+
+## Documentation Maintenance
+- Update when entry points change
+- Keep commands current
+- Remove outdated information
+- Focus on essential information only
+
+## Reference Points
+- **FastAPI Docs**: Built-in at `/docs` endpoint
+- **In-App Help**: Settings → Help menu
+- **Server Docs**: `server/README.md` for server-specific info
+- **Deployment**: `server/DEPLOYMENT.md` for production setup
+
+## Documentation Checklist
+- [ ] Getting started is clear and concise
+- [ ] Commands are copy-paste ready
+- [ ] Entry points are correct
+- [ ] Dependencies are minimal
+- [ ] No unnecessary details
+- [ ] Points to built-in docs
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

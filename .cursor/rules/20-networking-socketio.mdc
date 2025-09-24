@@ -1,0 +1,115 @@
+---
+alwaysApply: true
+---
+
+# Socket.IO Networking Guidelines
+
+## Core Events Used by WikiRace
+- `connect` / `disconnect` - Connection lifecycle
+- `join_room` / `leave_room` - Room management
+- `countdown_start` / `countdown_tick` - Game start countdown
+- `game_start` / `game_end` - Game lifecycle
+- `player_progress` / `navigation_update` - Real-time progress tracking
+- `room_config_update` - Host configuration broadcast
+- `player_finished` - Results handling
+
+## Connection Requirements
+- **TLS in Production**: Always use `https://` for production connections
+- **WebSocket Transport**: Prefer WebSocket when available, fallback to polling
+- **Reconnection Strategy**: Implement exponential backoff for reconnects
+- **Heartbeat/Ping**: Configure appropriate ping intervals
+
+## Event Handling Patterns
+- Use namespaced events for organization
+- Require explicit acknowledgements for critical operations (e.g., `start_game`)
+- Handle reconnects deterministically with proper state recovery
+- Log unexpected events for debugging
+
+## Network Architecture
+- **Client**: `src/logic/Network.py` - Socket.IO client, REST API calls, reconnection logic
+- **Server**: `server/socket_handlers.py` - Real-time event handling with countdown & config broadcast
+- **Models**: `server/models.py` - GameRoom, Player, GameState, NavigationEntry
+
+## Error Handling
+- Implement automatic reconnection with exponential backoff
+- Handle network drops gracefully
+- Provide user-friendly error messages via QMessageBox
+- Log network events for debugging
+
+## Checklist for Network Changes
+- [ ] Version pinning for python-socketio compatibility
+- [ ] Server/client compatibility verified
+- [ ] Heartbeat/ping tuning appropriate
+- [ ] Unexpected events logged
+- [ ] Reconnection logic tested
+- [ ] TLS enforced in production
+
+## Real-time Features
+- **Room Management**: Real-time player list updates
+- **Game Synchronization**: 5-second countdown with simultaneous start
+- **Progress Tracking**: Navigation history with timestamps
+- **Configuration Broadcast**: Host settings synchronized to all clients
+- **Results System**: First-to-finish triggers end for all players
+
+## Network Patterns
+- Socket.IO events for real-time communication
+- REST API for stateful operations (room creation/joining)
+- Pydantic models for data validation
+- Qt signals to bridge network events to UI updates
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.# Socket.IO Networking Guidelines
+
+## Core Events Used by WikiRace
+- `connect` / `disconnect` - Connection lifecycle
+- `join_room` / `leave_room` - Room management
+- `countdown_start` / `countdown_tick` - Game start countdown
+- `game_start` / `game_end` - Game lifecycle
+- `player_progress` / `navigation_update` - Real-time progress tracking
+- `room_config_update` - Host configuration broadcast
+- `player_finished` - Results handling
+
+## Connection Requirements
+- **TLS in Production**: Always use `https://` for production connections
+- **WebSocket Transport**: Prefer WebSocket when available, fallback to polling
+- **Reconnection Strategy**: Implement exponential backoff for reconnects
+- **Heartbeat/Ping**: Configure appropriate ping intervals
+
+## Event Handling Patterns
+- Use namespaced events for organization
+- Require explicit acknowledgements for critical operations (e.g., `start_game`)
+- Handle reconnects deterministically with proper state recovery
+- Log unexpected events for debugging
+
+## Network Architecture
+- **Client**: `src/logic/Network.py` - Socket.IO client, REST API calls, reconnection logic
+- **Server**: `server/socket_handlers.py` - Real-time event handling with countdown & config broadcast
+- **Models**: `server/models.py` - GameRoom, Player, GameState, NavigationEntry
+
+## Error Handling
+- Implement automatic reconnection with exponential backoff
+- Handle network drops gracefully
+- Provide user-friendly error messages via QMessageBox
+- Log network events for debugging
+
+## Checklist for Network Changes
+- [ ] Version pinning for python-socketio compatibility
+- [ ] Server/client compatibility verified
+- [ ] Heartbeat/ping tuning appropriate
+- [ ] Unexpected events logged
+- [ ] Reconnection logic tested
+- [ ] TLS enforced in production
+
+## Real-time Features
+- **Room Management**: Real-time player list updates
+- **Game Synchronization**: 5-second countdown with simultaneous start
+- **Progress Tracking**: Navigation history with timestamps
+- **Configuration Broadcast**: Host settings synchronized to all clients
+- **Results System**: First-to-finish triggers end for all players
+
+## Network Patterns
+- Socket.IO events for real-time communication
+- REST API for stateful operations (room creation/joining)
+- Pydantic models for data validation
+- Qt signals to bridge network events to UI updates
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

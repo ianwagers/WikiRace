@@ -1,0 +1,135 @@
+---
+alwaysApply: false
+---
+
+# Uvicorn Deployment Guidelines
+
+## Production Process Model
+- **Recommended**: uvicorn behind a process manager (systemd, supervisor)
+- **Alternative**: Gunicorn with uvicorn workers using `uvicorn-worker` package
+- **Note**: Avoid deprecated `gunicorn.workers.UvicornWorker`
+
+## Environment Variables
+- `HOST` - Server host (default: 0.0.0.0)
+- `PORT` - Server port (default: 8000)
+- `WORKERS` - Number of worker processes (CPU cores * 2)
+- `LOG_LEVEL` - Logging level (info, warning, error)
+- `REDIS_URL` - Redis connection string (optional)
+
+## Graceful Shutdown
+- Implement proper signal handling
+- Allow in-flight requests to complete
+- Close database connections gracefully
+- Log shutdown events
+
+## Health Checks
+- Implement `/health` endpoint
+- Return 200 OK for healthy status
+- Include basic system information
+- Monitor response times
+
+## Log Format Expectations
+- Use structured logging (JSON format)
+- Include timestamps, log levels, and context
+- Log request/response information
+- Include error stack traces
+
+## Container Deployment
+- Use Docker with multi-stage builds
+- Set appropriate resource limits
+- Configure health checks
+- Use non-root user for security
+
+## Nginx Configuration
+- Reverse proxy configuration in `server/nginx.conf`
+- SSL termination at Nginx level
+- WebSocket support for Socket.IO
+- Proper timeout settings
+
+## Deployment Checklist
+- [ ] Set workers appropriately for CPU cores
+- [ ] Test sticky sessions if needed for Socket.IO
+- [ ] Confirm CORS settings
+- [ ] Verify timeout configurations
+- [ ] Test health check endpoints
+- [ ] Validate SSL/TLS setup
+- [ ] Monitor resource usage
+
+## Quick Deployment
+```bash
+cd server/
+chmod +x deploy.sh
+./deploy.sh deploy
+```
+
+## Development vs Production
+- **Development**: Single worker, debug mode
+- **Production**: Multiple workers, optimized settings
+- **Docker**: Containerized deployment with docker-compose.yml
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.# Uvicorn Deployment Guidelines
+
+## Production Process Model
+- **Recommended**: uvicorn behind a process manager (systemd, supervisor)
+- **Alternative**: Gunicorn with uvicorn workers using `uvicorn-worker` package
+- **Note**: Avoid deprecated `gunicorn.workers.UvicornWorker`
+
+## Environment Variables
+- `HOST` - Server host (default: 0.0.0.0)
+- `PORT` - Server port (default: 8000)
+- `WORKERS` - Number of worker processes (CPU cores * 2)
+- `LOG_LEVEL` - Logging level (info, warning, error)
+- `REDIS_URL` - Redis connection string (optional)
+
+## Graceful Shutdown
+- Implement proper signal handling
+- Allow in-flight requests to complete
+- Close database connections gracefully
+- Log shutdown events
+
+## Health Checks
+- Implement `/health` endpoint
+- Return 200 OK for healthy status
+- Include basic system information
+- Monitor response times
+
+## Log Format Expectations
+- Use structured logging (JSON format)
+- Include timestamps, log levels, and context
+- Log request/response information
+- Include error stack traces
+
+## Container Deployment
+- Use Docker with multi-stage builds
+- Set appropriate resource limits
+- Configure health checks
+- Use non-root user for security
+
+## Nginx Configuration
+- Reverse proxy configuration in `server/nginx.conf`
+- SSL termination at Nginx level
+- WebSocket support for Socket.IO
+- Proper timeout settings
+
+## Deployment Checklist
+- [ ] Set workers appropriately for CPU cores
+- [ ] Test sticky sessions if needed for Socket.IO
+- [ ] Confirm CORS settings
+- [ ] Verify timeout configurations
+- [ ] Test health check endpoints
+- [ ] Validate SSL/TLS setup
+- [ ] Monitor resource usage
+
+## Quick Deployment
+```bash
+cd server/
+chmod +x deploy.sh
+./deploy.sh deploy
+```
+
+## Development vs Production
+- **Development**: Single worker, debug mode
+- **Production**: Multiple workers, optimized settings
+- **Docker**: Containerized deployment with docker-compose.yml
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

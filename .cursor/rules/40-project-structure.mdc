@@ -1,0 +1,91 @@
+# Project Structure Guidelines
+
+## Directory Layout
+```
+WikiRace/
+├── bin/                        # Application entry points
+│   ├── main.py                 # Main game executable
+│   └── start_all.py            # Combined client/server startup
+├── src/                        # Main application code
+│   ├── app.py                  # Application initialization
+│   ├── gui/                    # PyQt6 UI components
+│   │   ├── HomePage.py         # Landing page and game setup
+│   │   ├── SoloGamePage.py     # Solo Wikipedia racing game
+│   │   ├── MultiplayerPage.py  # Multiplayer room management
+│   │   ├── MultiplayerGamePage.py # Multiplayer game wrapper
+│   │   ├── CountdownDialog.py  # Game start countdown
+│   │   ├── ServerConfigDialog.py # Server configuration UI
+│   │   ├── MultiplayerResultsDialog.py # Results with path visualization
+│   │   ├── PlayerNameDialog.py # Player name input
+│   │   ├── SettingsPage.py     # Application settings
+│   │   └── components/         # Reusable UI components
+│   │       ├── ConfettiEffect.py # Victory animation
+│   │       ├── CustomTimer.py    # Game timer widget
+│   │       ├── LinkHistory.py    # Navigation history
+│   │       ├── UrlInterceptor.py  # WebView URL handling
+│   │       └── WikipediaTheme.py # Wikipedia styling
+│   ├── logic/                  # Business logic
+│   │   ├── GameLogic.py        # Core game mechanics
+│   │   ├── Network.py          # Multiplayer networking with reconnection
+│   │   ├── MultiplayerConfig.py # Configuration management
+│   │   ├── ThemeManager.py     # UI theming system
+│   │   └── SettingsLogic.py    # Settings management
+│   └── resources/              # Assets (icons, images)
+│       └── icons/              # Application icons
+├── server/                     # Multiplayer server
+│   ├── main.py                 # FastAPI application
+│   ├── start_server.py         # Server startup script
+│   ├── models.py               # Data models (Pydantic) with NavigationEntry
+│   ├── room_manager.py         # Game room lifecycle
+│   ├── socket_handlers.py      # Socket.IO events with countdown & config broadcast
+│   ├── api_routes.py           # REST API endpoints
+│   ├── game_logic.py           # Server-side Wikipedia page selection
+│   ├── config.py               # Server configuration
+│   ├── redis_manager.py        # Redis integration (optional)
+│   ├── test_server.py          # Server testing utilities
+│   ├── deploy.sh               # Automated deployment script
+│   ├── nginx.conf              # Production reverse proxy
+│   ├── requirements.txt        # Server dependencies
+│   ├── DEPLOYMENT.md           # Deployment guide
+│   ├── SETUP.md                # Server setup instructions
+│   └── README.md               # Server documentation
+├── logs/                       # Log files
+│   └── wikirace_server.log     # Server log file
+├── images/                     # Screenshots and assets
+├── Python313/                  # Portable Python distribution (Windows)
+├── venv/                       # Virtual environment (local development)
+├── pyproject.toml              # Project configuration
+└── README.md                   # Project overview
+```
+
+## File Placement Rules
+- **New GUI pages**: Place in `src/gui/` with matching names
+- **New logic modules**: Place in `src/logic/` with descriptive names
+- **New server modules**: Place in `server/` with appropriate names
+- **New components**: Place in `src/gui/components/` for reusable UI elements
+- **New assets**: Place in `src/resources/` with proper organization
+
+## Import Path Requirements
+- Update import paths when moving files
+- Verify startup scripts still work after changes
+- Maintain proper module structure
+- Use relative imports where appropriate
+
+## Entry Point Verification
+- **Client**: `bin/main.py` must work after changes
+- **Server**: `server/start_server.py` must work after changes
+- **Combined**: `bin/start_all.py` must work after changes
+
+## Refactoring Guidelines
+- Update import paths when moving files
+- Verify all entry points still work
+- Maintain backward compatibility
+- Test both solo and multiplayer modes
+
+## Naming Conventions
+- Use descriptive names for new files
+- Follow existing naming patterns
+- Use PascalCase for classes
+- Use snake_case for modules
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

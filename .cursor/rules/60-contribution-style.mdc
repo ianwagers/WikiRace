@@ -1,0 +1,61 @@
+# Contribution Style Guidelines
+
+## Code Style Requirements
+- **Small, Atomic Diffs**: Make focused changes that are easy to review
+- **Type Hints**: Update type hints inline with changes
+- **Docstrings**: Add docstrings for public methods
+- **Comments**: Keep comments actionable and short
+- **Imports**: Update import paths when moving files
+
+## Self-Check Before Proposing Changes
+- [ ] All imports resolve correctly
+- [ ] Lints pass without errors
+- [ ] App launches successfully
+- [ ] Relevant UI flow or API route was exercised
+- [ ] Changes are minimal and focused
+- [ ] No unnecessary files created
+
+## Code Quality Standards
+- Use descriptive variable and function names
+- Follow existing code patterns and conventions
+- Maintain backward compatibility where possible
+- Keep functions focused and single-purpose
+- Avoid code duplication
+
+## Change Management
+- Make atomic changes that can be reviewed independently
+- Update related files when making structural changes
+- Verify all entry points still work after changes
+- Test both solo and multiplayer modes when relevant
+
+## Documentation Standards
+- Add docstrings for new public methods
+- Update existing docstrings when changing behavior
+- Keep documentation concise and actionable
+- Avoid over-documenting obvious code
+
+## Error Handling
+- Add proper error handling for new functionality
+- Use appropriate exception types
+- Provide meaningful error messages
+- Log errors appropriately for debugging
+
+## Performance Considerations
+- Avoid blocking operations in UI code
+- Use appropriate data structures
+- Minimize memory allocations
+- Consider performance impact of changes
+
+## Testing Requirements
+- Verify changes work in real application
+- Test both solo and multiplayer modes when relevant
+- Ensure no regressions in existing functionality
+- Use existing functionality to debug issues
+
+## File Organization
+- Place new files in appropriate directories
+- Use descriptive file names
+- Follow existing naming conventions
+- Update import paths when moving files
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

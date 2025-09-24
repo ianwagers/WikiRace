@@ -1,0 +1,111 @@
+---
+alwaysApply: true
+---
+
+# PyQt6 UI Guidelines
+
+## Thread Safety Requirements
+- **NEVER** touch widgets off the main thread
+- QWebEngineView and widgets are NOT thread-safe
+- Use QThread/QThreadPool for background work
+- Use signals/slots for cross-thread communication
+- Never block the Qt event loop
+
+## WebView Usage for Wikipedia Pages
+- Handle URL interception carefully in `UrlInterceptor.py`
+- Apply minimal CSS/JS modifications
+- Centralize dark-theme handling in `WikipediaTheme.py`
+- Avoid repeated DOM/CSS injection to prevent reflows
+- Batch WebView updates when possible
+
+## UI Patterns
+- Use Qt signals/slots for event handling
+- Apply consistent theming via `ThemeManager.py`
+- Implement proper widget lifecycle (show/hide/cleanup)
+- Use QTimer for periodic updates
+- Keep page transition jank to a minimum
+
+## Mini Review Checklist
+- [ ] No blocking calls in slots
+- [ ] No `sleep()` calls in UI code
+- [ ] Navigation works smoothly
+- [ ] Font sizing is consistent
+- [ ] Page transitions are smooth
+- [ ] WebView content loads without stutter
+
+## Performance Guidelines
+- Defer heavy work to background threads
+- Batch DOM/CSS injection to QWebEngine
+- Avoid repeated reflows
+- Use QThreadPool for concurrent operations
+- Minimize widget creation/destruction
+
+## Common UI Components
+- **HomePage**: Game mode selection, settings, about info
+- **SoloGamePage**: Complete solo game with WebView
+- **MultiplayerPage**: Room creation/joining, lobby management
+- **MultiplayerGamePage**: Multiplayer game wrapper with progress sidebar
+- **CountdownDialog**: Visual countdown timer
+- **ServerConfigDialog**: Server settings UI
+- **MultiplayerResultsDialog**: Results with path visualization
+
+## Error Handling
+- Use QMessageBox for user-friendly error messages
+- Implement graceful degradation when server unavailable
+- Add proper error handling around network operations
+- Use try/catch around all network operations
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.# PyQt6 UI Guidelines
+
+## Thread Safety Requirements
+- **NEVER** touch widgets off the main thread
+- QWebEngineView and widgets are NOT thread-safe
+- Use QThread/QThreadPool for background work
+- Use signals/slots for cross-thread communication
+- Never block the Qt event loop
+
+## WebView Usage for Wikipedia Pages
+- Handle URL interception carefully in `UrlInterceptor.py`
+- Apply minimal CSS/JS modifications
+- Centralize dark-theme handling in `WikipediaTheme.py`
+- Avoid repeated DOM/CSS injection to prevent reflows
+- Batch WebView updates when possible
+
+## UI Patterns
+- Use Qt signals/slots for event handling
+- Apply consistent theming via `ThemeManager.py`
+- Implement proper widget lifecycle (show/hide/cleanup)
+- Use QTimer for periodic updates
+- Keep page transition jank to a minimum
+
+## Mini Review Checklist
+- [ ] No blocking calls in slots
+- [ ] No `sleep()` calls in UI code
+- [ ] Navigation works smoothly
+- [ ] Font sizing is consistent
+- [ ] Page transitions are smooth
+- [ ] WebView content loads without stutter
+
+## Performance Guidelines
+- Defer heavy work to background threads
+- Batch DOM/CSS injection to QWebEngine
+- Avoid repeated reflows
+- Use QThreadPool for concurrent operations
+- Minimize widget creation/destruction
+
+## Common UI Components
+- **HomePage**: Game mode selection, settings, about info
+- **SoloGamePage**: Complete solo game with WebView
+- **MultiplayerPage**: Room creation/joining, lobby management
+- **MultiplayerGamePage**: Multiplayer game wrapper with progress sidebar
+- **CountdownDialog**: Visual countdown timer
+- **ServerConfigDialog**: Server settings UI
+- **MultiplayerResultsDialog**: Results with path visualization
+
+## Error Handling
+- Use QMessageBox for user-friendly error messages
+- Implement graceful degradation when server unavailable
+- Add proper error handling around network operations
+- Use try/catch around all network operations
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

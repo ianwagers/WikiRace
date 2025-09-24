@@ -1,0 +1,119 @@
+---
+alwaysApply: false
+---
+
+# FastAPI API Guidelines
+
+## Router Patterns
+- Organize routes in `server/api_routes.py`
+- Use dependency injection for shared resources
+- Implement proper error handling with HTTP status codes
+- Follow RESTful conventions for endpoints
+
+## Pydantic Models
+- Define models in `server/models.py`
+- Use strict validation with proper field types
+- Implement response models for all endpoints
+- Include proper docstrings for model fields
+
+## Endpoint Patterns
+- Prefer async endpoints for I/O bound operations
+- Use proper HTTP status codes (200, 201, 400, 404, 500)
+- Implement request/response validation
+- Add proper error handling with try/catch blocks
+
+## API Structure
+- **Main App**: `server/main.py` - FastAPI application setup
+- **Routes**: `server/api_routes.py` - REST endpoints for room operations
+- **Models**: `server/models.py` - Pydantic models (GameRoom, Player, GameState, NavigationEntry)
+- **Config**: `server/config.py` - Server configuration
+
+## Documentation
+- Rely on built-in OpenAPI docs at `/docs` endpoint
+- Use minimal, focused docstrings over long prose
+- Avoid writing separate documentation that won't be read
+- Let FastAPI generate interactive API documentation
+
+## Error Handling
+- Implement proper HTTP status codes
+- Use Pydantic validation for request/response models
+- Add comprehensive error handling around all operations
+- Log errors appropriately for debugging
+
+## Response Models
+- Define response models for all endpoints
+- Use proper validation for all responses
+- Include appropriate status codes
+- Implement consistent error response format
+
+## Key Endpoints
+- Room creation and management
+- Player registration and updates
+- Game state synchronization
+- Navigation history tracking
+- Results and statistics
+
+## Performance
+- Use async/await for I/O operations
+- Implement proper connection pooling
+- Add appropriate timeouts
+- Monitor API performance
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.# FastAPI API Guidelines
+
+## Router Patterns
+- Organize routes in `server/api_routes.py`
+- Use dependency injection for shared resources
+- Implement proper error handling with HTTP status codes
+- Follow RESTful conventions for endpoints
+
+## Pydantic Models
+- Define models in `server/models.py`
+- Use strict validation with proper field types
+- Implement response models for all endpoints
+- Include proper docstrings for model fields
+
+## Endpoint Patterns
+- Prefer async endpoints for I/O bound operations
+- Use proper HTTP status codes (200, 201, 400, 404, 500)
+- Implement request/response validation
+- Add proper error handling with try/catch blocks
+
+## API Structure
+- **Main App**: `server/main.py` - FastAPI application setup
+- **Routes**: `server/api_routes.py` - REST endpoints for room operations
+- **Models**: `server/models.py` - Pydantic models (GameRoom, Player, GameState, NavigationEntry)
+- **Config**: `server/config.py` - Server configuration
+
+## Documentation
+- Rely on built-in OpenAPI docs at `/docs` endpoint
+- Use minimal, focused docstrings over long prose
+- Avoid writing separate documentation that won't be read
+- Let FastAPI generate interactive API documentation
+
+## Error Handling
+- Implement proper HTTP status codes
+- Use Pydantic validation for request/response models
+- Add comprehensive error handling around all operations
+- Log errors appropriately for debugging
+
+## Response Models
+- Define response models for all endpoints
+- Use proper validation for all responses
+- Include appropriate status codes
+- Implement consistent error response format
+
+## Key Endpoints
+- Room creation and management
+- Player registration and updates
+- Game state synchronization
+- Navigation history tracking
+- Results and statistics
+
+## Performance
+- Use async/await for I/O operations
+- Implement proper connection pooling
+- Add appropriate timeouts
+- Monitor API performance
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

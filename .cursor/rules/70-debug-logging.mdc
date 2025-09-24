@@ -1,0 +1,74 @@
+# Debug Logging Standards
+
+## Logging Categories
+- **UI**: User interface events, navigation, theme changes
+- **Networking**: Socket.IO events, API calls, connection status
+- **Server**: Room management, game state, player actions
+- **Game**: Game logic, Wikipedia API calls, page selection
+
+## Log Levels
+- **INFO**: Normal operation, user actions, successful operations
+- **WARNING**: Recoverable issues, fallback behaviors
+- **ERROR**: Failures, exceptions, critical issues
+- **DEBUG**: Detailed debugging information (development only)
+
+## Log Format Requirements
+- Include timestamps in all log entries
+- Use structured logging format
+- Include relevant context (room ID, player name, game ID)
+- Redact PII (personal identifiable information)
+- Use consistent log message format
+
+## Context Information
+- **Room Operations**: Include room ID and player count
+- **Game Events**: Include game ID and player names
+- **Network Events**: Include connection status and event types
+- **UI Events**: Include page names and user actions
+
+## Logging Best Practices
+- Avoid using `print()` statements
+- Use proper logging levels
+- Include relevant context
+- Log errors with stack traces
+- Use consistent message format
+
+## Error Logging
+- Log all exceptions with stack traces
+- Include relevant context for debugging
+- Use appropriate log levels
+- Provide actionable error information
+
+## Performance Logging
+- Log operation timing for performance-critical code
+- Include relevant metrics
+- Use appropriate log levels
+- Avoid excessive logging
+
+## Security Considerations
+- Redact PII from logs
+- Avoid logging sensitive information
+- Use appropriate log levels
+- Consider log retention policies
+
+## Log File Management
+- Use appropriate log file names
+- Implement log rotation if needed
+- Consider log file size limits
+- Use structured log format
+
+## Debugging Guidelines
+- Use logging to debug issues
+- Include relevant context
+- Use appropriate log levels
+- Avoid excessive debug logging
+
+## Common Log Patterns
+```python
+# Good logging examples
+logger.info(f"Player {player_name} joined room {room_id}")
+logger.warning(f"Connection lost for player {player_name}, attempting reconnection")
+logger.error(f"Failed to start game in room {room_id}: {error}")
+logger.debug(f"Wikipedia API call: {api_url}")
+```
+
+**Priority**: Fix/finish the real feature over scaffolding test stubs or writing narrative docs.

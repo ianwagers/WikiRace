@@ -1,0 +1,61 @@
+# WikiRace - Core Project Context
+
+## Project Overview
+WikiRace is a desktop Wikipedia navigation game built with PyQt6 and Python 3.13. Features both solo and real-time multiplayer functionality using a FastAPI + Socket.IO server architecture.
+
+**Current Status**: v1.7.0 Beta (Production Ready)
+- ✅ Solo gameplay fully functional
+- ✅ Multiplayer server infrastructure complete  
+- ✅ Real-time room management and player communication
+- ✅ Complete multiplayer game flow with countdown and synchronization
+- ✅ Navigation history tracking and visualization
+- ✅ Automatic reconnection logic
+- ✅ Client configuration UI
+- ✅ Docker deployment ready
+
+## Technology Stack
+- **Frontend**: PyQt6, PyQt6-WebEngine (Wikipedia display)
+- **Backend**: FastAPI, Socket.IO, Pydantic
+- **Data**: Redis (optional for persistence), in-memory storage (current)
+- **APIs**: Wikipedia API, MediaWiki API
+- **Build**: setuptools, pyproject.toml
+- **Deployment**: Docker, Docker Compose, Nginx (reverse proxy)
+- **Installation**: Cross-platform scripts (Windows/Linux/macOS)
+
+## Canonical Entry Points
+- **Client**: `bin/main.py` → `src/app.py`
+- **Server**: `server/start_server.py` → `server/main.py`
+- **Combined**: `bin/start_all.py` (client + server)
+
+## Key Directories
+- `src/gui/` - PyQt6 UI components (HomePage, SoloGamePage, MultiplayerPage, etc.)
+- `src/logic/` - Business logic (GameLogic, Network, ThemeManager, etc.)
+- `server/` - FastAPI + Socket.IO server (models, handlers, routes, etc.)
+- `bin/` - Application entry points
+- `src/resources/` - Assets (icons, images)
+
+## Forbidden Output
+**DO NOT generate:**
+- Speculative test suites or validation scripts
+- Long boilerplate documentation
+- Stubs that don't run or aren't useful
+- Throwaway test files
+- Multi-page narrative docs
+
+**PREFER:** Fixing issues directly in the actual application code rather than creating test scripts or documentation.
+
+## Definition of Done
+Before proposing changes, verify:
+- [ ] Code runs locally without errors
+- [ ] All imports resolve correctly
+- [ ] Type hints are validated
+- [ ] Basic smoke test passes (app launches, core functionality works)
+- [ ] Changes are minimal and focused
+- [ ] No new tests or docs added unless explicitly requested
+
+## Development Philosophy
+**PREFER DEBUGGING AND CODE CHANGES OVER TESTING SCRIPTS**
+- Focus on fixing issues directly in the codebase
+- Use existing functionality to debug problems
+- Make targeted code changes to resolve issues
+- When debugging, modify the actual application code to add logging, error handling, or fixes

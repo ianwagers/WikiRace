@@ -1118,3 +1118,4 @@
 2025-09-24 07:38:26,298 - socket_handlers - INFO - Player GEA left room DOPG
 2025-09-24 07:39:21,464 - socket_handlers - INFO - Client disconnected: 5aURvyCt41SpAMxJAAAB
 2025-09-24 07:39:31,473 - socket_handlers - INFO - Client disconnected: yU6HqFCwe1bg_lUnAAAD
+2025-09-24 07:49:58,753 - redis_manager - INFO - Disconnected from Redis
