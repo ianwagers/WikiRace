@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from src.logic.ThemeManager import theme_manager
 from src.logic.Network import NetworkManager
+from src.gui.components.PlayerColorPicker import PlayerColorPicker
 import json
 
 class MultiplayerPage(QWidget):
@@ -28,6 +29,8 @@ class MultiplayerPage(QWidget):
         self.is_leader = False
         self.players_in_room = []
         self.countdown_dialogs = []  # Store list of countdown dialogs for debugging
+        self.player_colors = {}  # Store player color mappings
+        self.my_color = None  # Store current player's selected color
         
         self.initUI()
         self.apply_theme()
@@ -88,11 +91,20 @@ class MultiplayerPage(QWidget):
         self.network_manager.room_deleted.connect(self.on_room_deleted)
         self.network_manager.game_starting.connect(self.on_game_starting)
         self.network_manager.game_started.connect(self.on_game_started)
+        self.network_manager.game_ended.connect(self.on_game_ended)
         self.network_manager.error_occurred.connect(self.on_error_occurred)
         self.network_manager.reconnecting.connect(self.on_reconnecting)
         self.network_manager.reconnected.connect(self.on_reconnected)
         self.network_manager.reconnection_failed.connect(self.on_reconnection_failed)
         self.network_manager.game_config_updated.connect(self.on_game_config_updated)
+        self.network_manager.player_color_updated.connect(self.on_player_color_updated)
+        
+        # Also try connecting with a different approach
+        try:
+            self.network_manager.player_color_updated.disconnect()
+            self.network_manager.player_color_updated.connect(self.on_player_color_updated)
+        except:
+            pass
     
     def test_server_connection(self):
         """Test connection to the multiplayer server"""
@@ -176,6 +188,15 @@ class MultiplayerPage(QWidget):
         self.right_layout = QVBoxLayout(self.right_panel)
         self.right_layout.setContentsMargins(0, 0, 0, 0)
         self.right_layout.setSpacing(15)
+        
+        # Player Color Picker (only visible when in a room)
+        self.color_picker = PlayerColorPicker()
+        self.color_picker.hide()  # Hidden initially
+        self.color_picker.color_selected.connect(self.on_color_selected)
+        self.right_layout.addWidget(self.color_picker)
+        
+        # Track used colors for conflict detection
+        self.used_colors = set()
         
         # Add panels to main layout
         self.main_layout.addWidget(self.left_panel, 1)  # Left panel gets more space
@@ -794,6 +815,7 @@ class MultiplayerPage(QWidget):
         self.gameConfigFrame.hide()
         self.gameSelectionDisplay.hide()
         self.startGameButton.hide()
+        self.color_picker.hide()
         
         # Show the host/join sections again
         self.show_host_join_sections()
@@ -803,6 +825,8 @@ class MultiplayerPage(QWidget):
         self.player_name = None
         self.is_leader = False
         self.players_in_room = []
+        self.player_colors = {}
+        self.my_color = None
         
         # Update server status
         self.update_server_status()
@@ -885,6 +909,9 @@ class MultiplayerPage(QWidget):
     
     def update_players_grid(self, players):
         """Update the players grid display"""
+        print(f"🎨 DEBUG: update_players_grid called with players: {players}")
+        print(f"🎨 DEBUG: Current player_colors: {self.player_colors}")
+        
         # Clear all labels first
         for label in self.playerLabels:
             label.setText("")
@@ -894,7 +921,32 @@ class MultiplayerPage(QWidget):
         for i, player in enumerate(players[:10]):  # Limit to 10 players
             if i < len(self.playerLabels):
                 label = self.playerLabels[i]
+                
+                # Clean player name (remove leader tag for color lookup)
+                clean_name = player.replace(" (Leader)", "")
+                
+                # Get player color if available, use default gray if not set
+                player_color = self.player_colors.get(clean_name, "#CCCCCC")  # Default gray
+                print(f"🎨 DEBUG: Player {clean_name} -> color {player_color}")
+                
+                # Update label text and styling
                 label.setText(player)
+                label.setStyleSheet(f"""
+                    QLabel {{
+                        background-color: {player_color};
+                        border: 2px solid {player_color};
+                        border-radius: 8px;
+                        padding: 8px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        color: #000000;
+                        min-height: 40px;
+                    }}
+                    QLabel:hover {{
+                        border: 2px solid #ffffff;
+                        /* box-shadow not supported in Qt stylesheets */
+                    }}
+                """)
                 label.show()
         
         # Don't show any empty slots - only show boxes when players actually join
@@ -903,6 +955,9 @@ class MultiplayerPage(QWidget):
         """Show room information"""
         self.roomInfoLabel.setText(title)
         self.update_players_grid(players)
+        
+        # Show color picker for all players when in a room
+        self.color_picker.show()
         
         # Show game configuration for all players, but with different permissions
         self.gameConfigFrame.show()
@@ -961,6 +1016,18 @@ class MultiplayerPage(QWidget):
         self.players_in_room = [p['display_name'] for p in players_list]
         self.hide_host_join_sections()
         
+        # Extract player colors from the players list
+        for player_data in players_list:
+            if isinstance(player_data, dict):
+                player_name_data = player_data.get('display_name', '')
+                player_color = player_data.get('player_color')
+                if player_color:
+                    self.player_colors[player_name_data] = player_color
+                    print(f"🎨 Loaded existing color for {player_name_data}: {player_color}")
+        
+        # Update used colors tracking
+        self._update_used_colors()
+        
         # Format players list with leader tag
         formatted_players = []
         for i, p in enumerate(players_list):
@@ -979,15 +1046,40 @@ class MultiplayerPage(QWidget):
         QMessageBox.information(self, "Room Joined", 
                               f"Successfully joined room {room_code}!")
     
-    def on_player_joined(self, player_name):
+    def on_player_joined(self, player_name, players_list):
         """Handle player join event"""
-        # Add to our local player list
-        if player_name not in self.players_in_room:
-            self.players_in_room.append(player_name)
+        print(f"🎨 UI RECEIVED: Player {player_name} joined with players list: {players_list}")
+        
+        # Update our local player list with the server's authoritative list
+        self.players_in_room = [p['display_name'] for p in players_list]
+        
+        # Update player colors from server data
+        for player_data in players_list:
+            player_name_from_data = player_data['display_name']
+            player_color = player_data.get('player_color')
+            if player_color:  # Only update if player has a color
+                self.player_colors[player_name_from_data] = player_color
+                print(f"🎨 UI RECEIVED: Updated color for {player_name_from_data}: {player_color}")
+            else:
+                # Remove color for players who don't have one (like newly joined players)
+                if player_name_from_data in self.player_colors:
+                    del self.player_colors[player_name_from_data]
+                    print(f"🎨 UI RECEIVED: Removed color for {player_name_from_data} (no color assigned)")
+        
+        print(f"🎨 UI RECEIVED: Current players_in_room: {self.players_in_room}")
+        print(f"🎨 UI RECEIVED: Current player_colors: {self.player_colors}")
         
         # Update the grid display
         if hasattr(self, 'update_players_grid'):
-            self.update_players_grid(self.players_in_room)
+            # Format players list with leader tag
+            formatted_players = []
+            for p in players_list:
+                if p.get('is_host', False):
+                    formatted_players.append(f"{p['display_name']} (Leader)")
+                else:
+                    formatted_players.append(p['display_name'])
+            
+            self.update_players_grid(formatted_players)
         
         # Clear waiting for players flag if we were waiting
         self.clear_waiting_for_players()
@@ -1083,6 +1175,9 @@ class MultiplayerPage(QWidget):
         """Handle game starting countdown event"""
         print(f"🎬 DEBUG: Received game_starting event with data: {countdown_data}")
         
+        # Lock colors during game
+        self.lock_colors()
+        
         # Clean up any existing countdown dialogs first
         self.cleanup_countdown_dialogs()
         
@@ -1142,16 +1237,21 @@ class MultiplayerPage(QWidget):
         
         print(f"🎮 DEBUG: Extracted game data - room: {room_code}, start: {start_title}, end: {end_title}")
         
-        # Add players data to game_data
-        game_data['players'] = []
-        for player_name in self.players_in_room:
-            # Remove "(Leader)" suffix for processing
-            clean_name = player_name.replace(" (Leader)", "")
-            is_host = "(Leader)" in player_name
-            game_data['players'].append({
-                'name': clean_name,
-                'is_host': is_host
-            })
+        # Use server's player data if available (includes colors), otherwise build from local data
+        if 'players' not in game_data or not game_data['players']:
+            # Fallback: build from local data if server didn't provide player data
+            game_data['players'] = []
+            for player_name in self.players_in_room:
+                # Remove "(Leader)" suffix for processing
+                clean_name = player_name.replace(" (Leader)", "")
+                is_host = "(Leader)" in player_name
+                player_color = self.player_colors.get(clean_name, '#CCCCCC')
+                game_data['players'].append({
+                    'name': clean_name,
+                    'is_host': is_host,
+                    'player_color': player_color
+                })
+        # Server provided player data - use it as is (includes colors)
         
         print(f"🎮 DEBUG: Players in game: {game_data['players']}")
         
@@ -1377,6 +1477,43 @@ class MultiplayerPage(QWidget):
         
         print(f"📝 Game configuration updated by {host_name}: {start_text} -> {end_text}")
     
+    def on_player_color_updated(self, player_name, color_hex, color_name):
+        """Handle player color update from server"""
+        print(f"🎨 UI RECEIVED: Player {player_name} updated color to {color_name} ({color_hex})")
+        print(f"🎨 UI RECEIVED: Current players_in_room: {self.players_in_room}")
+        print(f"🎨 UI RECEIVED: Current player_colors: {self.player_colors}")
+        
+        # Update local color mapping
+        self.player_colors[player_name] = color_hex
+        print(f"🎨 Updated player_colors: {self.player_colors}")
+        
+        # Update used colors tracking
+        self._update_used_colors()
+        
+        # Format players list with leader tag for display
+        formatted_players = []
+        for player in self.players_in_room:
+            clean_name = player.replace(" (Leader)", "")
+            if clean_name == player_name:
+                # Check if this player is the leader by looking at the original player name
+                if "(Leader)" in player:
+                    formatted_players.append(f"{player_name} (Leader)")
+                else:
+                    formatted_players.append(player_name)
+            else:
+                formatted_players.append(player)
+        
+        # Update the players grid to show the new color
+        self.update_players_grid(formatted_players)
+        
+        # Force UI update
+        self.update()
+        self.repaint()
+        
+        # Use a timer to refresh the display after a short delay
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(100, lambda: self.update_players_grid(formatted_players))
+    
     def _validate_wikipedia_page(self, page_title):
         """Validate that a Wikipedia page exists using search API"""
         try:
@@ -1463,5 +1600,89 @@ class MultiplayerPage(QWidget):
             self.startGameButton.setEnabled(True)
             self.update_start_game_button_state()
             
-            # Reset button text
-            self.startGameButton.setText("Start Game")
+        # Reset button text
+        self.startGameButton.setText("Start Game")
+    
+    def on_color_selected(self, color_hex, color_name):
+        """Handle player color selection"""
+        if not self.player_name or not self.current_room_code:
+            return
+        
+        print(f"🎨 Player {self.player_name} selected color: {color_name} ({color_hex})")
+        
+        # Check for color conflicts
+        if color_hex in self.used_colors:
+            print(f"⚠️ Color {color_name} is already used by another player")
+            # Find an available color
+            available_colors = self._get_available_colors()
+            if available_colors:
+                color_hex, color_name = available_colors[0]
+                print(f"🔄 Auto-selecting available color: {color_name} ({color_hex})")
+            else:
+                print(f"❌ No available colors, keeping current selection")
+                return
+        
+        # Store the color locally
+        self.my_color = color_hex
+        self.player_colors[self.player_name] = color_hex
+        
+        # Update used colors tracking
+        self._update_used_colors()
+        
+        # Send color update to server
+        if hasattr(self.network_manager, 'send_player_color'):
+            self.network_manager.send_player_color(color_hex, color_name)
+        
+        # Format players list with leader tag for display
+        formatted_players = []
+        for player in self.players_in_room:
+            clean_name = player.replace(" (Leader)", "")
+            if clean_name == self.player_name:
+                # This is the current player - check if they are the leader
+                if self.is_leader:
+                    formatted_players.append(f"{self.player_name} (Leader)")
+                else:
+                    formatted_players.append(self.player_name)
+            else:
+                formatted_players.append(player)
+        
+        # Update the players grid to show the new color
+        self.update_players_grid(formatted_players)
+    
+    def _update_used_colors(self):
+        """Update the used colors set and notify color picker"""
+        self.used_colors = set(self.player_colors.values())
+        self.color_picker.update_used_colors(list(self.used_colors))
+        print(f"🎨 Updated used colors: {self.used_colors}")
+    
+    def _get_available_colors(self):
+        """Get list of available colors that aren't used"""
+        # Get all possible colors from the color picker
+        all_colors = []
+        if hasattr(self.color_picker, 'light_colors'):
+            all_colors.extend(self.color_picker.light_colors)
+        if hasattr(self.color_picker, 'dark_colors'):
+            all_colors.extend(self.color_picker.dark_colors)
+        
+        # Filter out used colors
+        available = []
+        for color_hex, color_name in all_colors:
+            if color_hex not in self.used_colors:
+                available.append((color_hex, color_name))
+        
+        return available
+    
+    def lock_colors(self):
+        """Lock color selection during game"""
+        self.color_picker.setEnabled(False)
+        print("🔒 Colors locked during game")
+    
+    def unlock_colors(self):
+        """Unlock color selection between games"""
+        self.color_picker.setEnabled(True)
+        print("🔓 Colors unlocked between games")
+    
+    def on_game_ended(self, results):
+        """Handle game end event - unlock colors for next game"""
+        print("🏁 Game ended - unlocking colors for next game")
+        self.unlock_colors()

@@ -89,7 +89,8 @@ async def check_inactive_players(sio, room_manager: RoomManager):
                             'players': [{
                                 'socket_id': p.socket_id,
                                 'display_name': p.display_name,
-                                'is_host': p.is_host
+                                'is_host': p.is_host,
+                                'player_color': p.player_color
                             } for p in updated_room.players.values()]
                         }, room=room_code, skip_sid=socket_id)
                         
@@ -160,7 +161,8 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         'players': [{
                             'socket_id': p.socket_id,
                             'display_name': p.display_name,
-                            'is_host': p.is_host
+                            'is_host': p.is_host,
+                            'player_color': p.player_color
                         } for p in updated_room.players.values()]
                     }, room=room_code, skip_sid=sid)
                     
@@ -258,7 +260,8 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 'players': [{
                     'socket_id': p.socket_id,
                     'display_name': p.display_name,
-                    'is_host': p.is_host
+                    'is_host': p.is_host,
+                    'player_color': p.player_color
                 } for p in room.players.values()]
             }, room=sid)
             
@@ -270,7 +273,8 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 'players': [{
                     'socket_id': p.socket_id,
                     'display_name': p.display_name,
-                    'is_host': p.is_host
+                    'is_host': p.is_host,
+                    'player_color': p.player_color
                 } for p in room.players.values()]
             }, room=room.room_code, skip_sid=sid)
             
@@ -312,7 +316,8 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     'players': [{
                         'socket_id': p.socket_id,
                         'display_name': p.display_name,
-                        'is_host': p.is_host
+                        'is_host': p.is_host,
+                        'player_color': p.player_color
                     } for p in updated_room.players.values()]
                 }, room=room_code, skip_sid=sid)
                 
@@ -588,6 +593,15 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     await broadcast_room_progress(sio, room, skip_sid=None)
                     
                     logger.info(f"DEBUG: Sending game_started event to room {room.room_code}")
+                    # Prepare players data with colors
+                    players_data = []
+                    for player in room.players.values():
+                        players_data.append({
+                            'name': player.display_name,
+                            'is_host': player.is_host,
+                            'player_color': player.player_color or '#CCCCCC'
+                        })
+                    
                     # Notify all players that game has started
                     await sio.emit('game_started', {
                         'room_code': room.room_code,
@@ -596,6 +610,7 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         'start_title': room.start_title,
                         'end_title': room.end_title,
                         'game_state': room.game_state.value,
+                        'players': players_data,
                         'message': 'GO! Race to the destination!'
                     }, room=room.room_code)
                     logger.info(f"DEBUG: game_started emit completed successfully")
@@ -706,20 +721,20 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 for i, entry in enumerate(player.navigation_history):
                     print(f"📊 DEBUG:     {i}: {entry.page_title} (link #{entry.link_number})")
                 
-                # Broadcast progress to ALL players in the room (including sender for sync)
+                # Broadcast progress to OTHER players only (exclude sender to prevent feedback loop)
                 await sio.emit('player_progress', {
                     'player_name': player_name,
                     'current_page': page_title,  # Send title for display
                     'current_page_url': page_url,
                     'links_used': player.links_clicked,
                     'time_elapsed': navigation_entry.time_elapsed
-                }, room=room_code)
+                }, room=room_code, skip_sid=sid)
                 
                 print(f"📊 DEBUG: Broadcasting progress for {player_name}: {page_title} (links: {player.links_clicked})")
                 print(f"📊 DEBUG: Room has {len(room.players)} players, broadcasting to room {room_code}")
                 
-                # Also send updated progress to all players for sync (including sender)
-                await broadcast_room_progress(sio, room, skip_sid=None)
+                # Also send updated progress to all players for sync (exclude sender to prevent feedback)
+                await broadcast_room_progress(sio, room, skip_sid=sid)
                 
                 logger.info(f"Player {player_name} navigation: {page_title} (Link #{player.links_clicked}, {navigation_entry.time_elapsed:.1f}s)")
             
@@ -770,6 +785,47 @@ def register_socket_handlers(sio, room_manager: RoomManager):
         except Exception as e:
             logger.error(f"Error handling game completion: {e}")
             await sio.emit('error', {'message': 'Failed to process completion'}, room=sid)
+    
+    @sio.event
+    async def player_color_update(sid, data):
+        """Handle player color update"""
+        try:
+            room_code = data.get('room_code')
+            player_name = data.get('player_name')
+            color_hex = data.get('color_hex')
+            color_name = data.get('color_name')
+            
+            logger.info(f"Player {player_name} updated color to {color_name} ({color_hex}) in room {room_code}")
+            
+            if not room_code or not player_name or not color_hex:
+                await sio.emit('error', {'message': 'Invalid color update data'}, room=sid)
+                return
+            
+            room = room_manager.get_room(room_code)
+            if not room:
+                await sio.emit('error', {'message': 'Room not found'}, room=sid)
+                return
+            
+            player = room.get_player(sid)
+            if not player or player.display_name != player_name:
+                await sio.emit('error', {'message': 'Player not found in room'}, room=sid)
+                return
+            
+            # Update player color
+            player.update_color(color_hex)
+            
+            # Broadcast color update to all players in the room
+            await sio.emit('player_color_updated', {
+                'player_name': player_name,
+                'color_hex': color_hex,
+                'color_name': color_name
+            }, room=room.room_code, skip_sid=sid)
+            
+            logger.info(f"Color update broadcasted for {player_name} in room {room_code}")
+            
+        except Exception as e:
+            logger.error(f"Error handling color update: {e}")
+            await sio.emit('error', {'message': 'Failed to update color'}, room=sid)
 
 
 async def end_game_for_room(sio, room):

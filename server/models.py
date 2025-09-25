@@ -41,6 +41,7 @@ class Player(BaseModel):
     socket_id: str = Field(..., description="Unique socket connection ID")
     display_name: str = Field(..., min_length=1, max_length=50, description="Player's chosen name")
     is_host: bool = Field(default=False, description="Whether player is room host")
+    player_color: Optional[str] = Field(default=None, description="Player's chosen color (hex code)")
     
     # Game state
     current_page: Optional[str] = Field(default=None, description="Current Wikipedia page URL")
@@ -114,6 +115,11 @@ class Player(BaseModel):
             }
             for entry in self.navigation_history
         ]
+    
+    def update_color(self, color_hex: str):
+        """Update player's color"""
+        self.player_color = color_hex
+        self.last_activity = datetime.utcnow()
 
 
 class GameRoom(BaseModel):
@@ -223,6 +229,12 @@ class GameConfigRequest(BaseModel):
 class GameStartRequest(BaseModel):
     """Request model for starting a game"""
     pass  # No additional parameters needed
+
+
+class PlayerColorUpdate(BaseModel):
+    """Request model for updating player color"""
+    color_hex: str = Field(..., description="Player's chosen color in hex format")
+    color_name: str = Field(..., description="Human-readable color name")
 
 
 class PlayerProgressUpdate(BaseModel):

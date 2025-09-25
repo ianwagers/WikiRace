@@ -14,19 +14,27 @@ from PyQt6.QtGui import QFont
 from src.gui.SoloGamePage import SoloGamePage
 from src.logic.ThemeManager import theme_manager
 from src.logic.Network import NetworkManager
+from src.logic.Player import Player
 
 
 class PlayerProgressWidget(QWidget):
     """Widget showing individual player progress in the sidebar"""
     
-    def __init__(self, player_name, is_host=False, parent=None):
+    def __init__(self, player: Player, parent=None):
         super().__init__(parent)
-        self.player_name = player_name
-        self.is_host = is_host
+        self.player = player
+        self.player_name = player.display_name
+        self.is_host = player.is_host
+        self.player_color = player.player_color or "#CCCCCC"  # Default gray color
         self.current_page = "Starting..."
         self.links_used = 0
         self.is_completed = False
         self.completion_time = None
+        
+        # Connect to player signals
+        self.player.color_changed.connect(self._on_player_color_changed)
+        self.player.progress_updated.connect(self._on_player_progress_updated)
+        self.player.game_finished.connect(self._on_player_game_completed)
         
         # Detect screen size for responsive design
         self.is_small_screen = self._is_small_screen()
@@ -39,8 +47,110 @@ class PlayerProgressWidget(QWidget):
         self.initUI()
         self.apply_theme()
         
+        # CRITICAL FIX: Ensure color is properly applied after theme is set
+        if self.player_color and self.player_color != "#CCCCCC":
+            print(f"🎨 DEBUG: Applying initial color {self.player_color} to {self.player_name}")
+            self._apply_progress_bar_theme()
+        
         # Connect to resize events for dynamic sizing
         self.installEventFilter(self)
+    
+    def _on_player_color_changed(self, color_hex: str, color_name: str):
+        """Handle player color change from Player instance"""
+        print(f"🎨 DEBUG: PlayerProgressWidget {self.player_name} received color change: {color_hex}")
+        self.player_color = color_hex
+        self.update_display()
+        print(f"🎨 DEBUG: PlayerProgressWidget {self.player_name} color updated to {self.player_color}")
+    
+    def _on_player_progress_updated(self, current_page: str, links_used: int):
+        """Handle player progress update from Player instance"""
+        self.current_page = current_page
+        self.links_used = links_used
+        self.update_display()
+    
+    def _on_player_game_completed(self, completion_time: float, links_used: int):
+        """Handle player game completion from Player instance"""
+        self.is_completed = True
+        self.completion_time = completion_time
+        self.links_used = links_used
+        self.update_display()
+    
+    def update_display(self):
+        """Update the display based on current state"""
+        # Update progress bar
+        self.progress_bar.setValue(self.links_used)
+        
+        # Update current page display
+        if hasattr(self, 'current_page_label'):
+            self.current_page_label.setText(self.current_page)
+        
+        # Update color if changed
+        if hasattr(self, 'color_indicator'):
+            self.color_indicator.setStyleSheet(f"background-color: {self.player_color};")
+        
+        # Update completion state
+        if self.is_completed:
+            self.progress_bar.setStyleSheet("""
+                QProgressBar {
+                    background-color: #2d5a2d;
+                    border: 1px solid #4a8b4a;
+                    border-radius: 4px;
+                    text-align: center;
+                }
+                QProgressBar::chunk {
+                    background-color: #4a8b4a;
+                    border-radius: 3px;
+                }
+            """)
+        else:
+            # Apply theme with current player color
+            self._apply_progress_bar_theme()
+    
+    def _apply_progress_bar_theme(self):
+        """Apply progress bar theme with current player color"""
+        print(f"🎨 DEBUG: _apply_progress_bar_theme called for {self.player_name} with color {self.player_color}")
+        styles = theme_manager.get_theme_styles()
+        
+        if styles['is_dark']:
+            # Dark theme progress bar with player color
+            progress_style = f"""
+                QProgressBar {{
+                    border: 2px solid {styles['border_color']};
+                    border-radius: 10px;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 11px;
+                    color: white;
+                    background-color: #1a1a1a;
+                    margin: 4px 0px;
+                }}
+                QProgressBar::chunk {{
+                    background-color: {self.player_color};
+                    border-radius: 8px;
+                    margin: 1px;
+                }}
+            """
+        else:
+            # Light theme progress bar with player color
+            progress_style = f"""
+                QProgressBar {{
+                    border: 2px solid {styles['border_color']};
+                    border-radius: 10px;
+                    text-align: center;
+                    font-weight: bold;
+                    font-size: 11px;
+                    color: black;
+                    background-color: #f0f0f0;
+                    margin: 4px 0px;
+                }}
+                QProgressBar::chunk {{
+                    background-color: {self.player_color};
+                    border-radius: 8px;
+                    margin: 1px;
+                }}
+            """
+        
+        self.progress_bar.setStyleSheet(progress_style)
     
     def resizeEvent(self, event):
         """Handle resize events directly"""
@@ -184,10 +294,19 @@ class PlayerProgressWidget(QWidget):
         host_icon.setFont(QFont("Inter", icon_size))
         name_layout.addWidget(host_icon)
         
-        name_label = QLabel(self.player_name)
+        # Create color dot + name label
+        name_label = QLabel(f"● {self.player_name}")
         # Smaller font for small screens
         name_size = 10 if self.is_small_screen else 12
         name_label.setFont(QFont("Inter", name_size, QFont.Weight.Bold))
+        
+        # Style the label with player color for the dot
+        name_label.setStyleSheet(f"""
+            QLabel {{
+                color: {self.player_color};
+            }}
+        """)
+        
         name_layout.addWidget(name_label)
         name_layout.addStretch()
         
@@ -282,7 +401,7 @@ class PlayerProgressWidget(QWidget):
                 }}
             """)
             
-            # Dark theme progress bar with Wikipedia link blue
+            # Dark theme progress bar with player color
             progress_style = f"""
                 QProgressBar {{
                     border: 2px solid {styles['border_color']};
@@ -295,7 +414,7 @@ class PlayerProgressWidget(QWidget):
                     margin: 4px 0px;
                 }}
                 QProgressBar::chunk {{
-                    background-color: #0645ad;
+                    background-color: {self.player_color};
                     border-radius: 8px;
                     margin: 1px;
                 }}
@@ -309,12 +428,12 @@ class PlayerProgressWidget(QWidget):
                     border-radius: 12px;
                     margin: 8px;
                     padding: 4px;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                    /* box-shadow not supported in Qt stylesheets */
                 }}
                 PlayerProgressWidget:hover {{
                     border-color: {styles['border_hover']};
                     background-color: {styles['secondary_background']};
-                    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+                    /* box-shadow not supported in Qt stylesheets */
                 }}
                 QLabel {{
                     color: {styles['text_color']};
@@ -323,7 +442,7 @@ class PlayerProgressWidget(QWidget):
                 }}
             """)
             
-            # Light theme progress bar with Wikipedia link blue
+            # Light theme progress bar with player color
             progress_style = f"""
                 QProgressBar {{
                     border: 2px solid {styles['border_color']};
@@ -336,7 +455,7 @@ class PlayerProgressWidget(QWidget):
                     margin: 4px 0px;
                 }}
                 QProgressBar::chunk {{
-                    background-color: #0645ad;
+                    background-color: {self.player_color};
                     border-radius: 8px;
                     margin: 1px;
                 }}
@@ -372,6 +491,20 @@ class PlayerProgressWidget(QWidget):
         
         print(f"📊 UI SYNC: {self.player_name} -> Sidebar: {links_used}, Progress: {links_used}")
     
+    def update_color(self, new_color):
+        """Update the player's color and refresh styling"""
+        self.player_color = new_color
+        
+        # Update name label color (for the color dot)
+        if hasattr(self, 'name_label'):
+            self.name_label.setStyleSheet(f"""
+                QLabel {{
+                    color: {self.player_color};
+                }}
+            """)
+        
+        self.apply_theme()  # Reapply theme with new color
+    
     def get_debug_info(self):
         """Debug method to check current state"""
         return {
@@ -400,6 +533,7 @@ class MultiplayerGamePage(QWidget):
         
         # Game state
         self.players = {}  # player_name -> PlayerProgressWidget
+        self.player_instances = {}  # player_name -> Player instance
         self.game_started = False
         self.game_finished = False  # Changed variable name to avoid conflict with signal
         self.results_dialog_shown = False  # Prevent duplicate dialogs
@@ -597,6 +731,7 @@ class MultiplayerGamePage(QWidget):
         self.network_manager.game_ended.connect(self.on_game_ended)
         self.network_manager.player_completed.connect(self.on_player_completed)
         self.network_manager.player_left.connect(self.on_player_left)
+        self.network_manager.player_color_updated.connect(self.on_player_color_updated)
     
     def disconnect_network_signals(self):
         """Disconnect from network manager signals to prevent multiple dialogs"""
@@ -607,6 +742,7 @@ class MultiplayerGamePage(QWidget):
             self.network_manager.game_ended.disconnect(self.on_game_ended)
             self.network_manager.player_completed.disconnect(self.on_player_completed)
             self.network_manager.player_left.disconnect(self.on_player_left)
+            self.network_manager.player_color_updated.disconnect(self.on_player_color_updated)
             print(f"🔌 DEBUG: Disconnected network signals for instance {id(self)}")
         except Exception as e:
             print(f"⚠️ DEBUG: Error disconnecting network signals: {e}")
@@ -735,21 +871,49 @@ class MultiplayerGamePage(QWidget):
         for player_data in players_list:
             player_name = player_data.get('name', 'Unknown')
             is_host = player_data.get('is_host', False)
+            player_color = player_data.get('player_color', '#CCCCCC')  # Default gray
             
-            print(f"🎮 DEBUG: Creating player widget for {player_name} (host: {is_host})")
+            print(f"🎮 DEBUG: Creating player widget for {player_name} (host: {is_host}, color: {player_color})")
             
-            # Create player progress widget
-            player_widget = PlayerProgressWidget(player_name, is_host)
+            # Get or create Player instance
+            player_instance = self.network_manager.get_room_player(player_name)
+            if not player_instance:
+                # Create Player instance if not found
+                player_instance = self.network_manager.create_player(
+                    player_data.get('socket_id', ''),
+                    player_name,
+                    is_host
+                )
+                self.network_manager.add_room_player(player_instance)
+            
+            # CRITICAL FIX: Ensure color is set on Player instance BEFORE creating widget
+            if player_color != '#CCCCCC':
+                player_instance.update_color(player_color)
+                print(f"🎨 DEBUG: Set {player_name}'s color to {player_color} on Player instance")
+            else:
+                print(f"🎨 DEBUG: {player_name} using default color {player_color}")
+            
+            # Create player progress widget with Player instance
+            player_widget = PlayerProgressWidget(player_instance)
+            
+            # CRITICAL FIX: Ensure color is properly applied to the widget after creation
+            if player_color != '#CCCCCC':
+                player_widget.update_color(player_color)
+                print(f"🎨 DEBUG: Applied color {player_color} to {player_name}'s widget after creation")
             
             # Ensure progress starts at 0
             player_widget.update_progress("Starting...", 0, False, None)
             
             self.players[player_name] = player_widget
+            self.player_instances[player_name] = player_instance
             
             # Add to layout
             self.players_layout.addWidget(player_widget)
         
         print(f"🎮 DEBUG: Initialized {len(self.players)} players: {list(self.players.keys())}")
+        
+        # CRITICAL FIX: Ensure all player colors are properly applied after initialization
+        self._refresh_all_player_colors()
         
         # Update all player widgets for dynamic sizing
         self._update_all_player_widgets()
@@ -959,7 +1123,19 @@ class MultiplayerGamePage(QWidget):
         
         # Start the multiplayer game
         self.start_game()
+        
+        # CRITICAL FIX: Ensure all player colors are properly applied after game start
+        self._refresh_all_player_colors()
+        
         print(f"🎮 DEBUG: Game started successfully, game_started is now: {self.game_started}")
+    
+    def _refresh_all_player_colors(self):
+        """Refresh all player colors to ensure they are properly applied"""
+        print(f"🎨 DEBUG: Refreshing all player colors")
+        for player_name, player_widget in self.players.items():
+            if hasattr(player_widget, 'player_color'):
+                print(f"🎨 DEBUG: Refreshing color for {player_name}: {player_widget.player_color}")
+                player_widget._apply_progress_bar_theme()
     
     def on_player_progress(self, player_name, current_page, links_used):
         """SERVER UPDATE PATH: Updates for other players, skips local player to avoid conflicts"""
@@ -978,6 +1154,13 @@ class MultiplayerGamePage(QWidget):
             print(f"📊 SKIPPING: Local player progress from server (handled directly)")
             return
         
+        # Update Player instance if it exists
+        if player_name in self.player_instances:
+            player_instance = self.player_instances[player_name]
+            # Add navigation entry to Player instance
+            player_instance.add_navigation_entry(current_page, current_page)
+            print(f"📊 PROGRESS UPDATE: Updated {player_name}'s Player instance with {links_used} links")
+        
         # Update progress widget for other players only
         print(f"📊 PROGRESS UPDATE: Updating {player_name} widget with {links_used} links")
         self.players[player_name].update_progress(current_page, links_used)
@@ -988,6 +1171,12 @@ class MultiplayerGamePage(QWidget):
     
     def on_player_completed(self, player_name, completion_time, links_used):
         """Handle player completion events"""
+        # Update Player instance if it exists
+        if player_name in self.player_instances:
+            player_instance = self.player_instances[player_name]
+            player_instance.complete_game(completion_time)
+            print(f"🏁 Updated {player_name}'s Player instance completion: {completion_time:.2f}s with {links_used} links")
+        
         if player_name in self.players:
             self.players[player_name].update_progress(
                 "🏆 COMPLETED!", 
@@ -1005,6 +1194,12 @@ class MultiplayerGamePage(QWidget):
         print(f"🔄 DEBUG: Current players dict: {list(self.players.keys())}")
         print(f"🔄 DEBUG: Current players count: {len(self.players)}")
         
+        # Reset Player instances
+        for player_name, player_instance in self.player_instances.items():
+            print(f"🔄 DEBUG: Resetting Player instance for {player_name}")
+            player_instance.reset_game_state()
+        
+        # Reset player widgets
         for player_name, player_widget in self.players.items():
             print(f"🔄 DEBUG: Resetting {player_name} widget...")
             player_widget.update_progress(
@@ -1113,6 +1308,24 @@ class MultiplayerGamePage(QWidget):
         
         # Emit signal for parent components
         self.player_progress_updated.emit(player_name, "DISCONNECTED", 0)
+    
+    def on_player_color_updated(self, player_name, color_hex, color_name):
+        """Handle player color update during game"""
+        print(f"🎨 Player {player_name} updated color to {color_name} ({color_hex})")
+        
+        # Update Player instance if it exists
+        if player_name in self.player_instances:
+            player_instance = self.player_instances[player_name]
+            player_instance.update_color(color_hex, color_name)
+            print(f"🎨 Updated {player_name}'s Player instance color to {color_hex}")
+        
+        # CRITICAL FIX: Also update the PlayerProgressWidget directly
+        if player_name in self.players:
+            player_widget = self.players[player_name]
+            player_widget.update_color(color_hex)
+            print(f"🎨 Updated {player_name}'s progress widget color to {color_hex}")
+        else:
+            print(f"⚠️ Player {player_name} not found in players widgets")
     
     def stop_all_progress_bars(self):
         """Stop progress tracking for all players when game ends"""

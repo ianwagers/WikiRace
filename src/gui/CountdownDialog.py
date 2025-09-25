@@ -195,7 +195,7 @@ class CountdownDialog(QDialog):
         layout.addStretch()
     
     def center_on_parent(self):
-        """Center the dialog on the parent window with offset for multiple dialogs"""
+        """Center the dialog on the parent window with current position"""
         parent = self.parent()
         while parent and parent.parent():
             if hasattr(parent, 'geometry'):
@@ -207,19 +207,37 @@ class CountdownDialog(QDialog):
             from PyQt6.QtWidgets import QApplication
             parent_geo = QApplication.primaryScreen().geometry()
         
-        # Calculate base center position
-        base_x = parent_geo.x() + (parent_geo.width()) // 2
-        base_y = parent_geo.y() + (parent_geo.height()) // 2
+        # Get current parent window position (not original)
+        if hasattr(parent, 'window'):
+            # If parent has a window property, use that
+            parent_geometry = parent.window().geometry()
+        else:
+            # Get current geometry of parent
+            parent_geometry = parent_geo
         
-        # Add offset for multiple dialogs (stagger them)
-        offset_x = (int(self.dialog_id.split('_')[1]) % 5) * 50  # Offset based on dialog ID
-        offset_y = (int(self.dialog_id.split('_')[1]) % 3) * 30
+        # Calculate center position - dialog should be centered on parent
+        dialog_size = self.size()
+        center_x = parent_geometry.x() + (parent_geometry.width() - dialog_size.width()) // 2
+        center_y = parent_geometry.y() + (parent_geometry.height() - dialog_size.height()) // 2
         
-        x = base_x + offset_x
-        y = base_y + offset_y
+        # Add small offset for multiple dialogs (stagger them slightly)
+        offset_x = (int(self.dialog_id.split('_')[1]) % 3) * 20  # Reduced offset
+        offset_y = (int(self.dialog_id.split('_')[1]) % 3) * 15  # Reduced offset
+        
+        x = center_x + offset_x
+        y = center_y + offset_y
+        
+        # Ensure dialog stays on screen
+        screen_geometry = self.parent().screen().availableGeometry()
+        x = max(screen_geometry.left(), min(x, screen_geometry.right() - dialog_size.width()))
+        y = max(screen_geometry.top(), min(y, screen_geometry.bottom() - dialog_size.height()))
         
         print(f"🎬 DEBUG: Positioning CountdownDialog {self.dialog_id} at ({x}, {y})")
         self.move(x, y)
+        
+        # Force update to ensure positioning works
+        self.update()
+        self.repaint()
     
     def apply_theme(self):
         """Apply theme-based styling with responsive fonts"""

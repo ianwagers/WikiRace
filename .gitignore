@@ -14,3 +14,6 @@ __pycache__/
 /logs/
 build_portable/
 /Python313/
+
+# Other files
+wikirace_server.log
