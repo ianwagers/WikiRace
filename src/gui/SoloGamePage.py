@@ -126,7 +126,6 @@ class SoloGamePage(QWidget):
         # Top-bar section
         destinationTitle = self.end_title if self.end_title else self.getTitleFromUrlPath(self.end_url)
         self.topBarLabel = QLabel("Destination page: " + destinationTitle)
-        self.topBarLabel.setStyleSheet("font-size: 20px; font-weight: bold; padding: 10px;")
         self.mainContentLayout.addWidget(self.topBarLabel)
 
         # Initialize and configure the web view with Wikipedia theme
@@ -167,18 +166,6 @@ class SoloGamePage(QWidget):
         print(f"🎨 WikiRace: [{time.time():.3f}] SoloGamePage AGGRESSIVE theme setup with theme: {current_theme}")
         print(f"🔍 WikiRace: [{time.time():.3f}] Theme manager current state: {theme_manager.get_theme()}")
         
-        # STEP 1: Clear all existing theme state first
-        print(f"🧹 WikiRace: [{time.time():.3f}] Step 1: Clearing all theme state...")
-        WikipediaTheme._clearThemeState(self.webView)
-        
-        # STEP 2: Force setup theme from scratch
-        print(f"🔧 WikiRace: [{time.time():.3f}] Step 2: Setting up {current_theme} theme from scratch...")
-        WikipediaTheme._setupInitialTheme(self.webView, current_theme)
-        WikipediaTheme._setupNavigationScripts(self.webView, current_theme)
-        
-        # VERIFICATION: Double-check theme was applied
-        print(f"✅ WikiRace: [{time.time():.3f}] AGGRESSIVE theme setup completed with theme: {current_theme}")
-        
         # Ensure Vector 2022 skin is used for theme support
         start_url_with_skin = WikipediaTheme.ensureVector2022Skin(self.start_url)
         end_url_with_skin = WikipediaTheme.ensureVector2022Skin(self.end_url)
@@ -186,6 +173,14 @@ class SoloGamePage(QWidget):
         # Update the URLs to use Vector 2022 skin
         self.start_url = start_url_with_skin
         self.end_url = end_url_with_skin
+        
+        # STEP 1: Use the optimized theme setup method BEFORE loading
+        # This ensures theme is applied before page content loads
+        print(f"🔧 WikiRace: [{time.time():.3f}] Setting up {current_theme} theme using optimized method...")
+        WikipediaTheme.setupThemeWithNavigation(self.webView, current_theme)
+        
+        # VERIFICATION: Double-check theme was applied
+        print(f"✅ WikiRace: [{time.time():.3f}] Theme setup completed with theme: {current_theme}")
         
         # Start loading the page
         self.webView.load(QUrl(self.start_url))
@@ -218,6 +213,72 @@ class SoloGamePage(QWidget):
         self.confetti_widget.hide()
         
         theme_manager.theme_changed.connect(self.on_theme_changed)
+        
+        # Apply initial theme
+        self.apply_theme()
+
+    def apply_theme(self):
+        """Apply theme styles to SoloGamePage components"""
+        styles = theme_manager.get_theme_styles()
+        
+        # Apply theme to main widget
+        self.setStyleSheet(f"""
+            QWidget {{
+                background-color: {styles['background_color']};
+                color: {styles['text_color']};
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+            }}
+            QLabel {{
+                color: {styles['text_color']};
+                font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+            }}
+        """)
+        
+        # Apply specific styling to labels
+        if hasattr(self, 'topBarLabel'):
+            self.topBarLabel.setStyleSheet(f"""
+                font-size: 20px; 
+                font-weight: bold; 
+                padding: 10px;
+                color: {styles['text_color']};
+                background-color: transparent;
+            """)
+        
+        if hasattr(self, 'stopwatchLabel'):
+            self.stopwatchLabel.setStyleSheet(f"""
+                font-size: 26px;
+                color: {styles['text_color']};
+                background-color: transparent;
+            """)
+        
+        if hasattr(self, 'linksUsedLabel'):
+            self.linksUsedLabel.setStyleSheet(f"""
+                font-size: 16px;
+                color: {styles['text_color']};
+                background-color: transparent;
+            """)
+        
+        if hasattr(self, 'previousLinksList'):
+            self.previousLinksList.setStyleSheet(f"""
+                QListWidget {{
+                    background-color: {styles['secondary_background']};
+                    color: {styles['text_color']};
+                    border: 1px solid {styles['border_color']};
+                    border-radius: 6px;
+                    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+                }}
+                QListWidget::item {{
+                    padding: 8px;
+                    border-bottom: 1px solid {styles['border_color']};
+                }}
+                QListWidget::item:selected {{
+                    background-color: {styles['tertiary_background']};
+                    color: {styles['text_color']};
+                }}
+                QListWidget::item:hover {{
+                    background-color: {styles['tertiary_background']};
+                }}
+            """)
 
     def onLoadStarted(self):
         """Handle page load started - theme is already set via cookies"""
@@ -238,6 +299,11 @@ class SoloGamePage(QWidget):
             load_duration = (self.page_load_finish_time - self.page_load_start_time) * 1000 if self.page_load_start_time else 0
             print(f"✅ WikiRace: [{self.page_load_finish_time:.3f}] SoloGamePage - Page loaded successfully with Wikipedia {current_theme} theme (load time: {load_duration:.1f}ms)")
             print(f"✅ WikiRace: [{self.page_load_finish_time:.3f}] SoloGamePage - Final URL: {self.webView.url().toString()}")
+            
+            # CRITICAL: Force theme application after page load to ensure it's applied
+            print(f"🔧 WikiRace: SoloGamePage - Force applying {current_theme} theme after page load...")
+            WikipediaTheme.forceTheme(self.webView, current_theme)
+            
             # Skip verification for performance - theme should be working via cookies
             print(f"✅ WikiRace: [{time.time():.3f}] SoloGamePage - Page loaded - {current_theme} theme should be active")
             
@@ -274,7 +340,7 @@ class SoloGamePage(QWidget):
                     def handle_check(visible):
                         if visible:
                             print(f"🔧 WikiRace: [{time.time():.3f}] Navigation still visible, applying fallback CSS...")
-                            WikipediaTheme._injectNavigationCSS(self.webView)
+                            WikipediaTheme.setupThemeWithNavigation(self.webView, current_theme)
                         else:
                             print(f"✅ WikiRace: [{time.time():.3f}] Navigation already hidden by DocumentReady script")
                     
@@ -320,7 +386,7 @@ class SoloGamePage(QWidget):
                             
                             if not matches:
                                 print(f"❌ WikiRace: [{time.time():.3f}] THEME MISMATCH DETECTED! Forcing correct theme...")
-                                WikipediaTheme.forceTheme(self.webView, current_theme)
+                                WikipediaTheme.setupThemeWithNavigation(self.webView, current_theme)
                     
                     self.webView.page().runJavaScript(verify_script, handle_verification)
                 
@@ -449,15 +515,22 @@ class SoloGamePage(QWidget):
         
         1. Updates webview background to prevent flash during theme switch
         2. Calls refreshWikipediaPage() to re-setup theme scripts
-        3. Without this, switching themes will leave solo games in old theme
+        3. Applies theme to all UI components
+        4. Without this, switching themes will leave solo games in old theme
         
         REGRESSION PREVENTION:
         - This method MUST be connected to theme_manager.theme_changed signal
         - refreshWikipediaPage() MUST be called to update Wikipedia theme
         - WebView background MUST be updated to match new theme
+        - apply_theme() MUST be called to update UI components
         """
         print(f"🎨 WikiRace: SoloGamePage - Theme changed to: {theme}")
         print(f"🔍 WikiRace: SoloGamePage - Current theme manager state: {theme_manager.get_theme()}")
+        
+        # CRITICAL: Apply theme to all UI components first
+        # DO NOT REMOVE: This updates labels, lists, and other UI elements
+        self.apply_theme()
+        print(f"🎨 WikiRace: SoloGamePage - Applied theme to UI components")
         
         # CRITICAL: Update webview background to prevent visual flash
         # DO NOT REMOVE: This prevents white/dark flash during theme transition
@@ -514,8 +587,10 @@ class SoloGamePage(QWidget):
         if currentPage.lower().strip() == destinationPage.lower().strip():
             print(f"🏆 WikiRace: [{time.time():.3f}] GAME COMPLETED! Player reached destination page!")
             
-            # Stop the timer immediately
+            # CRITICAL FIX: Stop the timer immediately and store game end time
             self.timer.stop()
+            self.game_end_time = time.time()
+            print(f"⏰ WikiRace: [{self.game_end_time:.3f}] Timer stopped for game completion - confetti time excluded from total")
             
             # Emit game completed signal for multiplayer integration
             self.gameCompleted.emit()
@@ -536,7 +611,11 @@ class SoloGamePage(QWidget):
                     
                     if exact_current_normalized == destination_normalized:
                         print(f"🏆 WikiRace: [{time.time():.3f}] GAME COMPLETED! (via exact title check) Player reached destination page!")
+                        
+                        # CRITICAL FIX: Stop the timer immediately and store game end time
                         self.timer.stop()
+                        self.game_end_time = time.time()
+                        print(f"⏰ WikiRace: [{self.game_end_time:.3f}] Timer stopped for game completion (exact title) - confetti time excluded from total")
                         
                         # Emit game completed signal for multiplayer integration
                         self.gameCompleted.emit()
@@ -548,7 +627,9 @@ class SoloGamePage(QWidget):
     
     def startGame(self):
         """Start the game - for multiplayer integration"""
-        # Reset game state for new game
+        print(f"🔄 WikiRace: [{time.time():.3f}] Starting new game - resetting all progress")
+        
+        # CRITICAL FIX: Reset game state for new game - ensure links reset to 0 between multiple games
         self.linksUsed = 0
         self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
         self.startTime = time.time()  # Reset start time for multiplayer games
@@ -557,9 +638,12 @@ class SoloGamePage(QWidget):
         # Clear previous links list
         self.previousLinksList.clear()
         
-        # Start the timer if not already running
-        if not self.timer.isActive():
+        # Stop any existing timer and restart fresh
+        if hasattr(self, 'timer'):
+            self.timer.stop()
             self.timer.start()
+        
+        print(f"✅ WikiRace: [{time.time():.3f}] Game state reset - Links: {self.linksUsed}, Timer: {'running' if self.timer.isActive() else 'stopped'}")
         
         # Load the starting page
         if self.start_url:
@@ -567,6 +651,13 @@ class SoloGamePage(QWidget):
     
     def showConfettiAndDialog(self):
         """Show confetti first, then dialog after confetti finishes"""
+        # CRITICAL FIX: Stop the timer immediately when confetti starts to exclude confetti time from total
+        if hasattr(self, 'timer') and self.timer.isActive():
+            self.timer.stop()
+            # Store the exact time when the timer stopped to use in dialog calculation
+            self.game_end_time = time.time()
+            print(f"⏰ WikiRace: [{self.game_end_time:.3f}] Timer stopped for confetti effect - confetti time excluded from total")
+        
         # Show confetti on the current game page
         self.triggerConfetti()
         
@@ -648,7 +739,7 @@ class EndGameDialog(QDialog):
         messageLabel = QLabel("Congratulations!")
         messageLabel.setStyleSheet(f"""
             font-size: 24px; 
-            color: {styles['accent_color']}; 
+            color: {styles['text_color']}; 
             padding: 10px;
             font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
             font-weight: bold;
@@ -668,8 +759,12 @@ class EndGameDialog(QDialog):
         """) 
         layout.addWidget(messageSubscript)
 
-        # Calculate total elapsed time
-        elapsed_time = time.time() - self.gamePage.startTime
+        # Calculate total elapsed time using the exact time when timer stopped (excluding confetti time)
+        if hasattr(self.gamePage, 'game_end_time'):
+            elapsed_time = self.gamePage.game_end_time - self.gamePage.startTime
+        else:
+            # Fallback to current time if game_end_time not set
+            elapsed_time = time.time() - self.gamePage.startTime
         totalTimeLabel = QLabel("Total time (hh:mm:ss): " + self.gamePage.formatTime(elapsed_time))
         totalTimeLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
         totalTimeLabel.setStyleSheet(f"""
@@ -693,6 +788,19 @@ class EndGameDialog(QDialog):
         layout.addWidget(closeButton)
 
     def returnToHomePage(self):
+        # CRITICAL FIX: Close the Solo Game tab after "Continue" button clicked
+        try:
+            # Find the current game tab index
+            current_index = self.tabWidget.indexOf(self.gamePage)
+            if current_index >= 0:
+                print(f"🗑️ WikiRace: [{time.time():.3f}] Closing Solo Game tab at index {current_index}")
+                self.tabWidget.removeTab(current_index)
+            else:
+                print(f"⚠️ WikiRace: [{time.time():.3f}] Could not find Solo Game tab to close")
+        except Exception as e:
+            print(f"❌ WikiRace: [{time.time():.3f}] Error closing Solo Game tab: {e}")
+        
+        # Switch to home page
         self.tabWidget.setCurrentIndex(self.homePageIndex)
         self.close()
 

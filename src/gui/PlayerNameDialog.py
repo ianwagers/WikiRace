@@ -207,25 +207,32 @@ class PlayerNameDialog(QDialog):
         # Clear any previous error state
         self.error_label.setVisible(False)
         
+        # Get theme-appropriate colors
+        styles = theme_manager.get_theme_styles()
+        if styles.get('is_dark', True):
+            normal_color = "#95a5a6"
+        else:
+            normal_color = "#4a4a4a"
+        
         # Change color based on character count with consistent styling
         if count > 45:
-            self.char_count_label.setStyleSheet("""
+            self.char_count_label.setStyleSheet(f"""
                 font-size: 12px; 
                 color: #e74c3c;
                 margin-top: 2px;
                 opacity: 0.9;
             """)
         elif count > 40:
-            self.char_count_label.setStyleSheet("""
+            self.char_count_label.setStyleSheet(f"""
                 font-size: 12px; 
                 color: #f39c12;
                 margin-top: 2px;
                 opacity: 0.9;
             """)
         else:
-            self.char_count_label.setStyleSheet("""
+            self.char_count_label.setStyleSheet(f"""
                 font-size: 12px; 
-                color: #95a5a6;
+                color: {normal_color};
                 margin-top: 2px;
                 opacity: 0.7;
             """)
@@ -260,12 +267,17 @@ class PlayerNameDialog(QDialog):
         self.name_input.setFocus()
     
     def apply_theme(self):
-        """Apply improved theme-based styling with near-black panel and unified design"""
+        """Apply improved theme-based styling with adaptive panel and unified design"""
         styles = theme_manager.get_theme_styles()
         
-        # Use near-black panel color (#0F1115) with subtle border and shadow
-        panel_color = "#0F1115"
-        border_color = "#404040"  # Gray border that works with dark theme
+        # Use adaptive panel color based on theme
+        if styles.get('is_dark', True):
+            panel_color = "#0F1115"  # Near-black for dark theme
+            border_color = "#404040"  # Gray border for dark theme
+        else:
+            panel_color = "#FFFFFF"  # White for light theme
+            border_color = "#CCCCCC"  # Light gray border for light theme
+        
         accent_color = styles['accent_color']
         
         # Apply backdrop dimming and remove any default borders
@@ -297,6 +309,15 @@ class PlayerNameDialog(QDialog):
             container_frame.setGraphicsEffect(shadow)
         
         # Input field styling - remove borders around input and counter
+        if styles.get('is_dark', True):
+            input_text_color = "#E6EAF2"
+            placeholder_color = "rgba(230, 234, 242, 0.6)"
+            hover_color = "rgba(255, 255, 255, 0.05)"
+        else:
+            input_text_color = "#1A1A1A"
+            placeholder_color = "rgba(26, 26, 26, 0.6)"
+            hover_color = "rgba(0, 0, 0, 0.05)"
+        
         self.name_input.setStyleSheet(f"""
             QLineEdit {{
                 background-color: {panel_color};
@@ -304,7 +325,7 @@ class PlayerNameDialog(QDialog):
                 border-radius: 10px;
                 padding: 12px 16px;
                 font-size: 15px;
-                color: #E6EAF2;
+                color: {input_text_color};
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
                 selection-background-color: {accent_color};
             }}
@@ -313,18 +334,23 @@ class PlayerNameDialog(QDialog):
                 background-color: {panel_color};
             }}
             QLineEdit:hover {{
-                background-color: rgba(255, 255, 255, 0.05);
+                background-color: {hover_color};
             }}
             QLineEdit::placeholder {{
-                color: rgba(230, 234, 242, 0.6);
+                color: {placeholder_color};
                 font-size: 15px;
             }}
         """)
         
         # Character counter styling - no borders, completely clean
+        if styles.get('is_dark', True):
+            counter_color = "rgba(149, 165, 166, 0.7)"
+        else:
+            counter_color = "rgba(74, 74, 74, 0.7)"
+        
         self.char_count_label.setStyleSheet(f"""
             font-size: 12px;
-            color: rgba(149, 165, 166, 0.7);
+            color: {counter_color};
             margin-top: 2px;
             background-color: transparent;
             border: none;
@@ -339,7 +365,14 @@ class PlayerNameDialog(QDialog):
             margin-top: 4px;
         """)
         
-        # Cancel button (secondary/ghost style) - remove yellow borders
+        # Cancel button (secondary/ghost style) - adaptive styling
+        if styles.get('is_dark', True):
+            cancel_hover_color = "rgba(255, 255, 255, 0.05)"
+            cancel_pressed_color = "rgba(255, 255, 255, 0.1)"
+        else:
+            cancel_hover_color = "rgba(0, 0, 0, 0.05)"
+            cancel_pressed_color = "rgba(0, 0, 0, 0.1)"
+        
         self.cancel_button.setStyleSheet(f"""
             QPushButton {{
                 font-size: 14px;
@@ -352,11 +385,11 @@ class PlayerNameDialog(QDialog):
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
             }}
             QPushButton:hover {{
-                background-color: rgba(255, 255, 255, 0.05);
+                background-color: {cancel_hover_color};
                 border-color: {styles['border_hover']};
             }}
             QPushButton:pressed {{
-                background-color: rgba(255, 255, 255, 0.1);
+                background-color: {cancel_pressed_color};
             }}
         """)
         

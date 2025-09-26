@@ -33,6 +33,10 @@ class NetworkManager(QObject):
     reconnected = pyqtSignal()           # successfully reconnected
     game_config_updated = pyqtSignal(dict)  # config_data
     player_color_updated = pyqtSignal(str, str, str)  # player_name, color_hex, color_name
+    kicked_for_inactivity = pyqtSignal(str)  # reason
+    room_closed = pyqtSignal(str)  # reason
+    player_disconnected = pyqtSignal(str, str)  # player_name, message
+    player_reconnected = pyqtSignal(str, str)  # player_name, message
     
     def __init__(self, server_url: str = "http://127.0.0.1:8000"):  # Fixed to match server port
         super().__init__()
@@ -275,6 +279,32 @@ class NetworkManager(QObject):
             
             # Always emit the signal, regardless of player instance
             self.player_color_updated.emit(player_name, color_hex, color_name)
+        
+        @self.sio.event
+        def kicked_for_inactivity(data):
+            print(f"⏰ Kicked for inactivity: {data}")
+            reason = data.get('reason', 'timeout')
+            self.kicked_for_inactivity.emit(reason)
+        
+        @self.sio.event
+        def room_closed(data):
+            print(f"🚪 Room closed: {data}")
+            reason = data.get('reason', 'timeout')
+            self.room_closed.emit(reason)
+        
+        @self.sio.event
+        def player_disconnected(data):
+            print(f"🔌 Player disconnected: {data}")
+            player_name = data.get('player_name', '')
+            message = data.get('message', '')
+            self.player_disconnected.emit(player_name, message)
+        
+        @self.sio.event
+        def player_reconnected(data):
+            print(f"🔄 Player reconnected: {data}")
+            player_name = data.get('player_name', '')
+            message = data.get('message', '')
+            self.player_reconnected.emit(player_name, message)
         
         @self.sio.event
         def room_progress_sync(data):

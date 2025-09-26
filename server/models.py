@@ -55,6 +55,7 @@ class Player(BaseModel):
     # Timestamps
     joined_at: datetime = Field(default_factory=datetime.utcnow, description="When player joined room")
     last_activity: datetime = Field(default_factory=datetime.utcnow, description="Last activity timestamp")
+    disconnected: bool = Field(default=False, description="Whether player disconnected during game")
     
     @validator('display_name')
     def validate_display_name(cls, v):

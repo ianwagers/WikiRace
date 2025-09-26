@@ -128,8 +128,27 @@ class RoomManager:
         # Check if player name already exists in room
         existing_player = room.get_player_by_name(display_name)
         if existing_player:
-            logger.warning(f"Player name '{display_name}' already exists in room {room_code}")
-            return None
+            # CRITICAL FIX: Handle rejoin scenario - allow rejoin if same socket ID or if player was disconnected
+            if existing_player.socket_id == player_socket_id:
+                logger.info(f"Player {display_name} rejoining room {room_code} with same socket ID")
+                # Update the player mapping in case it was lost
+                self.player_to_room[player_socket_id] = room_code
+                return room
+            elif existing_player.disconnected:
+                # Player was disconnected and is rejoining with a new socket ID
+                logger.info(f"Player {display_name} rejoining room {room_code} with new socket ID (was disconnected)")
+                # Remove old socket mapping
+                self.player_to_room.pop(existing_player.socket_id, None)
+                # Update player's socket ID
+                existing_player.socket_id = player_socket_id
+                existing_player.disconnected = False
+                existing_player.last_activity = datetime.utcnow()
+                # Add new socket mapping
+                self.player_to_room[player_socket_id] = room_code
+                return room
+            else:
+                logger.warning(f"Player name '{display_name}' already exists in room {room_code} and is not disconnected")
+                return None
         
         # Create player
         player = Player(
@@ -211,15 +230,42 @@ class RoomManager:
         
         room = self.rooms[room_code]
         
+        # CRITICAL FIX: Ensure complete cleanup of all persistent data
         # Remove all player mappings
         for socket_id in list(room.players.keys()):
             self.player_to_room.pop(socket_id, None)
         
-        # Remove room
+        # Remove room from Redis if available
+        if self.use_redis:
+            try:
+                import asyncio
+                # Run Redis cleanup in event loop if available
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # Schedule Redis cleanup
+                    asyncio.create_task(self._remove_room_from_redis(room_code))
+                else:
+                    # Run directly if no event loop
+                    asyncio.run(self._remove_room_from_redis(room_code))
+            except Exception as e:
+                logger.error(f"Failed to remove room {room_code} from Redis: {e}")
+        
+        # Remove room from memory
         del self.rooms[room_code]
         
-        logger.info(f"Closed room {room_code}")
+        logger.info(f"Closed room {room_code} and cleared all persistent data")
         return True
+    
+    async def _remove_room_from_redis(self, room_code: str) -> bool:
+        """Remove room data from Redis"""
+        if not self.use_redis:
+            return True
+        
+        try:
+            return await redis_manager.remove_room(room_code)
+        except Exception as e:
+            logger.error(f"Failed to remove room {room_code} from Redis: {e}")
+            return False
     
     def cleanup_expired_rooms(self) -> int:
         """Remove expired rooms and return count of cleaned rooms"""

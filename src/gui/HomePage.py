@@ -133,9 +133,6 @@ class HomePage(QWidget):
         self.url_interceptor = WikipediaUrlInterceptor()
         profile.setUrlRequestInterceptor(self.url_interceptor)
         
-        # OPTIMIZED: Set up Wikipedia theme with navigation hiding in one go
-        WikipediaTheme.setupThemeWithNavigation(self.webView, theme_manager.get_theme())
-        
         # Hide the webview initially to prevent flash of light content
         self.webView.setVisible(False)
         
@@ -143,6 +140,10 @@ class HomePage(QWidget):
         self.webView.page().loadStarted.connect(self.onLoadStarted)
         self.webView.page().loadFinished.connect(self.onPageLoaded)
         self.webView.urlChanged.connect(self.onUrlChanged)
+        
+        # OPTIMIZED: Set up Wikipedia theme with navigation hiding BEFORE loading
+        # This ensures theme is applied before page content loads
+        WikipediaTheme.setupThemeWithNavigation(self.webView, theme_manager.get_theme())
         
         # Ensure Vector 2022 skin is used for theme support
         main_page_url = WikipediaTheme.ensureVector2022Skin("https://en.wikipedia.org/wiki/Main_Page")
@@ -195,6 +196,10 @@ class HomePage(QWidget):
             print(f"✅ WikiRace: HomePage - Page loaded successfully with Wikipedia {current_theme} theme")
             print(f"✅ WikiRace: HomePage - Final URL: {self.webView.url().toString()}")
             
+            # CRITICAL: Force theme application after page load to ensure it's applied
+            print(f"🔧 WikiRace: HomePage - Force applying {current_theme} theme after page load...")
+            WikipediaTheme.forceTheme(self.webView, current_theme)
+            
             # Check if this is the Wikipedia main page and apply customization
             current_url = self.webView.url().toString()
             if "en.wikipedia.org/wiki/Main_Page" in current_url:
@@ -203,15 +208,14 @@ class HomePage(QWidget):
             
             # Verify theme was applied (for debugging)
             print(f"🔍 WikiRace: HomePage - Running {current_theme} mode verification...")
-            WikipediaTheme.verifyDarkModeApplied(self.webView)
+            # Theme verification is now handled automatically by setupThemeWithNavigation
             
             # Also check what cookies are actually in the browser
             print("🍪 WikiRace: HomePage - Checking cookies in browser...")
-            WikipediaTheme.checkCookiesInBrowser(self.webView)
+            # Cookie checking is now handled automatically by setupThemeWithNavigation
             
-            # If theme wasn't applied properly, force it
-            print(f"🔧 WikiRace: HomePage - Attempting to force {current_theme} theme as fallback...")
-            WikipediaTheme.forceTheme(self.webView, current_theme)
+            # OPTIMIZED: Theme setup is already handled by setupThemeWithNavigation during initialization
+            # No need to force it again here as the DocumentCreation script should handle it
             
             # OPTIMIZED: Navigation elements are hidden automatically by DOMContentLoaded script
             print(f"✅ WikiRace: [{time.time():.3f}] HomePage - Navigation elements handled by automatic script")
@@ -229,15 +233,17 @@ class HomePage(QWidget):
         # No need to reload - prevents redirect loops and double loading
         self.darkModeApplied = False  # Reset flag for new page
         
+        # Get current theme
+        current_theme = theme_manager.get_theme()
+        
         # Check if this is the Wikipedia main page and apply customization
         if "en.wikipedia.org/wiki/Main_Page" in url_str:
             print("🏠 WikiRace: HomePage - Detected Wikipedia main page in URL change, applying customization...")
             from PyQt6.QtCore import QTimer
             QTimer.singleShot(500, lambda: WikipediaTheme.applyMainPageCustomization(self.webView))
         
-        # Schedule hiding navigation elements after a brief delay to ensure page is loaded
-        from PyQt6.QtCore import QTimer
-        QTimer.singleShot(500, lambda: WikipediaTheme.hideNavigationElements(self.webView))
+        # OPTIMIZED: Theme setup is already handled by setupThemeWithNavigation during initialization
+        # No need to call it again here as it will be handled automatically by the DocumentReady script
 
     def showWebView(self):
         """Show the webview after theme has been applied"""
@@ -602,7 +608,7 @@ class CustomGameDialog(QDialog):
                 font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
             }}
             QLabel[objectName="sectionLabel"] {{
-                color: {styles['accent_color']};
+                color: {styles['text_color']};
                 font-weight: bold;
                 font-size: 14px;
             }}

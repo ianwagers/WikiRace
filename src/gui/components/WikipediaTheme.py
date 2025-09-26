@@ -19,55 +19,48 @@ class WikipediaTheme:
     OPTIMIZED: Now includes instant CSS injection for sub-second performance
     """
     
-    # Pre-compiled CSS for hiding navigation elements (optimized for performance)
+    # Optimized CSS for hiding navigation elements (lean and deterministic)
     _HIDE_NAVIGATION_CSS = """
-        /* Hide main header and navigation */
-        #mw-head, .vector-header, .vector-header-container, #mw-navigation, #mw-panel,
-        .vector-menu-tabs, .vector-menu-dropdown, .vector-user-menu, .vector-search-box,
-        #p-logo, #left-navigation, #right-navigation, .vector-main-menu, .vector-page-tools,
-        .vector-toc, #footer, .vector-footer, .mw-footer, #mw-footer, .vector-sidebar,
-        .vector-main-menu-container, .mw-editsection, .vector-view-edit, .vector-view-history,
-        .vector-view-view, .vector-more-collapsible, .vector-page-toolbar,
-        .vector-page-toolbar-container, #ca-talk, #ca-edit, #ca-ve-edit, #ca-history,
-        #ca-watch, #ca-unwatch, .mw-notification-area, #catlinks, .dablink, .hatnote,
-        #See_also, #Notes, #References, #Citations, #Bibliography, #Works_cited,
-        #Further_reading, #External_links, #Primary_sources, #Sources, #Footnotes,
-        #Navigation_boxes, #Categories, #Interlanguage_links, .vector-header-start,
-        .vector-logo { display: none !important; }
+        /* Top/header/side/tool menus */
+        #mw-head, .vector-header, .vector-header-container,
+        #mw-navigation, #mw-panel, .vector-main-menu, .vector-page-tools,
+        .vector-toc, .vector-sidebar, .vector-page-toolbar, .vector-page-toolbar-container,
+        .vector-logo, #p-logo { display:none !important; }
         
-        /* Hide external link icons */
-        .external:after { display: none !important; visibility: hidden !important; }
+        /* Appearance widget / menu (Vector 2022 variants) */
+        #p-appearance, [id^="vector-appearance"], [class*="vector-appearance"],
+        [aria-controls^="vector-appearance"], .vector-appearance, .vector-appearance-menu,
+        .vector-user-menu-item a[href*="Special:Preferences#mw-prefsection-rendering"],
+        a[href*="Special:Preferences#mw-prefsection-rendering"],
+        .vector-user-menu-item a[href*="appearance"],
+        .vector-user-menu-item a[href*="skins"],
+        .vector-user-menu-item a[href*="theme"] { display:none !important; }
         
-        /* Adjust main content area for full width */
+        /* External link icons (cheap) */
+        .external:after { display:none !important; visibility:hidden !important; }
+        
+        /* Content width sane */
         #content, .vector-body, .mw-body, #mw-content-text {
-            margin-left: 0 !important; margin-right: 0 !important;
-            padding-left: 20px !important; padding-right: 20px !important;
+            margin:0 !important; padding:0 20px !important;
         }
-        .vector-body { max-width: none !important; width: 100% !important; }
+        .vector-body { max-width:none !important; width:100% !important; }
         
-        /* Preserve and style article title - reduced font size for better balance */
-        h1.firstHeading, h1#firstHeading, h1.mw-page-title, .mw-page-title, .vector-page-title,
-        .mw-body h1:first-of-type, #content h1:first-of-type, .vector-body h1:first-of-type,
-        .mw-body-content h1:first-of-type, #mw-content-text h1:first-of-type,
-        .vector-page-titlebar h1, .vector-page-titlebar .mw-page-title,
-        .vector-page-titlebar .firstHeading {
-            display: block !important; visibility: visible !important; opacity: 1 !important;
-            color: inherit !important; font-size: 1.4em !important; font-weight: bold !important;
-            margin: 0.67em 0 !important; padding: 0 !important; line-height: 1.2 !important;
-            text-decoration: none !important;
+        /* Keep the article title visible and clean */
+        h1#firstHeading, h1.firstHeading, .vector-page-titlebar .firstHeading {
+            display:block !important; font-size:1.4em !important; line-height:1.2 !important;
+            font-weight:700 !important; margin:0.67em 0 !important; color:inherit !important;
         }
+        .vector-page-titlebar { background:transparent !important; border:none !important; padding:0 !important; margin:0 !important; }
         
-        /* Clean up titlebar styling */
-        .vector-page-titlebar {
-            background: transparent !important; border: none !important;
-            padding: 0 !important; margin: 0 !important;
-        }
+        /* Bottom "footer-ish" article sections (hide section contents) */
+        h2#References ~ *, h2#Notes ~ *, h2#Citations ~ *, h2#Bibliography ~ *,
+        h2#External_links ~ *, h2#See_also ~ *, h2#Further_reading ~ *,
+        h2#Footnotes ~ * { display:none !important; }
         
-        /* Hide footer sections using efficient selectors */
-        h2[id*="eference"] ~ *, h2[id*="ote"] ~ *, h2[id*="ee_also"] ~ *,
-        h2[id*="xternal"] ~ *, h2[id*="itation"] ~ *, h2[id*="ibliography"] ~ * {
-            display: none !important;
-        }
+        /* Also handle id variations generated by MediaWiki (case/underscore) */
+        h2[id*="eference"] ~ *, h2[id*="ote"] ~ *, h2[id*="itation"] ~ *,
+        h2[id*="ibliography"] ~ *, h2[id*="xternal"] ~ *, h2[id*="ee_also"] ~ *,
+        h2[id*="Further"] ~ *, h2[id*="ootnote"] ~ * { display:none !important; }
     """
     
     # Pre-compiled CSS specifically for Wikipedia main page customization
@@ -77,6 +70,598 @@ class WikipediaTheme:
         /* All main page styling is done via JavaScript for better compatibility */
     """
     
+    
+    
+    
+    
+    @staticmethod
+    def ensureVector2022Skin(url: str) -> str:
+        """
+        Ensure Wikipedia URLs use the Vector 2022 skin for dark mode support
+        Also adds performance optimizations to the URL
+        """
+        print(f"🔗 WikiRace: Ensuring Vector 2022 skin for URL: {url}")
+        
+        if not url or "wikipedia.org" not in url:
+            print(f"⚠️ WikiRace: URL is not a Wikipedia URL, skipping skin modification")
+            return url
+            
+        original_url = url
+        
+        # Parse URL to check for existing query parameters
+        if "?" in url:
+            # URL already has query parameters
+            if "useskin=" in url:
+                # Replace existing useskin parameter
+                import re
+                url = re.sub(r'useskin=[^&]*', 'useskin=vector-2022', url)
+                print(f"🔄 WikiRace: Replaced existing useskin parameter")
+            else:
+                # Add useskin parameter
+                url += "&useskin=vector-2022"
+                print(f"➕ WikiRace: Added useskin parameter to existing query string")
+            
+            # Could add performance parameters here if needed
+        else:
+            # No query parameters, add useskin only
+            url += "?useskin=vector-2022"
+            print(f"➕ WikiRace: Added useskin parameter as new query string")
+            
+        if url != original_url:
+            print(f"✅ WikiRace: URL updated from {original_url} to {url}")
+        else:
+            print(f"ℹ️ WikiRace: URL unchanged (already has correct skin)")
+            
+        return url
+    
+    
+    
+    
+    
+    
+    # Class variable to prevent concurrent setup
+    _setup_in_progress = False
+    
+    # Class variable to track last setup theme to prevent conflicts
+    _last_setup_theme = None
+    
+    @staticmethod
+    def setupThemeWithNavigation(webView: QWebEngineView, theme: str = 'dark'):
+        """
+        OPTIMIZED: Combined theme setup and navigation hiding in a single DocumentCreation script
+        This eliminates the 3-4 second delay by applying everything before the page renders
+        Also sets up scripts for subsequent page navigations
+        
+        CRITICAL: This method handles theme switching for existing WebViews
+        DO NOT REMOVE: Essential for preventing theme switching regressions
+        
+        THREAD-SAFE: Prevents race conditions when multiple WebViews share the same profile
+        """
+        print(f"🔄 WikiRace: [{time.time():.3f}] setupThemeWithNavigation called with theme: {theme}")
+        
+        # THREAD-SAFE: Prevent race conditions when multiple pages try to setup theme simultaneously
+        if WikipediaTheme._setup_in_progress:
+            print(f"⏳ WikiRace: [{time.time():.3f}] Theme setup already in progress, waiting...")
+            # Wait a bit and try again
+            import time as time_module
+            time_module.sleep(0.1)
+            if WikipediaTheme._setup_in_progress:
+                print(f"⏳ WikiRace: [{time.time():.3f}] Theme setup still in progress, skipping duplicate setup")
+                return
+        
+        # PREVENT REDUNDANT CALLS: Check if we already have the correct theme set up
+        # BUT allow theme setup for new WebViews or when switching themes
+        if (WikipediaTheme._last_setup_theme == theme and 
+            WikipediaTheme._setup_in_progress == False and
+            hasattr(webView, '_theme_setup_completed')):
+            print(f"⏳ WikiRace: [{time.time():.3f}] Theme {theme} already set up for this WebView, skipping redundant setup")
+            return
+        
+        # Always setup theme to ensure proper switching between dark/light modes
+        # Removed caching logic that was preventing theme switches
+        
+        try:
+            WikipediaTheme._setup_in_progress = True
+            
+            # CRITICAL: Clear all existing theme state to prevent conflicts
+            # DO NOT REMOVE: This prevents old theme cookies/scripts from interfering
+            WikipediaTheme._clearThemeState(webView)
+            
+            # Setup new theme
+            WikipediaTheme._setupInitialTheme(webView, theme)
+            WikipediaTheme._setupNavigationScripts(webView, theme)
+            
+            print(f"✅ WikiRace: [{time.time():.3f}] Theme setup completed successfully for {theme}")
+            
+            # Update the last setup theme to prevent redundant calls
+            WikipediaTheme._last_setup_theme = theme
+            
+            # Mark this WebView as having completed theme setup
+            webView._theme_setup_completed = True
+            
+        finally:
+            WikipediaTheme._setup_in_progress = False
+    
+    @staticmethod
+    def _setupInitialTheme(webView: QWebEngineView, theme: str = 'dark'):
+        """
+        Set up initial theme and DocumentCreation script
+        """
+        start_time = time.time()
+        print(f"🚀 WikiRace: [{start_time:.3f}] Setting up initial {theme} theme with navigation hiding...")
+        
+        if not webView:
+            print(f"❌ WikiRace: [{time.time():.3f}] WebView is None, cannot setup {theme} theme")
+            return
+            
+        try:
+            # Get the profile and cookie store
+            profile_start = time.time()
+            profile = webView.page().profile()
+            store = profile.cookieStore()
+            
+            # Set the mwclientpreferences cookie for the specified theme
+            cookie_start = time.time()
+            if theme == 'light':
+                cookie_val = b"skin-theme-clientpref-day"
+                color_scheme = 'light'
+                bg_color = '#FFFFFF'
+                text_color = '#1A1A1A'
+                theme_class = 'skin-theme-clientpref-day'
+                remove_class = 'skin-theme-clientpref-night'
+            else:
+                cookie_val = b"skin-theme-clientpref-night"
+                color_scheme = 'dark'
+                bg_color = '#101418'
+                text_color = '#ffffff'
+                theme_class = 'skin-theme-clientpref-night'
+                remove_class = 'skin-theme-clientpref-day'
+                
+            cookie = QNetworkCookie(b"mwclientpreferences", cookie_val)
+            cookie.setDomain(".wikipedia.org")
+            cookie.setPath("/")
+            cookie.setExpirationDate(QDateTime.currentDateTimeUtc().addYears(5))
+            
+            try:
+                cookie.setSameSitePolicy(QNetworkCookie.SameSite.Lax)
+            except Exception:
+                pass
+            
+            # Set cookie only for English Wikipedia (most commonly used)
+            store.setCookie(cookie, QUrl("https://en.wikipedia.org/"))
+            
+            # Create single optimized DocumentCreation script
+            script_start = time.time()
+            script = QWebEngineScript()
+            script.setName(f"optimized-{theme}-setup")
+            script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
+            script.setWorldId(QWebEngineScript.ScriptWorldId.ApplicationWorld)
+            script.setRunsOnSubFrames(False)  # Only main frame for better performance
+            
+            # Combined script that does everything at once
+            script.setSourceCode(f"""
+            try {{
+                var startTime = performance.now();
+                var pageLoadStart = performance.timeOrigin + performance.now();
+                console.log('WikiRace: [' + startTime.toFixed(3) + '] DocumentCreation script starting for {theme} theme');
+                console.log('WikiRace: [' + startTime.toFixed(3) + '] Page load started at: ' + pageLoadStart.toFixed(3));
+                
+                // Set new theme cookie immediately
+                document.cookie = 'mwclientpreferences={cookie_val.decode()}; domain=.wikipedia.org; path=/; max-age=157680000; SameSite=Lax';
+                
+                // Set theme background and classes immediately
+                document.documentElement.style.backgroundColor = '{bg_color}';
+                document.documentElement.style.color = '{text_color}';
+                
+                // CRITICAL: Aggressively remove ALL theme classes and set new one
+                if (document.documentElement) {{
+                    document.documentElement.classList.remove('skin-theme-clientpref-night', 'skin-theme-clientpref-day');
+                    document.documentElement.classList.remove('vector-theme-dark', 'vector-theme-light');
+                    document.documentElement.classList.add('{theme_class}');
+                }}
+                
+                // Set color scheme meta tag
+                var metaStart = performance.now();
+                var meta = document.createElement('meta');
+                meta.name = 'color-scheme';
+                meta.content = '{color_scheme}';
+                (document.head || document.documentElement).appendChild(meta);
+                
+                // Add DNS prefetch hints for faster loading
+                var dnsPrefetch = document.createElement('link');
+                dnsPrefetch.rel = 'dns-prefetch';
+                dnsPrefetch.href = '//en.wikipedia.org';
+                (document.head || document.documentElement).appendChild(dnsPrefetch);
+                
+                console.log('WikiRace: [' + performance.now().toFixed(3) + '] Meta and DNS prefetch added (+' + (performance.now() - metaStart).toFixed(1) + 'ms)');
+                
+                // Inject navigation hiding CSS immediately
+                var style = document.createElement('style');
+                style.id = 'wikirace-optimized-styles';
+                style.textContent = `{WikipediaTheme._HIDE_NAVIGATION_CSS}`;
+                (document.head || document.documentElement).appendChild(style);
+                
+                // CRITICAL: Actively hide any appearance elements that might be present
+                var appearanceElements = document.querySelectorAll(
+                    '.vector-user-menu, .vector-user-menu-dropdown, .vector-user-menu-item, ' +
+                    '#pt-preferences, #pt-appearance, .mw-preferences-link, ' +
+                    '.vector-user-links, .vector-user-menu-dropdown-item, ' +
+                    '.mw-user-menu, .mw-user-menu-dropdown, .mw-user-menu-item, ' +
+                    '.vector-user-menu-item a[href*="preferences"], ' +
+                    '.vector-user-menu-item a[href*="appearance"], ' +
+                    '.vector-user-menu-item a[href*="skins"], ' +
+                    '.vector-user-menu-item a[href*="theme"]'
+                );
+                appearanceElements.forEach(function(element) {{
+                    element.style.display = 'none';
+                    element.style.visibility = 'hidden';
+                    element.style.opacity = '0';
+                    element.style.pointerEvents = 'none';
+                }});
+                
+                // REMOVED: MutationObserver to reduce main-thread work
+                // REMOVED: Excessive logging to reduce performance overhead
+                
+                // OPTIMIZED: Minimal completion logging
+                console.log('WikiRace: DocumentCreation completed for {theme} theme');
+                
+            }} catch (e) {{
+                console.log('WikiRace: [' + performance.now().toFixed(3) + '] Error in DocumentCreation script:', e);
+            }}
+            """)
+            # CRITICAL: Remove ALL existing theme scripts before adding new one
+            # This prevents theme conflicts when switching between dark/light modes
+            # DO NOT REMOVE: This cleanup is essential to prevent old theme scripts
+            # from overriding new theme settings during theme switches
+            existing_scripts = profile.scripts()
+            scripts_to_remove = []
+            for i in range(existing_scripts.count()):
+                script_list = existing_scripts.toList()
+                if i < len(script_list):
+                    existing_script = script_list[i]
+                    script_name = existing_script.name()
+                    # Remove ANY theme-related scripts (all themes)
+                    if (script_name.startswith('prepaint-') or 
+                        script_name.startswith('optimized-') or
+                        script_name.startswith('navigation-hider-') or
+                        script_name.startswith('fallback-')):
+                        scripts_to_remove.append(existing_script)
+            
+            for script_to_remove in scripts_to_remove:
+                existing_scripts.remove(script_to_remove)
+            
+            
+            # Insert the new optimized script
+            profile.scripts().insert(script)
+            print(f"📜 WikiRace: [{time.time():.3f}] Inserted optimized-{theme}-setup script")
+            
+            # Configure WebEngine settings for optimal performance and security
+            settings = webView.settings()
+            settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
+            settings.setAttribute(QWebEngineSettings.WebAttribute.AutoLoadImages, True)
+            settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, False)
+            settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, False)
+            settings.setAttribute(QWebEngineSettings.WebAttribute.Accelerated2dCanvasEnabled, False)
+            settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, False)
+            
+            # Cache settings for faster repeat visits
+            profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
+            profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
+            
+            # Set up request interceptor to block unnecessary resources
+            WikipediaTheme._setupRequestInterceptor(profile)
+            
+            profile.setHttpUserAgent(f"WikiRace/1.0 (Optimized {theme.title()} Mode)")
+            
+            total_time = (time.time() - start_time) * 1000
+            print(f"✅ WikiRace: Optimized {theme} theme setup completed")
+            
+        except Exception as e:
+            error_time = time.time()
+            print(f"❌ WikiRace: [{error_time:.3f}] Error in initial theme setup: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    @staticmethod
+    def _setupNavigationScripts(webView: QWebEngineView, theme: str = 'dark'):
+        """
+        Set up scripts that run on every page load to ensure navigation elements are hidden
+        """
+        print(f"📜 WikiRace: [{time.time():.3f}] Setting up navigation scripts for {theme} theme")
+        if not webView:
+            return
+            
+        try:
+            profile = webView.page().profile()
+            
+            # Create a script that runs on every page - using DOMContentLoaded for reliability
+            nav_script = QWebEngineScript()
+            nav_script.setName(f"navigation-hider-{theme}")
+            nav_script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentReady)
+            nav_script.setWorldId(QWebEngineScript.ScriptWorldId.ApplicationWorld)
+            nav_script.setRunsOnSubFrames(False)
+            
+            # Set theme-specific values
+            if theme == 'light':
+                bg_color = '#FFFFFF'
+                text_color = '#1A1A1A'
+            else:
+                bg_color = '#101418'
+                text_color = '#ffffff'
+            
+            nav_script.setSourceCode(f"""
+            (function() {{
+                try {{
+                    // OPTIMIZED: Minimal operations for maximum performance
+                    // Only inject navigation CSS if DocumentCreation script missed it
+                    var existingStyle = document.getElementById('wikirace-navigation-css') || 
+                                      document.getElementById('wikirace-optimized-styles');
+                    
+                    if (!existingStyle) {{
+                        // Fallback injection if DocumentCreation script failed
+                        var style = document.createElement('style');
+                        style.id = 'wikirace-navigation-css';
+                        style.textContent = `{WikipediaTheme._HIDE_NAVIGATION_CSS}`;
+                        (document.head || document.documentElement).appendChild(style);
+                    }}
+                    
+                    // OPTIMIZED: Minimal theme background enforcement
+                    if (document.documentElement) {{
+                        document.documentElement.style.backgroundColor = '{bg_color}';
+                        document.documentElement.style.color = '{text_color}';
+                    }}
+                    
+                    // REMOVED: MutationObserver to reduce main-thread work
+                    // CSS will deterministically hide appearance elements without runtime observers
+                    
+                }} catch (e) {{
+                    // Silent error handling for performance
+                }}
+            }})();
+            """)
+            
+            # CRITICAL: Remove ONLY navigation-hider scripts (not optimized scripts)
+            # The optimized script is already added by _setupInitialTheme and should not be removed
+            existing_scripts = profile.scripts()
+            scripts_to_remove = []
+            for i in range(existing_scripts.count()):
+                script_list = existing_scripts.toList()
+                if i < len(script_list):
+                    existing_script = script_list[i]
+                    script_name = existing_script.name()
+                    # Remove navigation-hider and fallback scripts (not optimized scripts)
+                    if (script_name.startswith('navigation-hider-') or 
+                        script_name.startswith('fallback-')):
+                        scripts_to_remove.append(existing_script)
+                        print(f"🧹 WikiRace: [{time.time():.3f}] Removing old script: {script_name}")
+            
+            for script_to_remove in scripts_to_remove:
+                existing_scripts.remove(script_to_remove)
+            
+            
+            # Insert the navigation script
+            profile.scripts().insert(nav_script)
+            print(f"📜 WikiRace: [{time.time():.3f}] Inserted navigation-hider-{theme} script")
+            
+            # CRITICAL: Add a fallback DocumentReady script to ensure theme is applied
+            # This runs if the DocumentCreation script doesn't execute
+            fallback_script = QWebEngineScript()
+            fallback_script.setName(f"fallback-{theme}-theme")
+            fallback_script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentReady)
+            fallback_script.setWorldId(QWebEngineScript.ScriptWorldId.ApplicationWorld)
+            fallback_script.setRunsOnSubFrames(False)
+            
+            # Set theme-specific values
+            if theme == 'light':
+                cookie_value = 'skin-theme-clientpref-day'
+                color_scheme = 'light'
+                bg_color = '#FFFFFF'
+                text_color = '#1A1A1A'
+                theme_class = 'skin-theme-clientpref-day'
+                remove_class = 'skin-theme-clientpref-night'
+            else:
+                cookie_value = 'skin-theme-clientpref-night'
+                color_scheme = 'dark'
+                bg_color = '#101418'
+                text_color = '#ffffff'
+                theme_class = 'skin-theme-clientpref-night'
+                remove_class = 'skin-theme-clientpref-day'
+            
+            fallback_script.setSourceCode(f"""
+            try {{
+                console.log('WikiRace: Fallback {theme} theme script executing...');
+                
+                // Set theme cookie
+                document.cookie = 'mwclientpreferences={cookie_value}; domain=.wikipedia.org; path=/; max-age=157680000; SameSite=Lax';
+                
+                // Apply theme classes and styles
+                if (document.documentElement) {{
+                    document.documentElement.classList.remove('{remove_class}');
+                    document.documentElement.classList.add('{theme_class}');
+                    document.documentElement.style.backgroundColor = '{bg_color}';
+                    document.documentElement.style.color = '{text_color}';
+                }}
+                
+                // Set meta color-scheme
+                var meta = document.querySelector('meta[name="color-scheme"]');
+                if (meta) {{
+                    meta.content = '{color_scheme}';
+                }} else {{
+                    var newMeta = document.createElement('meta');
+                    newMeta.name = 'color-scheme';
+                    newMeta.content = '{color_scheme}';
+                    (document.head || document.documentElement).appendChild(newMeta);
+                }}
+                
+                console.log('WikiRace: Fallback {theme} theme applied successfully');
+            }} catch (e) {{
+                console.log('WikiRace: Error in fallback {theme} theme script:', e);
+            }}
+            """)
+            
+            profile.scripts().insert(fallback_script)
+            print(f"📜 WikiRace: [{time.time():.3f}] Inserted fallback-{theme}-theme script")
+            
+        except Exception as e:
+            print(f"❌ WikiRace: [{time.time():.3f}] Error setting up navigation scripts: {e}")
+            import traceback
+            traceback.print_exc()
+    
+    @staticmethod
+    def _setupRequestInterceptor(profile):
+        """
+        Set up a request interceptor to block unnecessary resources for faster loading
+        """
+        try:
+            from PyQt6.QtWebEngineCore import QWebEngineUrlRequestInterceptor
+            
+            class FastLoadingInterceptor(QWebEngineUrlRequestInterceptor):
+                def interceptRequest(self, info):
+                    url = info.requestUrl().toString()
+                    
+                    # Block unnecessary resources for faster loading (keep images)
+                    # BUT allow Wikipedia's own analytics modules that might be needed for theme system
+                    blocked_patterns = [
+                        'googletagmanager.com',
+                        'google-analytics.com', 
+                        'doubleclick.net',
+                        'googlesyndication.com',
+                        'facebook.com/tr',
+                        '.mp4', '.webm', '.ogg',  # Videos (still block these)
+                        'tracking',
+                        'ads'
+                    ]
+                    
+                    # Allow Wikipedia's own modules even if they contain "analytics"
+                    if 'wikipedia.org' in url.lower():
+                        # Debug: Log if this is an analytics-related module
+                        if 'analytics' in url.lower() or 'xlab' in url.lower():
+                            print(f"✅ WikiRace: Allowing Wikipedia module: {url}")
+                        return  # Don't block Wikipedia's own resources
+                    
+                    # Block external analytics/tracking services
+                    for pattern in blocked_patterns:
+                        if pattern in url.lower():
+                            print(f"🚫 WikiRace: Blocking external resource: {url}")
+                            info.block(True)
+                            return
+            
+            # Create and set the interceptor
+            interceptor = FastLoadingInterceptor()
+            profile.setUrlRequestInterceptor(interceptor)
+            print("🚫 WikiRace: Request interceptor set up to block unnecessary resources")
+            
+        except Exception as e:
+            print(f"⚠️ WikiRace: Could not set up request interceptor: {e}")
+            # Continue without interceptor - not critical
+    
+    @staticmethod
+    def _clearThemeState(webView: QWebEngineView):
+        """
+        CRITICAL: Clear all existing theme state (cookies, scripts) to prevent conflicts
+        
+        This method is ESSENTIAL for theme switching functionality.
+        DO NOT REMOVE OR MODIFY without understanding the consequences:
+        
+        1. Clears all mwclientpreferences cookies (both light and dark)
+        2. Removes all existing theme-related scripts
+        3. Resets WebEngine profile state
+        4. Without this, old theme state persists and causes conflicts
+        
+        REGRESSION PREVENTION:
+        - This MUST be called before setting up new theme
+        - ALL mwclientpreferences cookies MUST be cleared
+        - ALL theme scripts MUST be removed
+        - Profile state MUST be reset for theme switching to work
+        """
+        if not webView:
+            return
+            
+        try:
+            print(f"🧹 WikiRace: [{time.time():.3f}] Clearing all existing theme state...")
+            
+            profile = webView.page().profile()
+            store = profile.cookieStore()
+            
+            # CRITICAL: Clear ALL mwclientpreferences cookies
+            # DO NOT REMOVE: Old cookies will override new theme settings
+            
+            # Create empty cookie to clear existing ones
+            clear_cookie = QNetworkCookie(b"mwclientpreferences", b"")
+            clear_cookie.setDomain(".wikipedia.org")
+            clear_cookie.setPath("/")
+            clear_cookie.setExpirationDate(QDateTime.currentDateTimeUtc().addDays(-1))  # Expired = deleted
+            
+            # Clear cookies for all Wikipedia domains
+            domains = [
+                "https://en.wikipedia.org/",
+                "https://www.en.wikipedia.org/",
+                "https://wikipedia.org/",
+                "https://www.wikipedia.org/"
+            ]
+            
+            for domain in domains:
+                store.setCookie(clear_cookie, QUrl(domain))
+            
+            print(f"🍪 WikiRace: [{time.time():.3f}] Cleared mwclientpreferences cookies from all domains")
+            
+            # CRITICAL: Remove ALL existing theme scripts
+            # DO NOT REMOVE: Old scripts will continue running and override new theme
+            existing_scripts = profile.scripts()
+            scripts_to_remove = []
+            for i in range(existing_scripts.count()):
+                script_list = existing_scripts.toList()
+                if i < len(script_list):
+                    existing_script = script_list[i]
+                    script_name = existing_script.name()
+                    # Remove ALL theme-related scripts
+                    if (script_name.startswith('navigation-hider-') or 
+                        script_name.startswith('optimized-') or
+                        script_name.startswith('prepaint-') or
+                        script_name.startswith('fallback-')):
+                        scripts_to_remove.append(existing_script)
+            
+            for script_to_remove in scripts_to_remove:
+                existing_scripts.remove(script_to_remove)
+            
+            if scripts_to_remove:
+                print(f"🧹 WikiRace: [{time.time():.3f}] Removed {len(scripts_to_remove)} old theme scripts")
+            
+            # CRITICAL: Force clear any cached theme state via JavaScript
+            # DO NOT REMOVE: Browser may cache theme state that needs clearing
+            clear_js = """
+            try {
+                // Clear any cached theme preferences
+                document.cookie = 'mwclientpreferences=; domain=.wikipedia.org; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                
+                // Remove any existing theme classes
+                if (document.documentElement) {
+                    document.documentElement.classList.remove('skin-theme-clientpref-night', 'skin-theme-clientpref-day');
+                    document.documentElement.classList.remove('vector-theme-dark', 'vector-theme-light');
+                }
+                
+                console.log('WikiRace: Theme state cleared via JavaScript');
+            } catch (e) {
+                console.log('WikiRace: Error clearing theme state:', e);
+            }
+            """
+            
+            webView.page().runJavaScript(clear_js)
+            
+            print(f"✅ WikiRace: [{time.time():.3f}] Theme state cleared successfully")
+            
+            # Reset the last setup theme when clearing state
+            WikipediaTheme._last_setup_theme = None
+            
+            # Clear WebView theme setup flag
+            if hasattr(webView, '_theme_setup_completed'):
+                delattr(webView, '_theme_setup_completed')
+            
+        except Exception as e:
+            print(f"❌ WikiRace: [{time.time():.3f}] Error clearing theme state: {e}")
+            import traceback
+            traceback.print_exc()
+
     @staticmethod
     def setupTheme(webView: QWebEngineView, theme: str = 'dark'):
         """
@@ -223,7 +808,7 @@ class WikipediaTheme:
         store.setCookie(cookie, QUrl("https://ar.wikipedia.org/"))
         
         # Add document-creation micro-fallback to prevent any residual flash
-        WikipediaTheme._addDocumentCreationScript(profile)
+        WikipediaTheme._addDocumentCreationScript(profile, 'dark')
         
         # Configure WebEngine settings for optimal dark mode
         settings = webView.settings()
@@ -304,46 +889,6 @@ class WikipediaTheme:
         Backward compatibility method for dark theme setup
         """
         return WikipediaTheme.setupTheme(webView, 'dark')
-    
-    @staticmethod
-    def ensureVector2022Skin(url: str) -> str:
-        """
-        Ensure Wikipedia URLs use the Vector 2022 skin for dark mode support
-        Also adds performance optimizations to the URL
-        """
-        print(f"🔗 WikiRace: Ensuring Vector 2022 skin for URL: {url}")
-        
-        if not url or "wikipedia.org" not in url:
-            print(f"⚠️ WikiRace: URL is not a Wikipedia URL, skipping skin modification")
-            return url
-            
-        original_url = url
-        
-        # Parse URL to check for existing query parameters
-        if "?" in url:
-            # URL already has query parameters
-            if "useskin=" in url:
-                # Replace existing useskin parameter
-                import re
-                url = re.sub(r'useskin=[^&]*', 'useskin=vector-2022', url)
-                print(f"🔄 WikiRace: Replaced existing useskin parameter")
-            else:
-                # Add useskin parameter
-                url += "&useskin=vector-2022"
-                print(f"➕ WikiRace: Added useskin parameter to existing query string")
-            
-            # Could add performance parameters here if needed
-        else:
-            # No query parameters, add useskin only
-            url += "?useskin=vector-2022"
-            print(f"➕ WikiRace: Added useskin parameter as new query string")
-            
-        if url != original_url:
-            print(f"✅ WikiRace: URL updated from {original_url} to {url}")
-        else:
-            print(f"ℹ️ WikiRace: URL unchanged (already has correct skin)")
-            
-        return url
     
     @staticmethod
     def verifyDarkModeApplied(webView: QWebEngineView, callback=None):
@@ -635,467 +1180,6 @@ class WikipediaTheme:
         store.setCookie(cookie, QUrl("https://zh.wikipedia.org/"))
         store.setCookie(cookie, QUrl("https://ar.wikipedia.org/"))
     
-    # Class variable to track last setup theme to prevent conflicts
-    _last_setup_theme = None
-    _setup_in_progress = False
-    
-    @staticmethod
-    def setupThemeWithNavigation(webView: QWebEngineView, theme: str = 'dark'):
-        """
-        OPTIMIZED: Combined theme setup and navigation hiding in a single DocumentCreation script
-        This eliminates the 3-4 second delay by applying everything before the page renders
-        Also sets up scripts for subsequent page navigations
-        
-        CRITICAL: This method handles theme switching for existing WebViews
-        DO NOT REMOVE: Essential for preventing theme switching regressions
-        
-        THREAD-SAFE: Prevents race conditions when multiple WebViews share the same profile
-        """
-        print(f"🔄 WikiRace: [{time.time():.3f}] setupThemeWithNavigation called with theme: {theme}")
-        
-        # THREAD-SAFE: Prevent race conditions when multiple pages try to setup theme simultaneously
-        if WikipediaTheme._setup_in_progress:
-            print(f"⏳ WikiRace: [{time.time():.3f}] Theme setup already in progress, waiting...")
-            # Wait a bit and try again
-            import time as time_module
-            time_module.sleep(0.1)
-            if WikipediaTheme._setup_in_progress:
-                print(f"⏳ WikiRace: [{time.time():.3f}] Theme setup still in progress, skipping duplicate setup")
-                return
-        
-        # Check if theme is already set up correctly
-        if WikipediaTheme._last_setup_theme == theme:
-            print(f"✅ WikiRace: [{time.time():.3f}] Theme {theme} already set up correctly, skipping setup")
-            return
-        
-        try:
-            WikipediaTheme._setup_in_progress = True
-            
-            # CRITICAL: Clear all existing theme state to prevent conflicts
-            # DO NOT REMOVE: This prevents old theme cookies/scripts from interfering
-            WikipediaTheme._clearThemeState(webView)
-            
-            # Setup new theme
-            WikipediaTheme._setupInitialTheme(webView, theme)
-            WikipediaTheme._setupNavigationScripts(webView, theme)
-            
-            # Mark this theme as successfully set up
-            WikipediaTheme._last_setup_theme = theme
-            print(f"✅ WikiRace: [{time.time():.3f}] Theme setup completed successfully for {theme}")
-            
-        finally:
-            WikipediaTheme._setup_in_progress = False
-    
-    @staticmethod
-    def _setupInitialTheme(webView: QWebEngineView, theme: str = 'dark'):
-        """
-        Set up initial theme and DocumentCreation script
-        """
-        start_time = time.time()
-        print(f"🚀 WikiRace: [{start_time:.3f}] Setting up initial {theme} theme with navigation hiding...")
-        
-        if not webView:
-            print(f"❌ WikiRace: [{time.time():.3f}] WebView is None, cannot setup {theme} theme")
-            return
-            
-        try:
-            # Get the profile and cookie store
-            profile_start = time.time()
-            profile = webView.page().profile()
-            store = profile.cookieStore()
-            # Reduced logging for performance
-            
-            # Set the mwclientpreferences cookie for the specified theme
-            cookie_start = time.time()
-            if theme == 'light':
-                cookie_val = b"skin-theme-clientpref-day"
-                color_scheme = 'light'
-                bg_color = '#FFFFFF'
-                text_color = '#1A1A1A'
-                theme_class = 'skin-theme-clientpref-day'
-                remove_class = 'skin-theme-clientpref-night'
-            else:
-                cookie_val = b"skin-theme-clientpref-night"
-                color_scheme = 'dark'
-                bg_color = '#101418'
-                text_color = '#ffffff'
-                theme_class = 'skin-theme-clientpref-night'
-                remove_class = 'skin-theme-clientpref-day'
-                
-            cookie = QNetworkCookie(b"mwclientpreferences", cookie_val)
-            cookie.setDomain(".wikipedia.org")
-            cookie.setPath("/")
-            cookie.setExpirationDate(QDateTime.currentDateTimeUtc().addYears(5))
-            
-            try:
-                cookie.setSameSitePolicy(QNetworkCookie.SameSite.Lax)
-            except Exception:
-                pass
-            
-            # Set cookie only for English Wikipedia (most commonly used)
-            store.setCookie(cookie, QUrl("https://en.wikipedia.org/"))
-            # OPTIMIZED: Reduced logging for performance
-            
-            # Create single optimized DocumentCreation script
-            script_start = time.time()
-            script = QWebEngineScript()
-            script.setName(f"optimized-{theme}-setup")
-            script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentCreation)
-            script.setWorldId(QWebEngineScript.ScriptWorldId.ApplicationWorld)
-            script.setRunsOnSubFrames(False)  # Only main frame for better performance
-            
-            # Combined script that does everything at once
-            script.setSourceCode(f"""
-            try {{
-                var startTime = performance.now();
-                var pageLoadStart = performance.timeOrigin + performance.now();
-                console.log('WikiRace: [' + startTime.toFixed(3) + '] DocumentCreation script starting for {theme} theme');
-                console.log('WikiRace: [' + startTime.toFixed(3) + '] Page load started at: ' + pageLoadStart.toFixed(3));
-                
-                // CRITICAL: Force clear any existing theme cookies first
-                document.cookie = 'mwclientpreferences=; domain=.wikipedia.org; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-                
-                // Set new theme cookie immediately
-                var cookieStart = performance.now();
-                document.cookie = 'mwclientpreferences={cookie_val.decode()}; domain=.wikipedia.org; path=/; max-age=157680000; SameSite=Lax';
-                // OPTIMIZED: Minimal logging for performance
-                console.log('WikiRace: Theme cookie reset for {theme}');
-                
-                // Set theme background and classes immediately
-                document.documentElement.style.backgroundColor = '{bg_color}';
-                document.documentElement.style.color = '{text_color}';
-                
-                // CRITICAL: Aggressively remove ALL theme classes and set new one
-                if (document.documentElement) {{
-                    document.documentElement.classList.remove('skin-theme-clientpref-night', 'skin-theme-clientpref-day');
-                    document.documentElement.classList.remove('vector-theme-dark', 'vector-theme-light');
-                    document.documentElement.classList.add('{theme_class}');
-                }}
-                
-                // Set color scheme meta tag
-                var metaStart = performance.now();
-                var meta = document.createElement('meta');
-                meta.name = 'color-scheme';
-                meta.content = '{color_scheme}';
-                (document.head || document.documentElement).appendChild(meta);
-                
-                // Add DNS prefetch hints for faster loading
-                var dnsPrefetch = document.createElement('link');
-                dnsPrefetch.rel = 'dns-prefetch';
-                dnsPrefetch.href = '//en.wikipedia.org';
-                (document.head || document.documentElement).appendChild(dnsPrefetch);
-                
-                console.log('WikiRace: [' + performance.now().toFixed(3) + '] Meta and DNS prefetch added (+' + (performance.now() - metaStart).toFixed(1) + 'ms)');
-                
-                // Inject navigation hiding CSS immediately
-                var cssStart = performance.now();
-                var style = document.createElement('style');
-                style.id = 'wikirace-optimized-styles';
-                style.textContent = `{WikipediaTheme._HIDE_NAVIGATION_CSS}`;
-                (document.head || document.documentElement).appendChild(style);
-                // OPTIMIZED: Minimal logging for performance
-                console.log('WikiRace: Navigation CSS injected at DocumentCreation');
-                
-                // REMOVED: MutationObserver to reduce main-thread work
-                // REMOVED: Excessive logging to reduce performance overhead
-                
-                // OPTIMIZED: Minimal completion logging
-                console.log('WikiRace: DocumentCreation completed for {theme} theme');
-                setTimeout(function() {{
-                    var checkTime = performance.now();
-                    var header = document.querySelector('#mw-head, .vector-header');
-                    var isHidden = header && (header.style.display === 'none' || getComputedStyle(header).display === 'none');
-                    console.log('WikiRace: [' + checkTime.toFixed(3) + '] CSS effect check - header hidden: ' + isHidden + ' (+' + (checkTime - startTime).toFixed(1) + 'ms)');
-                }}, 10);
-                
-            }} catch (e) {{
-                console.log('WikiRace: [' + performance.now().toFixed(3) + '] Error in DocumentCreation script:', e);
-            }}
-            """)
-            # CRITICAL: Remove ALL existing theme scripts before adding new one
-            # This prevents theme conflicts when switching between dark/light modes
-            # DO NOT REMOVE: This cleanup is essential to prevent old theme scripts
-            # from overriding new theme settings during theme switches
-            existing_scripts = profile.scripts()
-            scripts_to_remove = []
-            for i in range(existing_scripts.count()):
-                script_list = existing_scripts.toList()
-                if i < len(script_list):
-                    existing_script = script_list[i]
-                    script_name = existing_script.name()
-                    # Remove ANY theme-related scripts (all themes)
-                    if (script_name.startswith('prepaint-') or 
-                        script_name.startswith('optimized-') or
-                        script_name.startswith('navigation-hider-')):
-                        scripts_to_remove.append(existing_script)
-            
-            for script_to_remove in scripts_to_remove:
-                existing_scripts.remove(script_to_remove)
-            
-            if scripts_to_remove:
-                print(f"🧹 WikiRace: [{time.time():.3f}] Cleaned up {len(scripts_to_remove)} old theme scripts")
-            
-            # Insert the new optimized script
-            profile.scripts().insert(script)
-            
-            # Configure WebEngine settings for optimal performance
-            settings = webView.settings()
-            settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
-            
-            # Performance optimizations (keep images enabled for better UX)
-            settings.setAttribute(QWebEngineSettings.WebAttribute.AutoLoadImages, True)  # Keep images for better experience
-            settings.setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, False)  # Disable plugins
-            settings.setAttribute(QWebEngineSettings.WebAttribute.WebGLEnabled, False)  # Disable WebGL
-            settings.setAttribute(QWebEngineSettings.WebAttribute.Accelerated2dCanvasEnabled, False)  # Disable 2D canvas acceleration
-            settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, False)  # Security + performance
-            
-            # Cache settings for faster repeat visits
-            profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
-            profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
-            
-            # Set up request interceptor to block unnecessary resources
-            WikipediaTheme._setupRequestInterceptor(profile)
-            
-            profile.setHttpUserAgent(f"WikiRace/1.0 (Optimized {theme.title()} Mode)")
-            
-            total_time = (time.time() - start_time) * 1000
-            print(f"✅ WikiRace: Optimized {theme} theme setup completed")
-            
-        except Exception as e:
-            error_time = time.time()
-            print(f"❌ WikiRace: [{error_time:.3f}] Error in initial theme setup: {e}")
-            import traceback
-            traceback.print_exc()
-    
-    @staticmethod
-    def _setupNavigationScripts(webView: QWebEngineView, theme: str = 'dark'):
-        """
-        Set up scripts that run on every page load to ensure navigation elements are hidden
-        """
-        print(f"📜 WikiRace: [{time.time():.3f}] Setting up navigation scripts for {theme} theme")
-        if not webView:
-            return
-            
-        try:
-            profile = webView.page().profile()
-            
-            # Create a script that runs on every page - using DOMContentLoaded for reliability
-            nav_script = QWebEngineScript()
-            nav_script.setName(f"navigation-hider-{theme}")
-            nav_script.setInjectionPoint(QWebEngineScript.InjectionPoint.DocumentReady)
-            nav_script.setWorldId(QWebEngineScript.ScriptWorldId.ApplicationWorld)
-            nav_script.setRunsOnSubFrames(False)
-            
-            # Set theme-specific values
-            if theme == 'light':
-                bg_color = '#FFFFFF'
-                text_color = '#1A1A1A'
-            else:
-                bg_color = '#101418'
-                text_color = '#ffffff'
-            
-            nav_script.setSourceCode(f"""
-            (function() {{
-                try {{
-                    // OPTIMIZED: Minimal operations for maximum performance
-                    // Only inject navigation CSS if DocumentCreation script missed it
-                    var existingStyle = document.getElementById('wikirace-navigation-css') || 
-                                      document.getElementById('wikirace-optimized-styles');
-                    
-                    if (!existingStyle) {{
-                        // Fallback injection if DocumentCreation script failed
-                        var style = document.createElement('style');
-                        style.id = 'wikirace-navigation-css';
-                        style.textContent = `{WikipediaTheme._HIDE_NAVIGATION_CSS}`;
-                        (document.head || document.documentElement).appendChild(style);
-                        console.log('WikiRace: DocumentReady fallback CSS injected');
-                    }}
-                    
-                    // OPTIMIZED: Minimal theme background enforcement
-                    if (document.documentElement) {{
-                        document.documentElement.style.backgroundColor = '{bg_color}';
-                        document.documentElement.style.color = '{text_color}';
-                    }}
-                    
-                }} catch (e) {{
-                    // Silent error handling for performance
-                }}
-            }})();
-            """)
-            
-            # CRITICAL: Remove ALL existing navigation scripts before adding new one
-            # This prevents theme conflicts when switching between dark/light modes
-            # DO NOT REMOVE: This cleanup is essential to prevent old theme scripts
-            # from overriding new theme settings during theme switches
-            existing_scripts = profile.scripts()
-            scripts_to_remove = []
-            for i in range(existing_scripts.count()):
-                script_list = existing_scripts.toList()
-                if i < len(script_list):
-                    existing_script = script_list[i]
-                    script_name = existing_script.name()
-                    # Remove ANY navigation-related scripts (all themes)
-                    if (script_name.startswith('navigation-hider-') or 
-                        script_name.startswith('optimized-') or
-                        script_name.startswith('prepaint-')):
-                        scripts_to_remove.append(existing_script)
-                        print(f"🧹 WikiRace: [{time.time():.3f}] Removing old script: {script_name}")
-            
-            for script_to_remove in scripts_to_remove:
-                existing_scripts.remove(script_to_remove)
-            
-            print(f"🧹 WikiRace: [{time.time():.3f}] Cleaned up {len(scripts_to_remove)} old navigation scripts")
-            
-            # Insert the navigation script
-            profile.scripts().insert(nav_script)
-            print(f"✅ WikiRace: [{time.time():.3f}] Navigation script inserted successfully for {theme} theme")
-            
-        except Exception as e:
-            print(f"❌ WikiRace: [{time.time():.3f}] Error setting up navigation scripts: {e}")
-            import traceback
-            traceback.print_exc()
-    
-    @staticmethod
-    def _setupRequestInterceptor(profile):
-        """
-        Set up a request interceptor to block unnecessary resources for faster loading
-        """
-        try:
-            from PyQt6.QtWebEngineCore import QWebEngineUrlRequestInterceptor
-            
-            class FastLoadingInterceptor(QWebEngineUrlRequestInterceptor):
-                def interceptRequest(self, info):
-                    url = info.requestUrl().toString()
-                    
-                    # Block unnecessary resources for faster loading (keep images)
-                    blocked_patterns = [
-                        'googletagmanager.com',
-                        'google-analytics.com', 
-                        'doubleclick.net',
-                        'googlesyndication.com',
-                        'facebook.com/tr',
-                        '.mp4', '.webm', '.ogg',  # Videos (still block these)
-                        'analytics',
-                        'tracking',
-                        'ads'
-                    ]
-                    
-                    for pattern in blocked_patterns:
-                        if pattern in url.lower():
-                            info.block(True)
-                            return
-            
-            # Create and set the interceptor
-            interceptor = FastLoadingInterceptor()
-            profile.setUrlRequestInterceptor(interceptor)
-            print("🚫 WikiRace: Request interceptor set up to block unnecessary resources")
-            
-        except Exception as e:
-            print(f"⚠️ WikiRace: Could not set up request interceptor: {e}")
-            # Continue without interceptor - not critical
-    
-    @staticmethod
-    def _clearThemeState(webView: QWebEngineView):
-        """
-        CRITICAL: Clear all existing theme state (cookies, scripts) to prevent conflicts
-        
-        This method is ESSENTIAL for theme switching functionality.
-        DO NOT REMOVE OR MODIFY without understanding the consequences:
-        
-        1. Clears all mwclientpreferences cookies (both light and dark)
-        2. Removes all existing theme-related scripts
-        3. Resets WebEngine profile state
-        4. Without this, old theme state persists and causes conflicts
-        
-        REGRESSION PREVENTION:
-        - This MUST be called before setting up new theme
-        - ALL mwclientpreferences cookies MUST be cleared
-        - ALL theme scripts MUST be removed
-        - Profile state MUST be reset for theme switching to work
-        """
-        if not webView:
-            return
-            
-        try:
-            print(f"🧹 WikiRace: [{time.time():.3f}] Clearing all existing theme state...")
-            
-            profile = webView.page().profile()
-            store = profile.cookieStore()
-            
-            # CRITICAL: Clear ALL mwclientpreferences cookies
-            # DO NOT REMOVE: Old cookies will override new theme settings
-            
-            # Create empty cookie to clear existing ones
-            clear_cookie = QNetworkCookie(b"mwclientpreferences", b"")
-            clear_cookie.setDomain(".wikipedia.org")
-            clear_cookie.setPath("/")
-            clear_cookie.setExpirationDate(QDateTime.currentDateTimeUtc().addDays(-1))  # Expired = deleted
-            
-            # Clear cookies for all Wikipedia domains
-            domains = [
-                "https://en.wikipedia.org/",
-                "https://www.en.wikipedia.org/",
-                "https://wikipedia.org/",
-                "https://www.wikipedia.org/"
-            ]
-            
-            for domain in domains:
-                store.setCookie(clear_cookie, QUrl(domain))
-            
-            print(f"🍪 WikiRace: [{time.time():.3f}] Cleared mwclientpreferences cookies from all domains")
-            
-            # CRITICAL: Remove ALL existing theme scripts
-            # DO NOT REMOVE: Old scripts will continue running and override new theme
-            existing_scripts = profile.scripts()
-            scripts_to_remove = []
-            for i in range(existing_scripts.count()):
-                script_list = existing_scripts.toList()
-                if i < len(script_list):
-                    existing_script = script_list[i]
-                    script_name = existing_script.name()
-                    # Remove ALL theme-related scripts
-                    if (script_name.startswith('navigation-hider-') or 
-                        script_name.startswith('optimized-') or
-                        script_name.startswith('prepaint-')):
-                        scripts_to_remove.append(existing_script)
-            
-            for script_to_remove in scripts_to_remove:
-                existing_scripts.remove(script_to_remove)
-            
-            if scripts_to_remove:
-                print(f"🧹 WikiRace: [{time.time():.3f}] Removed {len(scripts_to_remove)} old theme scripts")
-            
-            # CRITICAL: Force clear any cached theme state via JavaScript
-            # DO NOT REMOVE: Browser may cache theme state that needs clearing
-            clear_js = """
-            try {
-                // Clear any cached theme preferences
-                document.cookie = 'mwclientpreferences=; domain=.wikipedia.org; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-                
-                // Remove any existing theme classes
-                if (document.documentElement) {
-                    document.documentElement.classList.remove('skin-theme-clientpref-night', 'skin-theme-clientpref-day');
-                    document.documentElement.classList.remove('vector-theme-dark', 'vector-theme-light');
-                }
-                
-                console.log('WikiRace: Theme state cleared via JavaScript');
-            } catch (e) {
-                console.log('WikiRace: Error clearing theme state:', e);
-            }
-            """
-            
-            webView.page().runJavaScript(clear_js)
-            
-            # Reset tracking variables since we cleared everything
-            WikipediaTheme._last_setup_theme = None
-            
-            print(f"✅ WikiRace: [{time.time():.3f}] Theme state cleared successfully")
-            
-        except Exception as e:
-            print(f"❌ WikiRace: [{time.time():.3f}] Error clearing theme state: {e}")
-            import traceback
-            traceback.print_exc()
-
     @staticmethod
     def applyMainPageCustomization(webView: QWebEngineView):
         """
@@ -1171,7 +1255,7 @@ class WikipediaTheme:
                         });
                         
                         // If the comma is its own node, merge any split nodes
-                        element.textContent = element.textContent.replace(/\s*,\s*/g, ', ');
+                        element.textContent = element.textContent.replace(/\\s*,\\s*/g, ', ');
                         
                         console.log('WikiRace: Styled Welcome to Wikipedia text with new specifications:', text);
                         break;
@@ -1203,7 +1287,7 @@ class WikipediaTheme:
                     });
                     
                     // If the comma is its own node, merge any split nodes
-                    heading.textContent = heading.textContent.replace(/\s*,\s*/g, ', ');
+                    heading.textContent = heading.textContent.replace(/\\s*,\\s*/g, ', ');
                     
                     console.log('WikiRace: Styled welcome heading as fallback with new specifications:', text);
                     break;
@@ -1238,7 +1322,7 @@ class WikipediaTheme:
                     });
                     
                     // If the comma is its own node, merge any split nodes
-                    heading.textContent = heading.textContent.replace(/\s*,\s*/g, ', ');
+                    heading.textContent = heading.textContent.replace(/\\s*,\\s*/g, ', ');
                     
                     console.log('WikiRace: Applied styling to large heading:', text);
                     break;
@@ -1257,51 +1341,4 @@ class WikipediaTheme:
         except Exception as e:
             print(f"❌ WikiRace: Error applying main page customization: {e}")
     
-    @staticmethod
-    def hideNavigationElements(webView: QWebEngineView):
-        """
-        DEPRECATED: Use the optimized setupThemeWithNavigation method instead.
-        This method is kept for backward compatibility but should not be used for new code.
-        """
-        print("⚠️ WikiRace: Using deprecated hideNavigationElements method - consider using setupThemeWithNavigation")
-        WikipediaTheme._injectNavigationCSS(webView)
     
-    @staticmethod
-    def _injectNavigationCSS(webView: QWebEngineView):
-        """
-        Optimized method to inject navigation hiding CSS immediately without DOM traversal
-        """
-        if not webView:
-            return
-            
-        # Simple, fast CSS injection - no DOM manipulation
-        inject_css_js = f"""
-        try {{
-            var style = document.getElementById('wikirace-hide-navigation');
-            if (style) style.remove();
-            
-            style = document.createElement('style');
-            style.id = 'wikirace-hide-navigation';
-            style.textContent = `{WikipediaTheme._HIDE_NAVIGATION_CSS}`;
-            
-            (document.head || document.documentElement).appendChild(style);
-            console.log('WikiRace: Navigation CSS injected successfully');
-        }} catch (e) {{
-            console.log('WikiRace: Error injecting navigation CSS:', e);
-        }}
-        """
-        
-        try:
-            webView.page().runJavaScript(inject_css_js)
-        except Exception as e:
-            print(f"❌ WikiRace: Error injecting navigation CSS: {e}")
-
-    @staticmethod
-    def _old_hideNavigationElements_DEPRECATED(webView: QWebEngineView):
-        """
-        OLD METHOD - DEPRECATED AND SLOW
-        This is the old implementation that caused 3-4 second delays
-        Kept for reference only - DO NOT USE
-        """
-        print("⚠️ WikiRace: This is the OLD SLOW method - kept for reference only")
-        print("⚠️ WikiRace: Use setupThemeWithNavigation() instead for instant performance")

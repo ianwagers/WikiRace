@@ -20,7 +20,7 @@ class ColorButton(QPushButton):
         self.color_name = color_name
         self.is_selected = False
         
-        self.setFixedSize(32, 32)
+        self.setFixedSize(28, 28)
         self.setCheckable(True)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
         
@@ -29,7 +29,7 @@ class ColorButton(QPushButton):
             QPushButton {{
                 background-color: {color};
                 border: 2px solid {color};
-                border-radius: 16px;
+                border-radius: 14px;
             }}
             QPushButton:hover {{
                 border: 2px solid #ffffff;
@@ -88,27 +88,27 @@ class PlayerColorPicker(QWidget):
         """Initialize the color picker UI"""
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(4)
+        layout.setSpacing(0)
         
-        # Color grid container
+        # Color grid container - more compact
         self.color_frame = QFrame()
         self.color_frame.setFrameStyle(QFrame.Shape.StyledPanel)
         color_layout = QVBoxLayout(self.color_frame)
-        color_layout.setContentsMargins(12, 12, 12, 12)
-        color_layout.setSpacing(8)
+        color_layout.setContentsMargins(8, 8, 8, 8)
+        color_layout.setSpacing(4)
         
-        # Title inside the color frame
+        # Title inside the color frame - more compact
         self.title_label = QLabel("Choose Your Color")
         self.title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.title_label.setStyleSheet("""
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             color: #ffffff;
         """)
         color_layout.addWidget(self.title_label)
         
-        # Create color grid (2 rows of 5 colors)
+        # Create color grid (2 columns of 5 colors) - more compact
         self.color_buttons = []
         self.button_group = QButtonGroup(self)
         self.button_group.setExclusive(True)
@@ -116,11 +116,17 @@ class PlayerColorPicker(QWidget):
         # Get current colors based on theme
         current_colors = self._get_current_colors()
         
-        for i in range(2):  # 2 rows
-            row_layout = QHBoxLayout()
-            row_layout.setSpacing(4)
+        # Create horizontal layout to hold the 2 columns
+        colors_horizontal_layout = QHBoxLayout()
+        colors_horizontal_layout.setSpacing(4)
+        colors_horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        
+        for i in range(2):  # 2 columns
+            col_layout = QVBoxLayout()
+            col_layout.setSpacing(2)
+            col_layout.setContentsMargins(0, 0, 0, 0)
             
-            for j in range(5):  # 5 columns
+            for j in range(5):  # 5 rows
                 color_index = i * 5 + j
                 if color_index < len(current_colors):
                     color_hex, color_name = current_colors[color_index]
@@ -132,22 +138,24 @@ class PlayerColorPicker(QWidget):
                     self.color_buttons.append(color_btn)
                     self.button_group.addButton(color_btn, color_index)
                     
-                    row_layout.addWidget(color_btn)
+                    col_layout.addWidget(color_btn)
                 else:
                     # Add spacer for empty slots
                     spacer = QWidget()
-                    spacer.setFixedSize(32, 32)
-                    row_layout.addWidget(spacer)
+                    spacer.setFixedSize(28, 28)
+                    col_layout.addWidget(spacer)
             
-            color_layout.addLayout(row_layout)
+            colors_horizontal_layout.addLayout(col_layout)
         
-        # Selected color display inside the color frame
+        color_layout.addLayout(colors_horizontal_layout)
+        
+        # Selected color display inside the color frame - more compact
         self.selected_label = QLabel("No color selected")
         self.selected_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.selected_label.setStyleSheet("""
-            font-size: 12px;
+            font-size: 10px;
             font-style: italic;
-            margin-top: 8px;
+            margin-top: 4px;
             color: #cccccc;
         """)
         color_layout.addWidget(self.selected_label)
@@ -165,13 +173,14 @@ class PlayerColorPicker(QWidget):
         self.selected_color = color_hex
         self.selected_color_name = color_name
         
-        # Update selected color display
+        # Update selected color display with proper theming
+        styles = theme_manager.get_theme_styles()
         self.selected_label.setText(f"Selected: {color_name}")
         self.selected_label.setStyleSheet(f"""
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
             color: {color_hex};
-            margin-top: 8px;
+            margin-top: 4px;
         """)
         
         # Emit signal
@@ -198,7 +207,7 @@ class PlayerColorPicker(QWidget):
                         QPushButton {{
                             background-color: {color_hex};
                             border: 2px solid #ff0000;
-                            border-radius: 16px;
+                            border-radius: 14px;
                             position: relative;
                         }}
                         QPushButton:hover {{
@@ -216,7 +225,7 @@ class PlayerColorPicker(QWidget):
                         QPushButton {{
                             background-color: {color_hex};
                             border: 2px solid {color_hex};
-                            border-radius: 16px;
+                            border-radius: 14px;
                         }}
                         QPushButton:hover {{
                             border: 2px solid #ffffff;
@@ -229,9 +238,7 @@ class PlayerColorPicker(QWidget):
     
     def apply_theme(self):
         """Apply theme-based styling"""
-        print("🎨 DEBUG: apply_theme() called")
         styles = theme_manager.get_theme_styles()
-        print(f"🎨 DEBUG: Theme styles: {styles}")
         
         # Update color palette based on theme
         current_colors = self._get_current_colors()
@@ -248,7 +255,7 @@ class PlayerColorPicker(QWidget):
                     QPushButton {{
                         background-color: {color_hex};
                         border: 2px solid {color_hex};
-                        border-radius: 16px;
+                        border-radius: 14px;
                     }}
                     QPushButton:hover {{
                         border: 2px solid #ffffff;
@@ -258,24 +265,30 @@ class PlayerColorPicker(QWidget):
                     }}
                 """)
         
-        # Update frame styling to match other UI elements
+        # Update frame styling to match MultiplayerPage styling
         frame_style = f"""
             QFrame {{
                 background-color: {styles['card_background']};
-                border: 3px solid {styles['accent_color']};
-                border-radius: 8px;
-                padding: 12px;
+                border: 1px solid {styles['border_color']};
+                border-radius: 6px;
             }}
         """
         self.color_frame.setStyleSheet(frame_style)
-        print(f"🎨 DEBUG: Applied frame style: {frame_style}")
         
-        # Update title styling
+        # Update title styling to match MultiplayerPage
         self.title_label.setStyleSheet(f"""
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             color: {styles['text_color']};
-            margin-bottom: 8px;
+            margin-bottom: 4px;
+        """)
+        
+        # Update selected label styling
+        self.selected_label.setStyleSheet(f"""
+            font-size: 10px;
+            font-style: italic;
+            margin-top: 4px;
+            color: {styles['text_secondary']};
         """)
     
     def get_selected_color(self):
@@ -301,9 +314,12 @@ class PlayerColorPicker(QWidget):
         self.selected_color = None
         self.selected_color_name = None
         self.selected_label.setText("No color selected")
-        self.selected_label.setStyleSheet("""
-            font-size: 12px;
+        
+        # Use proper theming for reset state
+        styles = theme_manager.get_theme_styles()
+        self.selected_label.setStyleSheet(f"""
+            font-size: 10px;
             font-style: italic;
-            margin-top: 8px;
-            color: #cccccc;
+            margin-top: 4px;
+            color: {styles['text_secondary']};
         """)

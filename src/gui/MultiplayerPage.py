@@ -8,6 +8,7 @@ from src.logic.ThemeManager import theme_manager
 from src.logic.Network import NetworkManager
 from src.gui.components.PlayerColorPicker import PlayerColorPicker
 import json
+import time
 
 class MultiplayerPage(QWidget):
     def __init__(self, tabWidget, parent=None):
@@ -98,6 +99,10 @@ class MultiplayerPage(QWidget):
         self.network_manager.reconnection_failed.connect(self.on_reconnection_failed)
         self.network_manager.game_config_updated.connect(self.on_game_config_updated)
         self.network_manager.player_color_updated.connect(self.on_player_color_updated)
+        self.network_manager.kicked_for_inactivity.connect(self.on_kicked_for_inactivity)
+        self.network_manager.room_closed.connect(self.on_room_closed)
+        self.network_manager.player_disconnected.connect(self.on_player_disconnected)
+        self.network_manager.player_reconnected.connect(self.on_player_reconnected)
         
         # Also try connecting with a different approach
         try:
@@ -169,41 +174,22 @@ class MultiplayerPage(QWidget):
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         self.scroll_area.setMinimumHeight(400)  # Ensure scroll area has minimum height
         
-        # Create scroll content widget with horizontal layout
+        # Create scroll content widget with vertical layout
         self.scroll_content = QWidget()
-        self.main_layout = QHBoxLayout(self.scroll_content)
+        self.main_layout = QVBoxLayout(self.scroll_content)
         self.main_layout.setContentsMargins(15, 15, 15, 15)
-        self.main_layout.setSpacing(20)
-        
-        # Create left side (players) and right side (game settings)
-        self.left_panel = QWidget()
-        self.right_panel = QWidget()
-        
-        # Left panel layout (players)
-        self.left_layout = QVBoxLayout(self.left_panel)
-        self.left_layout.setContentsMargins(0, 0, 0, 0)
-        self.left_layout.setSpacing(15)
-        
-        # Right panel layout (game settings)
-        self.right_layout = QVBoxLayout(self.right_panel)
-        self.right_layout.setContentsMargins(0, 0, 0, 0)
-        self.right_layout.setSpacing(15)
+        self.main_layout.setSpacing(15)
         
         # Player Color Picker (only visible when in a room)
         self.color_picker = PlayerColorPicker()
         self.color_picker.hide()  # Hidden initially
         self.color_picker.color_selected.connect(self.on_color_selected)
-        self.right_layout.addWidget(self.color_picker)
         
         # Track used colors for conflict detection
         self.used_colors = set()
         
-        # Add panels to main layout
-        self.main_layout.addWidget(self.left_panel, 1)  # Left panel gets more space
-        self.main_layout.addWidget(self.right_panel, 1)  # Right panel gets equal space
-        
         # Keep the old layout reference for compatibility
-        self.layout = self.left_layout
+        self.layout = self.main_layout
         
         # Set minimum size to ensure scroll bar appears when needed
         self.scroll_content.setMinimumHeight(500)
@@ -212,11 +198,11 @@ class MultiplayerPage(QWidget):
         self.scroll_area.setWidget(self.scroll_content)
         main_layout.addWidget(self.scroll_area)
 
-        # Title (left panel)
+        # Title
         self.titleLabel = QLabel("🎮 Multiplayer WikiRace")
         self.titleLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.titleLabel.setStyleSheet("font-size: 20px; font-weight: bold; margin-bottom: 10px;")
-        self.left_layout.addWidget(self.titleLabel)
+        self.main_layout.addWidget(self.titleLabel)
 
         # Server status and settings
         status_layout = QVBoxLayout()  # Changed to vertical layout for better spacing
@@ -250,7 +236,7 @@ class MultiplayerPage(QWidget):
         
         status_layout.addLayout(status_info_layout)
         
-        self.layout.addLayout(status_layout)
+        self.main_layout.addLayout(status_layout)
 
         # Player name input removed - now handled by dialog
 
@@ -350,7 +336,7 @@ class MultiplayerPage(QWidget):
         self.host_join_layout.addWidget(self.join_frame)
         
         # Add the horizontal layout to main layout
-        self.layout.addLayout(self.host_join_layout)
+        self.main_layout.addLayout(self.host_join_layout)
 
         # Room info (hidden initially)
         self.roomInfoFrame = QFrame()
@@ -495,10 +481,26 @@ class MultiplayerPage(QWidget):
         self.leaveRoomButton.setMinimumWidth(int(self.dynamic_width * 0.8))  # Dynamic button width
         room_info_layout.addWidget(self.leaveRoomButton)
         
-        self.layout.addWidget(self.roomInfoFrame)
+        # Create horizontal frame to contain room info and color picker
+        self.roomAndColorFrame = QFrame()
+        self.roomAndColorFrame.setFrameStyle(QFrame.Shape.StyledPanel)
+        self.roomAndColorFrame.setMaximumWidth(self.dynamic_width)
+        self.roomAndColorFrame.setMinimumWidth(int(self.dynamic_width * 0.8))
+        self.roomAndColorFrame.hide()
+        room_and_color_layout = QHBoxLayout(self.roomAndColorFrame)
+        room_and_color_layout.setContentsMargins(16, 16, 16, 16)
+        room_and_color_layout.setSpacing(20)
+        
+        # Add room info frame to the left
+        room_and_color_layout.addWidget(self.roomInfoFrame, 1)
+        
+        # Add color picker to the right
+        room_and_color_layout.addWidget(self.color_picker, 1)
+        
+        self.main_layout.addWidget(self.roomAndColorFrame)
 
         # Add stretch to push everything to top
-        self.layout.addStretch()
+        self.main_layout.addStretch()
 
         # Connect signals
         self.hostGameButton.clicked.connect(self.on_host_game_clicked)
@@ -810,17 +812,27 @@ class MultiplayerPage(QWidget):
     
     def on_leave_room_clicked(self):
         """Handle leave room button click"""
+        # CRITICAL FIX: Properly clean up state when leaving room to prevent rejoin bugs
+        print(f"🔄 WikiRace: [{time.time():.3f}] Leaving room - cleaning up state")
+        
+        # Leave the room via network manager first
+        if hasattr(self.network_manager, 'leave_room') and self.current_room_code:
+            try:
+                self.network_manager.leave_room()
+                print(f"🔄 WikiRace: [{time.time():.3f}] Sent leave room request to server")
+            except Exception as e:
+                print(f"⚠️ WikiRace: [{time.time():.3f}] Error leaving room via network: {e}")
+        
         # Hide all room-related UI elements
-        self.roomInfoFrame.hide()
+        self.roomAndColorFrame.hide()
         self.gameConfigFrame.hide()
         self.gameSelectionDisplay.hide()
         self.startGameButton.hide()
-        self.color_picker.hide()
         
         # Show the host/join sections again
         self.show_host_join_sections()
         
-        # Reset all state
+        # CRITICAL FIX: Completely reset all state to prevent rejoin bugs
         self.current_room_code = None
         self.player_name = None
         self.is_leader = False
@@ -828,9 +840,26 @@ class MultiplayerPage(QWidget):
         self.player_colors = {}
         self.my_color = None
         
+        # Reset button states
+        if hasattr(self, 'hostGameButton'):
+            self.hostGameButton.setEnabled(True)
+            self.hostGameButton.setText("Create Room")
+        if hasattr(self, 'joinGameButton'):
+            self.joinGameButton.setEnabled(True)
+            self.joinGameButton.setText("Join Room")
+        
+        # Clear room code input
+        if hasattr(self, 'roomCodeInput'):
+            self.roomCodeInput.clear()
+        
+        # Reset color picker
+        if hasattr(self, 'color_picker'):
+            self.color_picker.hide()
+        
         # Update server status
         self.update_server_status()
         
+        print(f"✅ WikiRace: [{time.time():.3f}] Room state completely reset - ready for rejoin")
         QMessageBox.information(self, "Left Room", "You have left the room.")
     
     def reset_for_new_game(self):
@@ -867,6 +896,93 @@ class MultiplayerPage(QWidget):
             self._send_config_update()
         
         print("✅ Multiplayer page reset for new game")
+    
+    def reset_for_exit(self):
+        """CRITICAL FIX: Complete state reset when exiting multiplayer games"""
+        print("🔄 CRITICAL: Resetting multiplayer page state for exit...")
+        
+        # Disconnect from network and clean up connections
+        if hasattr(self, 'network_manager') and self.network_manager:
+            try:
+                self.network_manager.disconnect()
+                print("🔌 Disconnected from network manager")
+            except Exception as e:
+                print(f"⚠️ Error disconnecting network manager: {e}")
+        
+        # Reset all state variables to initial values
+        self.current_room_code = None
+        self.player_name = None
+        self.is_leader = False
+        self.players_in_room = []
+        self.player_colors = {}
+        self.my_color = None
+        self.used_colors = set()
+        
+        # Clear any waiting flags
+        if hasattr(self, '_waiting_for_players_ready'):
+            self._waiting_for_players_ready = False
+        
+        # Reset UI elements to initial state
+        if hasattr(self, 'startPageCombo'):
+            self.startPageCombo.setCurrentIndex(0)
+        if hasattr(self, 'endPageCombo'):
+            self.endPageCombo.setCurrentIndex(0)
+        if hasattr(self, 'customStartPageEdit'):
+            self.customStartPageEdit.clear()
+        if hasattr(self, 'customEndPageEdit'):
+            self.customEndPageEdit.clear()
+        
+        # Hide game-related UI elements
+        if hasattr(self, 'startGameButton'):
+            self.startGameButton.hide()
+        if hasattr(self, 'gameConfigFrame'):
+            self.gameConfigFrame.hide()
+        if hasattr(self, 'playersFrame'):
+            self.playersFrame.hide()
+        
+        # Show the host/join sections again
+        self.show_host_join_sections()
+        
+        # Clear any countdown dialogs
+        if hasattr(self, 'countdown_dialogs'):
+            for dialog in self.countdown_dialogs:
+                try:
+                    dialog.close()
+                except:
+                    pass
+            self.countdown_dialogs.clear()
+        
+        # Reset color picker if it exists
+        if hasattr(self, 'color_picker'):
+            self.color_picker.reset()
+        
+        print("✅ CRITICAL: Multiplayer page state completely reset for exit")
+    
+    def on_kicked_for_inactivity(self, reason):
+        """Handle being kicked for inactivity"""
+        print(f"⏰ Kicked for inactivity: {reason}")
+        QMessageBox.warning(self, "Disconnected", f"You were disconnected due to inactivity.\nReason: {reason}")
+        self.reset_for_exit()
+    
+    def on_room_closed(self, reason):
+        """Handle room being closed"""
+        print(f"🚪 Room closed: {reason}")
+        QMessageBox.information(self, "Room Closed", f"The room was closed.\nReason: {reason}")
+        self.reset_for_exit()
+    
+    def on_player_disconnected(self, player_name, message):
+        """Handle another player disconnecting"""
+        print(f"🔌 Player disconnected: {player_name} - {message}")
+        # Show a brief notification
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(self, "Player Disconnected", f"{player_name} has disconnected from the game.\n{message}")
+    
+    def on_player_reconnected(self, player_name, message):
+        """Handle another player reconnecting"""
+        print(f"🔄 Player reconnected: {player_name} - {message}")
+        # Show a brief notification
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(self, "Player Reconnected", f"{player_name} has reconnected to the game.\n{message}")
     
     def _validate_room_exists(self, room_code):
         """Validate that a room with the given code exists"""
@@ -956,8 +1072,9 @@ class MultiplayerPage(QWidget):
         self.roomInfoLabel.setText(title)
         self.update_players_grid(players)
         
-        # Show color picker for all players when in a room
-        self.color_picker.show()
+        # Show room and color picker section
+        self.roomAndColorFrame.show()
+        self.color_picker.show()  # Explicitly show the color picker
         
         # Show game configuration for all players, but with different permissions
         self.gameConfigFrame.show()
@@ -1144,9 +1261,10 @@ class MultiplayerPage(QWidget):
     
     def on_room_deleted(self):
         """Handle room deletion event"""
+        print(f"🗑️ WikiRace: [{time.time():.3f}] Room deleted - performing complete cleanup")
         QMessageBox.information(self, "Room Closed", 
                               "The room has been closed because all players have left.")
-        # Reset to initial state
+        # CRITICAL FIX: Reset to initial state with complete cleanup to prevent rejoin bugs
         self.on_leave_room_clicked()
     
     def cleanup_countdown_dialogs(self):
@@ -1335,8 +1453,9 @@ class MultiplayerPage(QWidget):
         """Handle failed reconnection"""
         self.show_server_status("❌ Connection Lost", "Could not reconnect to server", "error")
         
-        # If we were in a room, reset the UI state
+        # CRITICAL FIX: If we were in a room, perform complete cleanup to prevent rejoin bugs
         if self.current_room_code:
+            print(f"🔌 WikiRace: [{time.time():.3f}] Reconnection failed - cleaning up room state")
             self.on_leave_room_clicked()
         
         QMessageBox.warning(self, "Connection Lost", 

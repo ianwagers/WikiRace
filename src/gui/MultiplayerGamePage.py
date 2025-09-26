@@ -751,6 +751,17 @@ class MultiplayerGamePage(QWidget):
         """Handle widget close event - disconnect signals to prevent memory leaks"""
         print(f"🔌 DEBUG: MultiplayerGamePage closing, disconnecting signals for instance {id(self)}")
         self.disconnect_network_signals()
+        
+        # CRITICAL FIX: Reset multiplayer page state when exiting game
+        if hasattr(self, 'tabWidget'):
+            # Find the multiplayer page tab and reset its state
+            for i in range(self.tabWidget.count()):
+                widget = self.tabWidget.widget(i)
+                if hasattr(widget, 'reset_for_exit'):
+                    print("🔄 Resetting multiplayer page state on game exit")
+                    widget.reset_for_exit()
+                    break
+        
         super().closeEvent(event)
     
     def initUI(self):
@@ -1084,6 +1095,9 @@ class MultiplayerGamePage(QWidget):
         if not self.game_finished:
             self.game_finished = True
             
+            # CRITICAL FIX: Stop all timers immediately when local player completes
+            self.stop_all_timers_and_progress()
+            
             # Calculate completion time
             completion_time = time.time() - self.start_time if self.start_time else 0
             
@@ -1185,7 +1199,8 @@ class MultiplayerGamePage(QWidget):
                 completion_time
             )
             
-            # Stop all progress bars when any player wins
+            # CRITICAL FIX: Stop all timers and progress bars when any player wins
+            self.stop_all_timers_and_progress()
             self.stop_all_progress_bars()
     
     def reset_all_player_progress(self):
@@ -1326,6 +1341,27 @@ class MultiplayerGamePage(QWidget):
             print(f"🎨 Updated {player_name}'s progress widget color to {color_hex}")
         else:
             print(f"⚠️ Player {player_name} not found in players widgets")
+    
+    def stop_all_timers_and_progress(self):
+        """CRITICAL FIX: Stop all timers when game ends to prevent non-winners from continuing to tick"""
+        print(f"⏰ WikiRace: [{time.time():.3f}] Stopping all timers and progress tracking")
+        
+        # Stop the solo game timer if it exists
+        if hasattr(self, 'solo_game') and hasattr(self.solo_game, 'timer'):
+            if self.solo_game.timer.isActive():
+                self.solo_game.timer.stop()
+                print(f"⏰ WikiRace: [{time.time():.3f}] Stopped solo game timer")
+        
+        # Stop any monitoring timers
+        if hasattr(self, 'monitor_timer') and self.monitor_timer.isActive():
+            self.monitor_timer.stop()
+            print(f"⏰ WikiRace: [{time.time():.3f}] Stopped monitor timer")
+        
+        if hasattr(self, 'splitter_timer') and self.splitter_timer.isActive():
+            self.splitter_timer.stop()
+            print(f"⏰ WikiRace: [{time.time():.3f}] Stopped splitter timer")
+        
+        print(f"✅ WikiRace: [{time.time():.3f}] All timers stopped - no more ticking for non-winners")
     
     def stop_all_progress_bars(self):
         """Stop progress tracking for all players when game ends"""
@@ -1478,6 +1514,15 @@ class MultiplayerGamePage(QWidget):
     def close_game_tab_and_go_home(self):
         """Close the game tab and go to home page"""
         try:
+            # CRITICAL FIX: Reset multiplayer page state before closing game tab
+            # Find the multiplayer page and reset its state
+            for i in range(self.tabWidget.count()):
+                widget = self.tabWidget.widget(i)
+                if hasattr(widget, 'reset_for_exit'):
+                    print(f"🔄 CRITICAL: Resetting multiplayer page state for exit")
+                    widget.reset_for_exit()
+                    break
+            
             # Find the current tab index
             current_index = self.tabWidget.indexOf(self)
             if current_index >= 0:

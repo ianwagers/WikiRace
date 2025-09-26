@@ -101,7 +101,7 @@ class SettingsPage(QWidget):
                 padding: 10px 20px;
             }}
             QLabel[objectName="themeLabel"] {{
-                color: {styles['accent_color']};
+                color: {styles['text_color']};
                 font-weight: bold;
                 font-size: 14px;
             }}
