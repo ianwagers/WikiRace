@@ -112,7 +112,7 @@ class CountdownDialog(QDialog):
         
         # Calculate responsive dimensions - halved size as requested
         width = max(200, min(int(parent_geo.width() * 0.25), 400))  # Halved from 0.5 to 0.25
-        height = max(550, min(int(parent_geo.height() * 0.25), 600))  # Increased minimum height to 550px to prevent text cropping
+        height = max(250, min(int(parent_geo.height() * 0.25), 500))  # Increased minimum height to 550px to prevent text cropping
         
         self.dialog_width = width
         self.dialog_height = height

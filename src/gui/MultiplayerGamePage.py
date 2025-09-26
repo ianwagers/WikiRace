@@ -225,11 +225,11 @@ class PlayerProgressWidget(QWidget):
         
         # Increased font sizes for better readability even in compact mode
         if hasattr(self, 'name_label'):
-            self.name_label.setFont(QFont("Inter", 12, QFont.Weight.Bold))  # Increased from 8 to 12
+            self.name_label.setFont(QFont("Inter", 10, QFont.Weight.Bold))  # Increased from 8 to 12
         if hasattr(self, 'links_label'):
-            self.links_label.setFont(QFont("Inter", 10))  # Increased from 6 to 10
+            self.links_label.setFont(QFont("Inter", 8))  # Increased from 6 to 10
         if hasattr(self, 'host_icon'):
-            self.host_icon.setFont(QFont("Inter", 12))  # Increased from 8 to 12
+            self.host_icon.setFont(QFont("Inter", 10))  # Increased from 8 to 12
         
         # Very compact progress bar
         if hasattr(self, 'progress_bar'):
@@ -251,11 +251,11 @@ class PlayerProgressWidget(QWidget):
         
         # Increased standard font sizes for better readability
         if hasattr(self, 'name_label'):
-            self.name_label.setFont(QFont("Inter", 16, QFont.Weight.Bold))  # Increased from 11 to 16
+            self.name_label.setFont(QFont("Inter", 14, QFont.Weight.Bold))  # Increased from 11 to 16
         if hasattr(self, 'links_label'):
-            self.links_label.setFont(QFont("Inter", 14))  # Increased from 8 to 14
+            self.links_label.setFont(QFont("Inter", 12))  # Increased from 8 to 14
         if hasattr(self, 'host_icon'):
-            self.host_icon.setFont(QFont("Inter", 16))  # Increased from 11 to 16
+            self.host_icon.setFont(QFont("Inter", 14))  # Increased from 11 to 16
         
         # Standard progress bar size
         if hasattr(self, 'progress_bar'):
@@ -290,20 +290,21 @@ class PlayerProgressWidget(QWidget):
         
         host_icon = QLabel("👑" if self.is_host else "🔹")
         # Increased font sizes for better readability
-        icon_size = 14 if self.is_small_screen else 16
+        icon_size = 12 if self.is_small_screen else 14
         host_icon.setFont(QFont("Inter", icon_size))
         name_layout.addWidget(host_icon)
         
         # Create color dot + name label
         name_label = QLabel(f"● {self.player_name}")
         # Increased font sizes for better readability
-        name_size = 14 if self.is_small_screen else 16
+        name_size = 12 if self.is_small_screen else 14
         name_label.setFont(QFont("Inter", name_size, QFont.Weight.Bold))
         
         # Style the label with player color for the dot
         name_label.setStyleSheet(f"""
             QLabel {{
                 color: {self.player_color};
+                font-size: {name_size}px;
             }}
         """)
         
