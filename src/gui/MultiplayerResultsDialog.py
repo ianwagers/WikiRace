@@ -547,15 +547,7 @@ class MultiplayerResultsDialog(QDialog):
     
     def on_exit_to_home(self):
         """Handle exit to home button click - leave room and go to home page"""
-        # CRITICAL FIX: Reset multiplayer page state when exiting to home
-        if hasattr(self, 'tabWidget'):
-            # Find the multiplayer page tab and reset its state
-            for i in range(self.tabWidget.count()):
-                widget = self.tabWidget.widget(i)
-                if hasattr(widget, 'reset_for_exit'):
-                    print("🔄 Resetting multiplayer page state on exit to home")
-                    widget.reset_for_exit()
-                    break
-        
+        # The reset logic is handled by the parent MultiplayerGamePage
+        # which has access to the tabWidget and can properly reset the multiplayer page state
         self.exit_to_home_requested.emit()
         self.accept()  # Close the dialog

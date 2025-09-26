@@ -82,6 +82,39 @@ class MultiplayerPage(QWidget):
                 border: none;
                 background-color: transparent;
             }}
+            QComboBox {{
+                background-color: {styles['input_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['input_border']};
+                border-radius: 4px;
+                font-size: 12px;
+                padding: 6px;
+                min-height: 20px;
+            }}
+            QComboBox:hover {{
+                border-color: {styles['border_hover']};
+            }}
+            QComboBox:focus {{
+                border-color: {styles['input_focus']};
+            }}
+            QComboBox::drop-down {{
+                border: none;
+                background-color: {styles['input_background']};
+            }}
+            QComboBox::down-arrow {{
+                image: none;
+                border-left: 5px solid transparent;
+                border-right: 5px solid transparent;
+                border-top: 5px solid {styles['text_color']};
+                margin-right: 5px;
+            }}
+            QComboBox QAbstractItemView {{
+                background-color: {styles['input_background']};
+                color: {styles['text_color']};
+                border: 1px solid {styles['input_border']};
+                selection-background-color: {styles['accent_color']};
+                selection-color: white;
+            }}
         """)
 
     def connect_network_signals(self):
@@ -176,7 +209,7 @@ class MultiplayerPage(QWidget):
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
-        self.scroll_area.setMinimumHeight(400)  # Ensure scroll area has minimum height
+        self.scroll_area.setMinimumHeight(600)  # Ensure scroll area has minimum height
         
         # Create scroll content widget with vertical layout
         self.scroll_content = QWidget()
@@ -186,12 +219,16 @@ class MultiplayerPage(QWidget):
         
         # Player Color Picker (only visible when in a room)
         self.color_picker = PlayerColorPicker()
+        self.color_picker.setSizePolicy(QSizePolicy.Policy.Preferred,
+                                QSizePolicy.Policy.Expanding)
         self.color_picker.hide()  # Hidden initially
         self.color_picker.color_selected.connect(self.on_color_selected)
         
         # Wrap color picker in scroll area for scroll safety
         self.color_scroll = QScrollArea()
         self.color_scroll.setWidgetResizable(True)
+        self.color_scroll.setSizePolicy(QSizePolicy.Policy.Preferred,
+                                QSizePolicy.Policy.Expanding)
         self.color_scroll.setWidget(self.color_picker)
         self.color_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.color_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
@@ -255,7 +292,7 @@ class MultiplayerPage(QWidget):
         self.host_frame = QFrame()
         self.host_frame.setFrameStyle(QFrame.Shape.NoFrame)
         # Cap width at 600px for better UX as requested
-        self.host_frame.setMinimumWidth(200)  # Minimum width for readability
+        self.host_frame.setMinimumWidth(300)  # Minimum width for readability
         self.host_frame.setMaximumWidth(600)  # Cap at 600px as requested
         host_layout = QVBoxLayout(self.host_frame)
         host_layout.setContentsMargins(20, 20, 20, 20)  # Further increased padding for better spacing
@@ -296,7 +333,7 @@ class MultiplayerPage(QWidget):
         self.join_frame = QFrame()
         self.join_frame.setFrameStyle(QFrame.Shape.NoFrame)
         # Cap width at 600px for better UX as requested
-        self.join_frame.setMinimumWidth(200)  # Minimum width for readability
+        self.join_frame.setMinimumWidth(500)  # Minimum width for readability
         self.join_frame.setMaximumWidth(600)  # Cap at 600px as requested
         join_layout = QVBoxLayout(self.join_frame)
         join_layout.setContentsMargins(20, 20, 20, 20)  # Further increased padding for better spacing
@@ -347,6 +384,9 @@ class MultiplayerPage(QWidget):
         
         # Add join frame to horizontal layout
         self.host_join_layout.addWidget(self.join_frame)
+        
+        # Add spacer to force dialogs to the left on large displays
+        self.host_join_layout.addStretch()
         
         # Add the horizontal layout to main layout
         self.main_layout.addLayout(self.host_join_layout)
@@ -422,7 +462,6 @@ class MultiplayerPage(QWidget):
         start_layout.addWidget(start_label)
         
         self.startPageCombo = QComboBox()
-        self.startPageCombo.setStyleSheet("font-size: 12px; padding: 6px;")  # Increased font size and padding
         self.startPageCombo.setMinimumHeight(35)  # Increased combo box height
         self.startPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 
                                      'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 
@@ -446,7 +485,6 @@ class MultiplayerPage(QWidget):
         end_layout.addWidget(end_label)
         
         self.endPageCombo = QComboBox()
-        self.endPageCombo.setStyleSheet("font-size: 12px; padding: 6px;")  # Increased font size and padding
         self.endPageCombo.setMinimumHeight(35)  # Increased combo box height
         self.endPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 
                                    'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 
@@ -511,7 +549,7 @@ class MultiplayerPage(QWidget):
         room_and_color_layout.addWidget(self.color_scroll, stretch=1)
         
         # Anchor the color picker scroll area to the right and top
-        room_and_color_layout.setAlignment(self.color_scroll, Qt.AlignmentFlag.AlignTop)
+        # room_and_color_layout.setAlignment(self.color_scroll, Qt.AlignmentFlag.AlignTop)
         
         self.main_layout.addWidget(self.roomAndColorFrame)
 
@@ -586,12 +624,10 @@ class MultiplayerPage(QWidget):
         
         # Set proper size constraints for color picker to prevent overlap
         if hasattr(self, 'color_scroll'):
-            # Set maximum size based on parent dimensions
-            max_width = int(self.width() * 0.6)  # 60% of parent width
-            max_height = int(self.height() * 0.7)  # 70% of parent height
-            min_height = 200  # Minimum height to prevent shrinking too far
-            self.color_scroll.setMaximumSize(max_width, max_height)
-            self.color_scroll.setMinimumHeight(min_height)
+            # Set maximum width based on dynamic width to prevent overlap
+            max_width = int(self.dynamic_width * 0.4)  # 40% of dynamic width
+            self.color_scroll.setMaximumWidth(max_width)
+            self.color_scroll.setMinimumHeight(200)  # optional, small baseline
     
     def hide_host_join_sections(self):
         """Hide the host and join game sections when user joins a room"""
@@ -969,16 +1005,30 @@ class MultiplayerPage(QWidget):
         if hasattr(self, 'customEndPageEdit'):
             self.customEndPageEdit.clear()
         
-        # Hide game-related UI elements
-        if hasattr(self, 'startGameButton'):
-            self.startGameButton.hide()
+        # Hide all room-related UI elements
+        if hasattr(self, 'roomAndColorFrame'):
+            self.roomAndColorFrame.hide()
         if hasattr(self, 'gameConfigFrame'):
             self.gameConfigFrame.hide()
-        if hasattr(self, 'playersFrame'):
-            self.playersFrame.hide()
+        if hasattr(self, 'gameSelectionDisplay'):
+            self.gameSelectionDisplay.hide()
+        if hasattr(self, 'startGameButton'):
+            self.startGameButton.hide()
         
         # Show the host/join sections again
         self.show_host_join_sections()
+        
+        # Reset button states
+        if hasattr(self, 'hostGameButton'):
+            self.hostGameButton.setEnabled(True)
+            self.hostGameButton.setText("Create Room")
+        if hasattr(self, 'joinGameButton'):
+            self.joinGameButton.setEnabled(True)
+            self.joinGameButton.setText("Join Room")
+        
+        # Clear room code input
+        if hasattr(self, 'roomCodeInput'):
+            self.roomCodeInput.clear()
         
         # Clear any countdown dialogs
         if hasattr(self, 'countdown_dialogs'):
@@ -1503,16 +1553,27 @@ class MultiplayerPage(QWidget):
                           "Please rejoin manually if the room still exists.")
     
     def load_server_config(self):
-        """Load server configuration from file or use defaults"""
+        """Load server configuration from MultiplayerConfig"""
         try:
-            from src.gui.ServerConfigDialog import ServerConfigDialog
-            self.server_config = ServerConfigDialog.get_saved_config()
+            from src.logic.MultiplayerConfig import multiplayer_config
+            self.multiplayer_config = multiplayer_config
+            
+            # Convert to the expected format for backward compatibility
+            self.server_config = {
+                'server_host': self.multiplayer_config.server.host,
+                'server_port': self.multiplayer_config.server.port,
+                'auto_reconnect': self.multiplayer_config.reconnection.enabled,
+                'max_reconnection_attempts': self.multiplayer_config.reconnection.max_attempts,
+                'reconnection_delay': self.multiplayer_config.reconnection.initial_delay,
+                'max_reconnection_delay': self.multiplayer_config.reconnection.max_delay,
+                'connection_timeout': self.multiplayer_config.server.connection_timeout
+            }
         except Exception as e:
             print(f"Failed to load server config: {e}")
             # Use default configuration
             self.server_config = {
                 'server_host': '127.0.0.1',
-                'server_port': 8001,  # Changed to match server default
+                'server_port': 8001,
                 'auto_reconnect': True,
                 'max_reconnection_attempts': 5,
                 'reconnection_delay': 2.0,

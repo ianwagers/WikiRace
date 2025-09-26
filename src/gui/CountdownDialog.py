@@ -112,7 +112,7 @@ class CountdownDialog(QDialog):
         
         # Calculate responsive dimensions - halved size as requested
         width = max(200, min(int(parent_geo.width() * 0.25), 400))  # Halved from 0.5 to 0.25
-        height = max(175, min(int(parent_geo.height() * 0.25), 300))  # Halved from 0.5 to 0.25
+        height = max(550, min(int(parent_geo.height() * 0.25), 600))  # Increased minimum height to 550px to prevent text cropping
         
         self.dialog_width = width
         self.dialog_height = height
@@ -312,10 +312,10 @@ class CountdownDialog(QDialog):
                 self.countdown_label.setStyleSheet(f"color: {warning_color}; font-size: {self.countdown_font_size}px; font-weight: bold;")
         
         elif self.current_count == 0:
-            # GREEN LIGHT! GO!
-            self.red_light.set_light(QColor(220, 53, 69), False)
-            self.yellow_light.set_light(QColor(255, 193, 7), False)
-            self.green_light.set_light(QColor(40, 167, 69), True)  # GREEN LIGHT!
+            # ALL GREEN LIGHTS! GO!
+            self.red_light.set_light(QColor(40, 167, 69), True)    # Red light turns green
+            self.yellow_light.set_light(QColor(40, 167, 69), True)  # Yellow light turns green
+            self.green_light.set_light(QColor(40, 167, 69), True)   # Green light stays green
             
             self.countdown_label.setText("GO!")
             self.status_label.setText("Race has started! Good luck!")

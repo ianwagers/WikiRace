@@ -1518,7 +1518,10 @@ class MultiplayerGamePage(QWidget):
             # Find the multiplayer page and reset its state
             for i in range(self.tabWidget.count()):
                 widget = self.tabWidget.widget(i)
-                if hasattr(widget, 'reset_for_exit'):
+                # Check if this is the MultiplayerPage by looking for specific attributes
+                if (hasattr(widget, 'reset_for_exit') and 
+                    hasattr(widget, 'network_manager') and 
+                    hasattr(widget, 'current_room_code')):
                     print(f"🔄 CRITICAL: Resetting multiplayer page state for exit")
                     widget.reset_for_exit()
                     break

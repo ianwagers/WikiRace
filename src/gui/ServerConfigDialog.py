@@ -79,12 +79,6 @@ class ServerConfigDialog(QDialog):
         button_layout = QHBoxLayout()
         button_layout.setSpacing(10)  # Add spacing between buttons
         
-        # Test Connection button
-        self.test_button = QPushButton("Test Connection")
-        self.test_button.clicked.connect(self.test_connection)
-        self.test_button.setMinimumWidth(150)  # Ensure adequate width
-        button_layout.addWidget(self.test_button)
-        
         button_layout.addStretch()
         
         # Reset to defaults
@@ -295,37 +289,6 @@ class ServerConfigDialog(QDialog):
             'connection_timeout': float(self.timeout_input.value())
         }
     
-    def test_connection(self):
-        """Test connection to the server with current settings"""
-        config = self.get_config()
-        server_url = f"http://{config['server_host']}:{config['server_port']}"
-        
-        self.test_button.setText("Testing...")
-        self.test_button.setEnabled(False)
-        
-        # Test connection in a timer to avoid blocking UI
-        QTimer.singleShot(100, lambda: self._perform_connection_test(server_url))
-    
-    def _perform_connection_test(self, server_url):
-        """Perform the actual connection test"""
-        try:
-            import requests
-            response = requests.get(f"{server_url}/health", timeout=5)
-            
-            if response.status_code == 200:
-                QMessageBox.information(self, "Connection Test", 
-                                      f"✅ Successfully connected to server at {server_url}")
-            else:
-                QMessageBox.warning(self, "Connection Test", 
-                                  f"⚠️ Server responded with status {response.status_code}")
-        
-        except Exception as e:
-            QMessageBox.critical(self, "Connection Test", 
-                               f"❌ Failed to connect to {server_url}:\n{e}")
-        
-        finally:
-            self.test_button.setText("Test Connection")
-            self.test_button.setEnabled(True)
     
     def reset_to_defaults(self):
         """Reset all settings to defaults"""
@@ -362,11 +325,17 @@ class ServerConfigDialog(QDialog):
     
     def get_config_file_path(self):
         """Get the path to the configuration file"""
-        # Use a config directory in the user's home folder
+        # Use AppData on Windows, fallback to home directory on other platforms
         import os
         from pathlib import Path
         
-        config_dir = Path.home() / ".wikirace"
+        appdata = os.getenv('APPDATA')
+        if appdata:
+            config_dir = Path(appdata) / "wikirace"
+        else:
+            # Fallback for non-Windows systems
+            config_dir = Path.home() / ".wikirace"
+        
         config_dir.mkdir(exist_ok=True)
         return config_dir / "multiplayer_config.json"
     

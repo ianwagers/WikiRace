@@ -90,7 +90,14 @@ class MultiplayerConfig(QObject):
     
     def _get_config_file_path(self) -> Path:
         """Get the path to the configuration file"""
-        config_dir = Path.home() / ".wikirace"
+        # Use AppData on Windows, fallback to home directory on other platforms
+        appdata = os.getenv('APPDATA')
+        if appdata:
+            config_dir = Path(appdata) / "wikirace"
+        else:
+            # Fallback for non-Windows systems
+            config_dir = Path.home() / ".wikirace"
+        
         config_dir.mkdir(exist_ok=True)
         return config_dir / "multiplayer_config.json"
     

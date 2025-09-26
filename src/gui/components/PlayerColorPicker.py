@@ -47,7 +47,7 @@ class PlayerColorPicker(QWidget):
         self.selected_color = None
         self.selected_color_name = None
         self.used_colors = set()  # Track colors already selected by other players
-        self.tile_size = 80  # Will be calculated dynamically
+        self.tile_size = 70  # Will be calculated dynamically
         
         # Set object name for scoped styling
         self.setObjectName("ColorPickerDialog")
