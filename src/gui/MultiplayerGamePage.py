@@ -223,13 +223,13 @@ class PlayerProgressWidget(QWidget):
         if hasattr(self, 'progress_label'):
             self.progress_label.hide()
         
-        # Very aggressive font sizes for maximum space efficiency
+        # Increased font sizes for better readability even in compact mode
         if hasattr(self, 'name_label'):
-            self.name_label.setFont(QFont("Inter", 8, QFont.Weight.Bold))
+            self.name_label.setFont(QFont("Inter", 12, QFont.Weight.Bold))  # Increased from 8 to 12
         if hasattr(self, 'links_label'):
-            self.links_label.setFont(QFont("Inter", 6))
+            self.links_label.setFont(QFont("Inter", 10))  # Increased from 6 to 10
         if hasattr(self, 'host_icon'):
-            self.host_icon.setFont(QFont("Inter", 8))
+            self.host_icon.setFont(QFont("Inter", 12))  # Increased from 8 to 12
         
         # Very compact progress bar
         if hasattr(self, 'progress_bar'):
@@ -249,13 +249,13 @@ class PlayerProgressWidget(QWidget):
         if hasattr(self, 'progress_label'):
             self.progress_label.show()
         
-        # Standard font sizes
+        # Increased standard font sizes for better readability
         if hasattr(self, 'name_label'):
-            self.name_label.setFont(QFont("Inter", 11, QFont.Weight.Bold))
+            self.name_label.setFont(QFont("Inter", 16, QFont.Weight.Bold))  # Increased from 11 to 16
         if hasattr(self, 'links_label'):
-            self.links_label.setFont(QFont("Inter", 8))
+            self.links_label.setFont(QFont("Inter", 14))  # Increased from 8 to 14
         if hasattr(self, 'host_icon'):
-            self.host_icon.setFont(QFont("Inter", 11))
+            self.host_icon.setFont(QFont("Inter", 16))  # Increased from 11 to 16
         
         # Standard progress bar size
         if hasattr(self, 'progress_bar'):
@@ -283,21 +283,21 @@ class PlayerProgressWidget(QWidget):
         info_layout = QVBoxLayout()
         info_layout.setSpacing(2 if self.is_small_screen else 4)
         
-        # Player name with host indicator
+        # Player name with host indicator - increased font sizes
         name_layout = QHBoxLayout()
         name_layout.setContentsMargins(0, 0, 0, 0)
         name_layout.setSpacing(4 if self.is_small_screen else 6)
         
         host_icon = QLabel("👑" if self.is_host else "🔹")
-        # Smaller font for small screens
-        icon_size = 10 if self.is_small_screen else 12
+        # Increased font sizes for better readability
+        icon_size = 14 if self.is_small_screen else 16
         host_icon.setFont(QFont("Inter", icon_size))
         name_layout.addWidget(host_icon)
         
         # Create color dot + name label
         name_label = QLabel(f"● {self.player_name}")
-        # Smaller font for small screens
-        name_size = 10 if self.is_small_screen else 12
+        # Increased font sizes for better readability
+        name_size = 14 if self.is_small_screen else 16
         name_label.setFont(QFont("Inter", name_size, QFont.Weight.Bold))
         
         # Style the label with player color for the dot
@@ -315,17 +315,17 @@ class PlayerProgressWidget(QWidget):
         # Current page (smaller text) - hide on small screens to save space
         self.page_label = QLabel(self.current_page)
         if not self.is_small_screen:
-            self.page_label.setFont(QFont("Inter", 9))
+            self.page_label.setFont(QFont("Inter", 12))  # Increased from 9 to 12
             self.page_label.setWordWrap(True)
             info_layout.addWidget(self.page_label)
         else:
             # Hide on small screens
             self.page_label.hide()
         
-        # Links count
+        # Links count - increased font size
         self.links_label = QLabel(f"Links: {self.links_used}")
-        # Smaller font for small screens
-        links_size = 8 if self.is_small_screen else 9
+        # Increased font sizes for better readability
+        links_size = 12 if self.is_small_screen else 14
         self.links_label.setFont(QFont("Inter", links_size))
         info_layout.addWidget(self.links_label)
         

@@ -110,9 +110,9 @@ class CountdownDialog(QDialog):
             from PyQt6.QtWidgets import QApplication
             parent_geo = QApplication.primaryScreen().geometry()
         
-        # Calculate responsive dimensions (40-60% of parent, but not too small)
-        width = max(400, min(int(parent_geo.width() * 0.5), 800))
-        height = max(350, min(int(parent_geo.height() * 0.5), 600))
+        # Calculate responsive dimensions - halved size as requested
+        width = max(200, min(int(parent_geo.width() * 0.25), 400))  # Halved from 0.5 to 0.25
+        height = max(175, min(int(parent_geo.height() * 0.25), 300))  # Halved from 0.5 to 0.25
         
         self.dialog_width = width
         self.dialog_height = height
@@ -169,12 +169,12 @@ class CountdownDialog(QDialog):
         
         layout.addLayout(lights_layout)
         
-        # Message label
+        # Message label with text wrapping enabled
         self.message_label = QLabel(self.message)
         self.message_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.message_label.setFont(QFont("Inter", self.message_font_size, QFont.Weight.Bold))
-        self.message_label.setWordWrap(True)
-        self.message_label.setMaximumHeight(int(self.dialog_height * 0.15))
+        self.message_label.setWordWrap(True)  # Ensure text wrapping is enabled
+        self.message_label.setMaximumHeight(int(self.dialog_height * 0.2))  # Slightly more space for wrapped text
         layout.addWidget(self.message_label)
         
         # Countdown number
@@ -184,12 +184,12 @@ class CountdownDialog(QDialog):
         self.countdown_label.setMinimumHeight(int(self.dialog_height * 0.3))
         layout.addWidget(self.countdown_label)
         
-        # Status label
+        # Status label with text wrapping enabled
         self.status_label = QLabel("Race starts when countdown reaches 0")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.status_label.setFont(QFont("Inter", self.status_font_size))
-        self.status_label.setWordWrap(True)
-        self.status_label.setMaximumHeight(int(self.dialog_height * 0.1))
+        self.status_label.setWordWrap(True)  # Ensure text wrapping is enabled
+        self.status_label.setMaximumHeight(int(self.dialog_height * 0.15))  # Slightly more space for wrapped text
         layout.addWidget(self.status_label)
         
         layout.addStretch()
@@ -288,22 +288,22 @@ class CountdownDialog(QDialog):
         if self.current_count > 0:
             self.countdown_label.setText(str(self.current_count))
             
-            # Drag race lights sequence
-            if self.current_count == 5:
+            # Drag race lights sequence - Fixed sequence: Red on 3, Yellow on 2, Green on 1 and GO!
+            if self.current_count == 3:
                 # Red light on
                 self.red_light.set_light(QColor(220, 53, 69), True)
                 self.yellow_light.set_light(QColor(255, 193, 7), False)
                 self.green_light.set_light(QColor(40, 167, 69), False)
-            elif self.current_count == 3:
-                # Yellow light on
-                self.red_light.set_light(QColor(220, 53, 69), True)
-                self.yellow_light.set_light(QColor(255, 193, 7), True)
-                self.green_light.set_light(QColor(40, 167, 69), False)
             elif self.current_count == 2:
-                # All lights on (red + yellow)
+                # Yellow light on (red stays on)
                 self.red_light.set_light(QColor(220, 53, 69), True)
                 self.yellow_light.set_light(QColor(255, 193, 7), True)
                 self.green_light.set_light(QColor(40, 167, 69), False)
+            elif self.current_count == 1:
+                # Green light on (red and yellow stay on)
+                self.red_light.set_light(QColor(220, 53, 69), True)
+                self.yellow_light.set_light(QColor(255, 193, 7), True)
+                self.green_light.set_light(QColor(40, 167, 69), True)
             
             # Change countdown color as we get closer to 0
             if self.current_count <= 3:

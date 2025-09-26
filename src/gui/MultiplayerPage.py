@@ -78,6 +78,10 @@ class MultiplayerPage(QWidget):
                 background-color: {styles['button_pressed']};
                 border-color: {styles['border_pressed']};
             }}
+            QFrame {{
+                border: none;
+                background-color: transparent;
+            }}
         """)
 
     def connect_network_signals(self):
@@ -158,7 +162,7 @@ class MultiplayerPage(QWidget):
 
     def initUI(self):
         """Initialize the multiplayer UI"""
-        # Calculate dynamic width based on screen size - 35% larger than before for better visibility
+        # Calculate dynamic width based on screen size - cap at 600px for better UX
         screen_width = self.screen().availableGeometry().width()
         self.dynamic_width = min(int(screen_width * 0.45), 600)  # 45% of screen width, max 600px
         
@@ -184,6 +188,13 @@ class MultiplayerPage(QWidget):
         self.color_picker = PlayerColorPicker()
         self.color_picker.hide()  # Hidden initially
         self.color_picker.color_selected.connect(self.on_color_selected)
+        
+        # Wrap color picker in scroll area for scroll safety
+        self.color_scroll = QScrollArea()
+        self.color_scroll.setWidgetResizable(True)
+        self.color_scroll.setWidget(self.color_picker)
+        self.color_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.color_scroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         
         # Track used colors for conflict detection
         self.used_colors = set()
@@ -242,9 +253,10 @@ class MultiplayerPage(QWidget):
 
         # Host Game section
         self.host_frame = QFrame()
-        self.host_frame.setFrameStyle(QFrame.Shape.StyledPanel)
-        # Remove width constraints to allow horizontal expansion
+        self.host_frame.setFrameStyle(QFrame.Shape.NoFrame)
+        # Cap width at 600px for better UX as requested
         self.host_frame.setMinimumWidth(200)  # Minimum width for readability
+        self.host_frame.setMaximumWidth(600)  # Cap at 600px as requested
         host_layout = QVBoxLayout(self.host_frame)
         host_layout.setContentsMargins(20, 20, 20, 20)  # Further increased padding for better spacing
         
@@ -282,9 +294,10 @@ class MultiplayerPage(QWidget):
 
         # Join Game section
         self.join_frame = QFrame()
-        self.join_frame.setFrameStyle(QFrame.Shape.StyledPanel)
-        # Remove width constraints to allow horizontal expansion
+        self.join_frame.setFrameStyle(QFrame.Shape.NoFrame)
+        # Cap width at 600px for better UX as requested
         self.join_frame.setMinimumWidth(200)  # Minimum width for readability
+        self.join_frame.setMaximumWidth(600)  # Cap at 600px as requested
         join_layout = QVBoxLayout(self.join_frame)
         join_layout.setContentsMargins(20, 20, 20, 20)  # Further increased padding for better spacing
         
@@ -340,7 +353,7 @@ class MultiplayerPage(QWidget):
 
         # Room info (hidden initially)
         self.roomInfoFrame = QFrame()
-        self.roomInfoFrame.setFrameStyle(QFrame.Shape.StyledPanel)
+        self.roomInfoFrame.setFrameStyle(QFrame.Shape.NoFrame)
         self.roomInfoFrame.setMaximumWidth(self.dynamic_width)  # Use same dynamic width
         self.roomInfoFrame.setMinimumWidth(int(self.dynamic_width * 0.8))  # Minimum 80% of calculated width
         self.roomInfoFrame.hide()
@@ -390,7 +403,7 @@ class MultiplayerPage(QWidget):
         
         # Game Configuration Section (only visible for leader)
         self.gameConfigFrame = QFrame()
-        self.gameConfigFrame.setFrameStyle(QFrame.Shape.StyledPanel)
+        self.gameConfigFrame.setFrameStyle(QFrame.Shape.NoFrame)
         self.gameConfigFrame.hide()  # Hidden by default
         self.gameConfigFrame.setMaximumWidth(self.dynamic_width)  # Use dynamic width
         game_config_layout = QVBoxLayout(self.gameConfigFrame)
@@ -483,19 +496,22 @@ class MultiplayerPage(QWidget):
         
         # Create horizontal frame to contain room info and color picker
         self.roomAndColorFrame = QFrame()
-        self.roomAndColorFrame.setFrameStyle(QFrame.Shape.StyledPanel)
-        self.roomAndColorFrame.setMaximumWidth(self.dynamic_width)
+        self.roomAndColorFrame.setFrameStyle(QFrame.Shape.NoFrame)
+        self.roomAndColorFrame.setMaximumWidth(1600)  # Increased to accommodate game settings, room code, and color picker
         self.roomAndColorFrame.setMinimumWidth(int(self.dynamic_width * 0.8))
         self.roomAndColorFrame.hide()
         room_and_color_layout = QHBoxLayout(self.roomAndColorFrame)
         room_and_color_layout.setContentsMargins(16, 16, 16, 16)
         room_and_color_layout.setSpacing(20)
         
-        # Add room info frame to the left
-        room_and_color_layout.addWidget(self.roomInfoFrame, 1)
+        # Add room info frame to the left (takes more space)
+        room_and_color_layout.addWidget(self.roomInfoFrame, stretch=3)
         
-        # Add color picker to the right
-        room_and_color_layout.addWidget(self.color_picker, 1)
+        # Add color picker scroll area to the right (takes less space to prevent overlap)
+        room_and_color_layout.addWidget(self.color_scroll, stretch=1)
+        
+        # Anchor the color picker scroll area to the right and top
+        room_and_color_layout.setAlignment(self.color_scroll, Qt.AlignmentFlag.AlignTop)
         
         self.main_layout.addWidget(self.roomAndColorFrame)
 
@@ -526,7 +542,12 @@ class MultiplayerPage(QWidget):
         
         # Update dynamic width based on current window size
         current_width = self.width()
-        new_dynamic_width = min(int(current_width * 0.4), 500)
+        # Use screen width for better cross-platform support
+        screen_width = self.screen().availableGeometry().width()
+        
+        # Calculate new dynamic width with better cross-platform support
+        # Use 45% of screen width, capped at 600px for better UX
+        new_dynamic_width = min(int(screen_width * 0.45), 600)
         
         # Only update if there's a significant change to avoid constant updates
         if abs(new_dynamic_width - self.dynamic_width) > 20:
@@ -535,16 +556,21 @@ class MultiplayerPage(QWidget):
     
     def update_dynamic_sizing(self):
         """Update all dynamic sizing elements"""
-        # Update frame widths - host and join frames now expand horizontally
+        # Update frame widths - cap at 600px for better UX as requested
         # Calculate available width for each frame (half of available space minus spacing)
-        available_width = max(300, self.dynamic_width)  # Minimum 300px per frame
+        available_width = max(300, min(self.dynamic_width, 600))  # Minimum 300px, max 600px per frame
         self.host_frame.setMinimumWidth(available_width)
+        self.host_frame.setMaximumWidth(600)  # Ensure cap is maintained
         self.join_frame.setMinimumWidth(available_width)
+        self.join_frame.setMaximumWidth(600)  # Ensure cap is maintained
         
         # Room info and game config still use dynamic width
         self.roomInfoFrame.setMaximumWidth(self.dynamic_width)
         self.roomInfoFrame.setMinimumWidth(int(self.dynamic_width * 0.8))
         self.gameConfigFrame.setMaximumWidth(self.dynamic_width)
+        
+        # Keep room and color frame at the wider 1600px maximum
+        self.roomAndColorFrame.setMaximumWidth(1600)
         
         # Update button widths for horizontal layout
         button_width = max(200, int(self.dynamic_width * 0.4))  # Each button gets half the width
@@ -557,6 +583,15 @@ class MultiplayerPage(QWidget):
         self.roomInfoLabel.setMaximumWidth(self.dynamic_width)
         self.playersGrid.setMaximumWidth(self.dynamic_width)
         self.gameSelectionDisplay.setMaximumWidth(self.dynamic_width)
+        
+        # Set proper size constraints for color picker to prevent overlap
+        if hasattr(self, 'color_scroll'):
+            # Set maximum size based on parent dimensions
+            max_width = int(self.width() * 0.6)  # 60% of parent width
+            max_height = int(self.height() * 0.7)  # 70% of parent height
+            min_height = 200  # Minimum height to prevent shrinking too far
+            self.color_scroll.setMaximumSize(max_width, max_height)
+            self.color_scroll.setMinimumHeight(min_height)
     
     def hide_host_join_sections(self):
         """Hide the host and join game sections when user joins a room"""
@@ -855,6 +890,8 @@ class MultiplayerPage(QWidget):
         # Reset color picker
         if hasattr(self, 'color_picker'):
             self.color_picker.hide()
+        if hasattr(self, 'color_scroll'):
+            self.color_scroll.hide()
         
         # Update server status
         self.update_server_status()
@@ -955,6 +992,8 @@ class MultiplayerPage(QWidget):
         # Reset color picker if it exists
         if hasattr(self, 'color_picker'):
             self.color_picker.reset()
+        if hasattr(self, 'color_scroll'):
+            self.color_scroll.hide()
         
         print("✅ CRITICAL: Multiplayer page state completely reset for exit")
     
@@ -1074,7 +1113,7 @@ class MultiplayerPage(QWidget):
         
         # Show room and color picker section
         self.roomAndColorFrame.show()
-        self.color_picker.show()  # Explicitly show the color picker
+        self.color_scroll.show()  # Explicitly show the color picker scroll area
         
         # Show game configuration for all players, but with different permissions
         self.gameConfigFrame.show()
