@@ -751,17 +751,57 @@ class MultiplayerGamePage(QWidget):
     def closeEvent(self, event):
         """Handle widget close event - disconnect signals to prevent memory leaks"""
         print(f"🔌 DEBUG: MultiplayerGamePage closing, disconnecting signals for instance {id(self)}")
-        self.disconnect_network_signals()
         
-        # CRITICAL FIX: Reset multiplayer page state when exiting game
-        if hasattr(self, 'tabWidget'):
-            # Find the multiplayer page tab and reset its state
-            for i in range(self.tabWidget.count()):
-                widget = self.tabWidget.widget(i)
-                if hasattr(widget, 'reset_for_exit'):
-                    print("🔄 Resetting multiplayer page state on game exit")
-                    widget.reset_for_exit()
-                    break
+        # CRITICAL FIX: Proper cleanup order to prevent signal ordering issues
+        try:
+            # 1. Stop all timers first to prevent further updates
+            self.stop_all_timers_and_progress()
+            
+            # 2. Disconnect network signals to prevent further network events
+            self.disconnect_network_signals()
+            
+            # 3. Clear all player data and references
+            self.players.clear()
+            self.player_instances.clear()
+            
+            # 4. Reset game state flags
+            self.game_started = False
+            self.game_finished = False
+            self.results_dialog_shown = False
+            
+            # 5. Clean up solo game if it exists
+            if hasattr(self, 'solo_game') and self.solo_game:
+                try:
+                    self.solo_game.setEnabled(False)
+                    # Disconnect solo game signals
+                    if hasattr(self.solo_game, 'urlChanged'):
+                        self.solo_game.urlChanged.disconnect()
+                    if hasattr(self.solo_game, 'linkClicked'):
+                        self.solo_game.linkClicked.disconnect()
+                    if hasattr(self.solo_game, 'gameCompleted'):
+                        self.solo_game.gameCompleted.disconnect()
+                except Exception as e:
+                    print(f"⚠️ Error cleaning up solo game: {e}")
+            
+            # 6. Reset multiplayer page state when exiting game
+            if hasattr(self, 'tabWidget'):
+                # Find the multiplayer page tab and reset its state
+                for i in range(self.tabWidget.count()):
+                    widget = self.tabWidget.widget(i)
+                    if hasattr(widget, 'reset_for_exit'):
+                        print("🔄 Resetting multiplayer page state on game exit")
+                        try:
+                            widget.reset_for_exit()
+                        except Exception as e:
+                            print(f"⚠️ Error resetting multiplayer page: {e}")
+                        break
+            
+            print(f"✅ MultiplayerGamePage cleanup completed for instance {id(self)}")
+            
+        except Exception as e:
+            print(f"❌ Error during MultiplayerGamePage cleanup: {e}")
+            import traceback
+            print(f"❌ Cleanup traceback: {traceback.format_exc()}")
         
         super().closeEvent(event)
     
@@ -1347,22 +1387,45 @@ class MultiplayerGamePage(QWidget):
         """CRITICAL FIX: Stop all timers when game ends to prevent non-winners from continuing to tick"""
         print(f"⏰ WikiRace: [{time.time():.3f}] Stopping all timers and progress tracking")
         
-        # Stop the solo game timer if it exists
-        if hasattr(self, 'solo_game') and hasattr(self.solo_game, 'timer'):
-            if self.solo_game.timer.isActive():
-                self.solo_game.timer.stop()
-                print(f"⏰ WikiRace: [{time.time():.3f}] Stopped solo game timer")
-        
-        # Stop any monitoring timers
-        if hasattr(self, 'monitor_timer') and self.monitor_timer.isActive():
-            self.monitor_timer.stop()
-            print(f"⏰ WikiRace: [{time.time():.3f}] Stopped monitor timer")
-        
-        if hasattr(self, 'splitter_timer') and self.splitter_timer.isActive():
-            self.splitter_timer.stop()
-            print(f"⏰ WikiRace: [{time.time():.3f}] Stopped splitter timer")
-        
-        print(f"✅ WikiRace: [{time.time():.3f}] All timers stopped - no more ticking for non-winners")
+        try:
+            # Stop the solo game timer if it exists
+            if hasattr(self, 'solo_game') and self.solo_game:
+                if hasattr(self.solo_game, 'timer') and self.solo_game.timer.isActive():
+                    self.solo_game.timer.stop()
+                    print(f"⏰ WikiRace: [{time.time():.3f}] Stopped solo game timer")
+                
+                # Also stop any other timers in solo game
+                for attr_name in dir(self.solo_game):
+                    attr = getattr(self.solo_game, attr_name)
+                    if isinstance(attr, QTimer) and attr.isActive():
+                        attr.stop()
+                        print(f"⏰ WikiRace: [{time.time():.3f}] Stopped solo game timer: {attr_name}")
+            
+            # Stop any monitoring timers
+            if hasattr(self, 'monitor_timer') and self.monitor_timer and self.monitor_timer.isActive():
+                self.monitor_timer.stop()
+                print(f"⏰ WikiRace: [{time.time():.3f}] Stopped monitor timer")
+            
+            if hasattr(self, 'splitter_timer') and self.splitter_timer and self.splitter_timer.isActive():
+                self.splitter_timer.stop()
+                print(f"⏰ WikiRace: [{time.time():.3f}] Stopped splitter timer")
+            
+            # Stop all other timers that might exist
+            for attr_name in dir(self):
+                attr = getattr(self, attr_name)
+                if isinstance(attr, QTimer) and attr.isActive():
+                    attr.stop()
+                    print(f"⏰ WikiRace: [{time.time():.3f}] Stopped timer: {attr_name}")
+            
+            # Stop progress tracking for all players
+            self.stop_all_progress_bars()
+            
+            print(f"✅ WikiRace: [{time.time():.3f}] All timers stopped - no more ticking for non-winners")
+            
+        except Exception as e:
+            print(f"❌ Error stopping timers: {e}")
+            import traceback
+            print(f"❌ Timer stop traceback: {traceback.format_exc()}")
     
     def stop_all_progress_bars(self):
         """Stop progress tracking for all players when game ends"""
@@ -1515,26 +1578,47 @@ class MultiplayerGamePage(QWidget):
     def close_game_tab_and_go_home(self):
         """Close the game tab and go to home page"""
         try:
-            # CRITICAL FIX: Reset multiplayer page state before closing game tab
-            # Find the multiplayer page and reset its state
+            # CRITICAL FIX: Close tabs first, then disconnect from server
+            # Find the multiplayer page and close its tab
+            multiplayer_tab_index = None
             for i in range(self.tabWidget.count()):
                 widget = self.tabWidget.widget(i)
                 # Check if this is the MultiplayerPage by looking for specific attributes
                 if (hasattr(widget, 'reset_for_exit') and 
                     hasattr(widget, 'network_manager') and 
                     hasattr(widget, 'current_room_code')):
-                    print(f"🔄 CRITICAL: Resetting multiplayer page state for exit")
-                    widget.reset_for_exit()
+                    print(f"🔄 CRITICAL: Found multiplayer tab for exit")
+                    multiplayer_tab_index = i
                     break
             
-            # Find the current tab index
+            # Find the current game tab index
             current_index = self.tabWidget.indexOf(self)
             if current_index >= 0:
-                # Close this tab
+                # Close the game tab first
                 self.tabWidget.removeTab(current_index)
+                print(f"🔄 CRITICAL: Game tab closed")
+            
+            # Close the multiplayer tab if found
+            if multiplayer_tab_index is not None:
+                # Adjust index if game tab was removed before multiplayer tab
+                if multiplayer_tab_index > current_index:
+                    multiplayer_tab_index -= 1
                 
-                # Switch to home tab (index 0)
-                self.tabWidget.setCurrentIndex(0)
+                # Get the multiplayer widget before removing the tab
+                multiplayer_widget = self.tabWidget.widget(multiplayer_tab_index)
+                
+                # Close the multiplayer tab first
+                self.tabWidget.removeTab(multiplayer_tab_index)
+                print(f"🔄 CRITICAL: Multiplayer tab closed")
+                
+                # Disconnect from server after closing tab
+                if hasattr(multiplayer_widget, 'network_manager') and multiplayer_widget.network_manager:
+                    print(f"🔄 CRITICAL: Disconnecting from server after closing multiplayer tab")
+                    multiplayer_widget.network_manager.disconnect_from_server()
+            
+            # Switch to home tab (index 0)
+            self.tabWidget.setCurrentIndex(0)
+            print(f"🔄 CRITICAL: Returned to home page - ready for new games")
                 
         except Exception as e:
             print(f"❌ Error closing game tab and going home: {e}")

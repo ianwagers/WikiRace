@@ -349,7 +349,8 @@ class WikipediaTheme:
             profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
             
             # Set up request interceptor to block unnecessary resources
-            WikipediaTheme._setupRequestInterceptor(profile)
+            # DISABLED: Now handled by WikipediaUrlInterceptor to avoid conflicts
+            # WikipediaTheme._setupRequestInterceptor(profile)
             
             profile.setHttpUserAgent(f"WikiRace/1.0 (Optimized {theme.title()} Mode)")
             

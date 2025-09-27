@@ -129,8 +129,8 @@ class HomePage(QWidget):
         profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
         profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
         
-        # Set up URL interceptor to handle useskin=vector-2022 before navigation
-        self.url_interceptor = WikipediaUrlInterceptor()
+        # Set up URL interceptor to handle useskin=vector-2022 and external links
+        self.url_interceptor = WikipediaUrlInterceptor(self.webView)
         profile.setUrlRequestInterceptor(self.url_interceptor)
         
         # Hide the webview initially to prevent flash of light content
@@ -297,15 +297,18 @@ class HomePage(QWidget):
         # Uncheck the button immediately after click
         self.multiplayerButton.setChecked(False)
         
-        # Open the multiplayer tab
-        if not hasattr(self.mainApplication, 'multiplayerPage') or self.tabWidget.indexOf(self.mainApplication.multiplayerPage) == -1:
-            self.mainApplication.addMultiplayerTab()
-            # Switch to the newly created tab
-            index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
+        # CRITICAL FIX: Always create a new multiplayer tab to ensure clean state
+        # The previous tab may have been closed and the attribute deleted
+        print("🔄 HomePage: Creating new multiplayer tab")
+        self.mainApplication.addMultiplayerTab()
+        
+        # Switch to the newly created tab
+        index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
+        if index >= 0:
             self.tabWidget.setCurrentIndex(index)
+            print("✅ HomePage: Switched to multiplayer tab")
         else:
-            index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
-            self.tabWidget.setCurrentIndex(index)
+            print("❌ HomePage: Failed to find multiplayer tab")
     
     def onSettingsClicked(self):
         # Uncheck the button immediately after click

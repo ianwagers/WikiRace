@@ -246,7 +246,7 @@ class PlayerColorPicker(QWidget):
             }}
             
             #ColorPickerDialog QPushButton#ColorSwatch:focus {{
-                box-shadow: 0 0 0 2px rgba(255,255,255,0.25);
+                border: 2px solid rgba(255,255,255,0.5);
             }}
             
             #ColorPickerDialog QPushButton#ColorSwatch:disabled {{
@@ -280,7 +280,7 @@ class PlayerColorPicker(QWidget):
                         border: 4px solid #ffffff;
                     }}
                     QPushButton#ColorSwatch:focus {{
-                        box-shadow: 0 0 0 2px rgba(255,255,255,0.25);
+                        border: 2px solid rgba(255,255,255,0.5);
                     }}
                     QPushButton#ColorSwatch:disabled {{
                         opacity: 0.5;

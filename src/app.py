@@ -60,10 +60,20 @@ class MainApplication(QMainWindow):
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
 
     def addMultiplayerTab(self):
-        # Adds the Multiplayer tab only if it doesn't exist
-        if not hasattr(self, 'multiplayerPage'):
-            self.multiplayerPage = MultiplayerPage(self.tabWidget)
-            self.tabWidget.addTab(self.multiplayerPage, "Multiplayer")
+        # CRITICAL FIX: Always create a new multiplayer tab to ensure clean state
+        # Remove any existing multiplayer tab first
+        if hasattr(self, 'multiplayerPage'):
+            try:
+                existing_index = self.tabWidget.indexOf(self.multiplayerPage)
+                if existing_index >= 0:
+                    self.tabWidget.removeTab(existing_index)
+                delattr(self, 'multiplayerPage')
+            except:
+                pass  # Ignore errors if tab doesn't exist
+        
+        # Create new multiplayer tab
+        self.multiplayerPage = MultiplayerPage(self.tabWidget)
+        self.tabWidget.addTab(self.multiplayerPage, "Multiplayer")
 
     def addSettingsTab(self):
         # Adds the Settings tab only if it doesn't exist

@@ -88,6 +88,16 @@ class NetworkManager(QObject):
         """Get a player from the room players dictionary"""
         return self.room_players.get(player_name)
     
+    def request_room_state(self, room_code: str):
+        """Request current room state from server to refresh player list"""
+        try:
+            if self.connected_to_server and self.sio:
+                print(f"🔄 Requesting room state for {room_code}")
+                # Emit a ping to the room to trigger a state refresh
+                self.sio.emit('ping', {'room_code': room_code})
+        except Exception as e:
+            print(f"⚠️ Error requesting room state: {e}")
+    
     def _on_player_color_changed(self, color_hex: str, color_name: str):
         """Handle player color change from Player instance"""
         if self.current_player:
@@ -334,10 +344,22 @@ class NetworkManager(QObject):
                 
                 # Connect with longer timeout for stability
                 self.sio.connect(self.server_url, wait_timeout=15)
-                # Wait a moment for connection to establish
+                
+                # CRITICAL FIX: Wait for connection to be fully established
                 import time
-                time.sleep(0.5)
-                return self.sio.connected
+                max_wait = 3.0  # Maximum wait time in seconds
+                wait_interval = 0.1  # Check every 100ms
+                waited = 0.0
+                
+                while waited < max_wait:
+                    if self.connected_to_server and self.sio.connected:
+                        print(f"✅ Connection established after {waited:.1f}s")
+                        return True
+                    time.sleep(wait_interval)
+                    waited += wait_interval
+                
+                print(f"⚠️ Connection timeout after {max_wait}s")
+                return False
             return True
         except Exception as e:
             print(f"❌ Failed to connect to server: {e}")
@@ -345,18 +367,71 @@ class NetworkManager(QObject):
             return False
     
     def disconnect_from_server(self):
-        """Disconnect from the multiplayer server"""
+        """Disconnect from the multiplayer server with proper cleanup"""
         try:
+            print(f"🔌 Disconnecting from server...")
+            
             # Disable reconnection when manually disconnecting
             self.reconnection_enabled = False
             
-            # Stop heartbeat
+            # Stop heartbeat first
             self.stop_heartbeat()
             
+            # Clear reconnection state
+            self.current_reconnection_attempts = 0
+            
+            # Disconnect socket if connected
             if self.connected_to_server:
-                self.sio.disconnect()
+                try:
+                    if hasattr(self.sio, 'connected') and self.sio.connected:
+                        self.sio.disconnect()
+                        print(f"🔌 Socket disconnected")
+                except Exception as disconnect_error:
+                    print(f"⚠️ Error during socket disconnect: {disconnect_error}")
+            
+            # Reset connection state
+            self.connected_to_server = False
+            
+            # Clear room state
+            self.current_room = None
+            self.player_name = None
+            
+            # Clear player data
+            self.current_player = None
+            self.room_players.clear()
+            
+            print(f"✅ Disconnection completed")
+            
         except Exception as e:
-            print(f"Error disconnecting: {e}")
+            print(f"❌ Error during disconnection: {e}")
+            import traceback
+            print(f"❌ Disconnect traceback: {traceback.format_exc()}")
+    
+    def cleanup_network_resources(self):
+        """Clean up all network resources and prevent memory leaks"""
+        try:
+            print(f"🧹 Cleaning up network resources...")
+            
+            # Stop all timers
+            self.stop_heartbeat()
+            
+            # Disable reconnection
+            self.reconnection_enabled = False
+            
+            # Disconnect from server
+            self.disconnect_from_server()
+            
+            # Clear all references
+            self.sio = None
+            self.current_player = None
+            self.room_players.clear()
+            
+            print(f"✅ Network resources cleaned up")
+            
+        except Exception as e:
+            print(f"❌ Error cleaning up network resources: {e}")
+            import traceback
+            print(f"❌ Cleanup traceback: {traceback.format_exc()}")
     
     def start_heartbeat(self):
         """Start the heartbeat timer"""
@@ -418,40 +493,63 @@ class NetworkManager(QObject):
         self.reconnection_delay = min(self.reconnection_delay * 1.5, self.max_reconnection_delay)
     
     def _attempt_reconnection(self):
-        """Attempt to reconnect to the server"""
+        """Attempt to reconnect to the server with improved timeout handling"""
         try:
             print(f"🔄 Attempting reconnection #{self.current_reconnection_attempts}...")
             
             # Cleanup any existing connection
             try:
-                if self.sio.connected:
+                if hasattr(self.sio, 'connected') and self.sio.connected:
                     self.sio.disconnect()
-            except:
-                pass
+                    # Give time for cleanup
+                    import time
+                    time.sleep(0.1)
+            except Exception as cleanup_error:
+                print(f"⚠️ Error during connection cleanup: {cleanup_error}")
             
             # Try to reconnect with timeout
-            self.sio.connect(self.server_url, wait_timeout=10)
-            
-            # Wait a moment for connection to establish
-            import time
-            time.sleep(0.5)
-            
-            if self.sio.connected and self.connected_to_server:
-                print("✅ Reconnection successful!")
-                self.current_reconnection_attempts = 0
-                self.reconnection_delay = 0.5  # Reset to much faster initial delay
-                self.reconnected.emit()
+            try:
+                self.sio.connect(self.server_url, wait_timeout=5)  # Shorter timeout for faster failure detection
                 
-                # Try to rejoin the room if we were in one
-                if self.current_room and self.player_name:
-                    print(f"🚪 Attempting to rejoin room {self.current_room}")
-                    self.join_room(self.current_room, self.player_name)
-            else:
+                # Wait for connection to establish with timeout
+                max_wait = 2.0  # Maximum wait time in seconds
+                wait_interval = 0.1  # Check every 100ms
+                waited = 0.0
+                
+                while waited < max_wait:
+                    if (hasattr(self.sio, 'connected') and self.sio.connected and 
+                        self.connected_to_server and self._is_connection_healthy()):
+                        print(f"✅ Reconnection successful after {waited:.1f}s!")
+                        self.current_reconnection_attempts = 0
+                        self.reconnection_delay = 0.5  # Reset to much faster initial delay
+                        self.reconnected.emit()
+                        
+                        # Restart heartbeat
+                        self.start_heartbeat()
+                        
+                        # Try to rejoin the room if we were in one
+                        if self.current_room and self.player_name:
+                            print(f"🚪 Attempting to rejoin room {self.current_room}")
+                            # Use a small delay to ensure connection is fully established
+                            from PyQt6.QtCore import QTimer
+                            QTimer.singleShot(500, lambda: self.join_room(self.current_room, self.player_name))
+                        return
+                    
+                    time.sleep(wait_interval)
+                    waited += wait_interval
+                
                 # Connection failed, schedule next attempt
+                print(f"⚠️ Reconnection timeout after {max_wait}s")
+                self._schedule_reconnection()
+                
+            except Exception as connect_error:
+                print(f"❌ Connection attempt failed: {connect_error}")
                 self._schedule_reconnection()
                 
         except Exception as e:
             print(f"❌ Reconnection attempt {self.current_reconnection_attempts} failed: {e}")
+            import traceback
+            print(f"❌ Reconnection traceback: {traceback.format_exc()}")
             # Schedule next attempt
             self._schedule_reconnection()
     
@@ -643,13 +741,35 @@ class NetworkManager(QObject):
     def _is_connection_healthy(self) -> bool:
         """Check if the connection is healthy for sending messages"""
         try:
-            return (self.connected_to_server and 
-                   self.current_room and 
-                   hasattr(self.sio, 'connected') and 
-                   self.sio.connected and
-                   hasattr(self.sio, 'eio') and
-                   self.sio.eio.state == 'connected')
-        except:
+            # Basic connection checks
+            if not self.connected_to_server:
+                return False
+            
+            if not self.current_room:
+                return False
+            
+            # Socket.IO connection checks
+            if not hasattr(self.sio, 'connected') or not self.sio.connected:
+                return False
+            
+            # Engine.IO state checks
+            if hasattr(self.sio, 'eio'):
+                if self.sio.eio.state != 'connected':
+                    return False
+                
+                # Additional transport checks
+                if hasattr(self.sio.eio, 'transport') and self.sio.eio.transport:
+                    if hasattr(self.sio.eio.transport, 'state') and self.sio.eio.transport.state != 'connected':
+                        return False
+            
+            # Check if we're in the middle of reconnection
+            if self.current_reconnection_attempts > 0:
+                return False
+            
+            return True
+            
+        except Exception as e:
+            print(f"⚠️ Connection health check error: {e}")
             return False
     
     def send_player_color_update(self, color_hex: str, color_name: str):

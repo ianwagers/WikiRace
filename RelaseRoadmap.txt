@@ -1,0 +1,107 @@
+
+# WikiRace Release Roadmap - v1.8.0
+
+## 🎯 Release Goals
+- Fix all UI/UX issues for production readiness
+- Improve multiplayer stability and user experience
+- Standardize file storage and application branding
+
+---
+
+## 🐛 CRITICAL BUGS (Must Fix)
+
+### Theme & Visual Issues
+- [✅] **Settings Page Theme Text**: Fix "Theme" text color readability in dark mode
+- [✅] **Solo Game Labels**: Fix "Starting Page" and "Ending Page" text color in dark mode
+- [✅] **Theme Application**: Fix theme not always applied to SoloGamePage on theme changes
+- [✅] **Player Name Dialog**: Fix background/cancel button theming for light mode
+- [✅] **Hide Wikipedia Appearance**: Fix CSS injection to hide the wikipedia appearance options (We don't want other themes than the game setting)
+- [✅] **Congratulations Theme Text**: Fix the theme text color readability of "Congratulations" in the Game Over Dialog (Solo Game)
+- [✅] **Add solid background to the "Start Page" and "End Page" combo-box dropdowns on the Multiplayer game setup**
+- [✅] **Countdown Timer Veritcal Adjustment**: On some displays, the countdown timer is too small vertically and crops text. Fix the minimum height that's appropriate (maybe 550px)
+- [✅] **Host / Join Game Arrangement**: The Multiplayer page gets quite sparce *width-wise* on large displays. Force the Host Game and Join Game dialogs to the left (add a spacer to the layout)
+
+
+### Game Logic & Timing
+- [✅] **Confetti Timer Bug**: Exclude confetti effect time from total game time calculation on Game Over DIALOG in SOLO games - Not Fixed
+- [✅] **Multiplayer Timer Bug**: In multiplayer games, the timers for players that didn't win are still ticking after the game has ended.
+- [✅] **Solo Tab Cleanup**: Close Solo Game tab after "Continue" button clicked
+- [✅] **Player Progress Reset**: Fix links not resetting to 0 between multiple games
+- [✅] **Rejoin Game Bugs**: Fix strange bugs when rejoining with same player name
+- [✅] **External link handling**: If players click on a link that leads outside of Wikipedia - Send the player to the previous page they were on (using the "back" button functionality)
+
+
+### Multiplayer Stability
+- [✅] **Room Inactivity Timeout**: Increase timeout from 1-2 minutes to 20 minutes for inactivity
+- [✅] **Room Timeout Behavior**: If a room DOES timeout, all players must be consistently kicked and not have any persistent data from the room
+- [ ] **Player Disconnect Handling**: Test and fix bugs when players leave/close during games - NOT FIXED
+- [ ] **Room Management**: Test and fix joining/leaving/rejoining room bugs - NOT FIXED
+        - Players who click "Leave Room" should be returned to the home page and the server needs to delete all data for that player
+        - Players who leave a room, then rejoin the room with the same name or a new name are not shown a PlayerColorPicker
+            - This is independant of rooms, creating a new room doesn't fix the issue, this happens for leaders and non-leaders
+- [ ] **Multiplayer Exit Game**: Players who click "Exit to Home" then click Multiplayer from the home page see their last room (it should be reset to Join/Host game) - HAVE THE APP FULLY CLOSE THE MULTIPLAYER TAB WHEN THIS OCCURS
+        - Clicking "Exit to Home" from the PlayerResultsDialog does not close the multiplayer game room
+        - If one player clicks "Exit to Home" then another player clicks "Play again" the player who left the room is still shown in the game room
+
+---
+
+## 🎨 UI/UX IMPROVEMENTS (High Priority)
+
+### Multiplayer Page Layout
+- [✅] **Join Game Width**: Cap "Join a Game" layout at ~600px width
+- [✅] **Host Game Width**: Cap "Host a Game" layout at ~600px width
+- [ ] **Verify cross-platform support**: Ensure all multiplayer pages and elements look great on laptops with 1080p displays or different aspect ratios
+- [✅] **Color Picker Height**: Fix excessive height with QV layout and spacers
+    - ISSUE: The color picker is still too tall. Add spacers below the color picker
+- [✅] **Color Button Sizing**: Make color selection buttons 4x larger with rounded outlines
+    - ISSUE: The color picker always overlaps with the room code. Make color sizing dynamic dependant on the main application window size
+- [✅] **Color Picker Borders**: Remove visible borders in dark mode - NOT IMPLEMENTED IN DARK MODE - Light mode looks good
+- [✅] **Color Picker Consistency**: Remove borders, ensure consistent backgrounds for both themes - NOT IMPLEMENTED - Backgrounds around "Choose your color" are not the same as those on the multiplayer pages  
+- [✅] **Color Picker Text**: Increase text size for "Choose your color" and "Selected color"
+
+### Countdown & Progress
+- [✅] **Countdown Dialog Size**: Halve size and enable text wrapping
+- [✅] **Player Progress Font**: Increase font size for player name and links
+- [✅] **Race Lights Sequence**: Fix sequence (Red on 3, Yellow on 2, Green on 1 and GO!)
+
+---
+
+## 🔧 CONFIGURATION & CLEANUP
+
+### Server Configuration
+- [✅] **Remove Test Connection**: Remove "Test Connection" button and functionality
+
+---
+
+## ✨ ENHANCEMENTS (Nice to Have)
+
+### Application Branding
+- [ ] **Application Icon**: Add icon for all dialogs and taskbar
+
+### File Storage
+- [✅] **AppData Storage**: Move persistent files (theme & server) to %APPDATA%\wikirace
+
+### Customize Wikipedia links
+- [ ] **New links**: Reduce the number of options for game links in pre-chosen categories, get a new one caled "Wacky" for wack pages
+
+---
+
+## 📋 IMPLEMENTATION NOTES
+
+### Priority Order
+1. **Critical Bugs** - Game-breaking issues that affect core functionality
+2. **UI/UX Improvements** - Visual and usability issues that impact user experience  
+3. **Configuration & Cleanup** - Code cleanup and feature removal
+4. **Enhancements** - Nice-to-have features for polish
+
+### Technical Considerations
+- All theme fixes should be tested in both light and dark modes
+- Multiplayer fixes require testing with multiple clients
+- UI changes should maintain responsive design principles
+- File storage changes need migration logic for existing users
+
+### Testing Requirements
+- Test all multiplayer scenarios (join/leave/rejoin/name changes)
+- Verify theme consistency across all pages and dialogs
+- Test game timing accuracy and progress tracking
+- Validate file storage migration works correctly

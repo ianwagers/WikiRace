@@ -894,43 +894,8 @@ class MultiplayerPage(QWidget):
             except Exception as e:
                 print(f"⚠️ WikiRace: [{time.time():.3f}] Error leaving room via network: {e}")
         
-        # Hide all room-related UI elements
-        self.roomAndColorFrame.hide()
-        self.gameConfigFrame.hide()
-        self.gameSelectionDisplay.hide()
-        self.startGameButton.hide()
-        
-        # Show the host/join sections again
-        self.show_host_join_sections()
-        
-        # CRITICAL FIX: Completely reset all state to prevent rejoin bugs
-        self.current_room_code = None
-        self.player_name = None
-        self.is_leader = False
-        self.players_in_room = []
-        self.player_colors = {}
-        self.my_color = None
-        
-        # Reset button states
-        if hasattr(self, 'hostGameButton'):
-            self.hostGameButton.setEnabled(True)
-            self.hostGameButton.setText("Create Room")
-        if hasattr(self, 'joinGameButton'):
-            self.joinGameButton.setEnabled(True)
-            self.joinGameButton.setText("Join Room")
-        
-        # Clear room code input
-        if hasattr(self, 'roomCodeInput'):
-            self.roomCodeInput.clear()
-        
-        # Reset color picker
-        if hasattr(self, 'color_picker'):
-            self.color_picker.hide()
-        if hasattr(self, 'color_scroll'):
-            self.color_scroll.hide()
-        
-        # Update server status
-        self.update_server_status()
+        # CRITICAL FIX: Reset UI state but keep network connection for rejoining
+        self.reset_for_leave_room()
         
         print(f"✅ WikiRace: [{time.time():.3f}] Room state completely reset - ready for rejoin")
         QMessageBox.information(self, "Left Room", "You have left the room.")
@@ -938,6 +903,18 @@ class MultiplayerPage(QWidget):
     def reset_for_new_game(self):
         """Reset the multiplayer page state to allow starting new games after play again"""
         print("🔄 Resetting multiplayer page for new game...")
+        
+        # CRITICAL FIX: Force refresh room state to prevent ghost players
+        if self.current_room_code and hasattr(self, 'network_manager'):
+            try:
+                # Request current room state from server to ensure we have the latest player list
+                print(f"🔄 Requesting fresh room state for room {self.current_room_code}")
+                # The network manager should automatically sync room state when we reconnect
+                # But let's also trigger a manual refresh if possible
+                if hasattr(self.network_manager, 'request_room_state'):
+                    self.network_manager.request_room_state(self.current_room_code)
+            except Exception as e:
+                print(f"⚠️ Error refreshing room state: {e}")
         
         # Reset game configuration to defaults
         if hasattr(self, 'startPageCombo'):
@@ -970,6 +947,71 @@ class MultiplayerPage(QWidget):
         
         print("✅ Multiplayer page reset for new game")
     
+    def reset_for_leave_room(self):
+        """Reset UI state when leaving room but keep network connection for rejoining"""
+        print("🔄 Resetting multiplayer page state for leave room...")
+        
+        # Reset all state variables to initial values
+        self.current_room_code = None
+        self.player_name = None
+        self.is_leader = False
+        self.players_in_room = []
+        self.player_colors = {}
+        self.my_color = None
+        self.used_colors = set()
+        
+        # Clear any waiting flags
+        if hasattr(self, '_waiting_for_players_ready'):
+            self._waiting_for_players_ready = False
+        
+        # Reset UI elements to initial state
+        if hasattr(self, 'startPageCombo'):
+            self.startPageCombo.setCurrentIndex(0)
+        if hasattr(self, 'endPageCombo'):
+            self.endPageCombo.setCurrentIndex(0)
+        if hasattr(self, 'customStartPageEdit'):
+            self.customStartPageEdit.clear()
+        if hasattr(self, 'customEndPageEdit'):
+            self.customEndPageEdit.clear()
+        
+        # Hide room-related UI elements
+        if hasattr(self, 'roomAndColorFrame'):
+            self.roomAndColorFrame.hide()
+        if hasattr(self, 'gameConfigFrame'):
+            self.gameConfigFrame.hide()
+        if hasattr(self, 'gameSelectionDisplay'):
+            self.gameSelectionDisplay.hide()
+        if hasattr(self, 'startGameButton'):
+            self.startGameButton.hide()
+        if hasattr(self, 'roomInfoFrame'):
+            self.roomInfoFrame.hide()
+        
+        # Show the host/join sections again
+        self.show_host_join_sections()
+        
+        # Reset button states
+        if hasattr(self, 'hostGameButton'):
+            self.hostGameButton.setEnabled(True)
+            self.hostGameButton.setText("Create Room")
+        if hasattr(self, 'joinGameButton'):
+            self.joinGameButton.setEnabled(True)
+            self.joinGameButton.setText("Join Room")
+        
+        # Clear room code input
+        if hasattr(self, 'roomCodeInput'):
+            self.roomCodeInput.clear()
+        
+        # Reset color picker if it exists
+        if hasattr(self, 'color_picker'):
+            self.color_picker.reset_selection()
+        if hasattr(self, 'color_scroll'):
+            self.color_scroll.hide()
+        
+        # Update server status
+        self.update_server_status()
+        
+        print("✅ Multiplayer page state reset for leave room - network connection preserved")
+    
     def reset_for_exit(self):
         """CRITICAL FIX: Complete state reset when exiting multiplayer games"""
         print("🔄 CRITICAL: Resetting multiplayer page state for exit...")
@@ -977,7 +1019,7 @@ class MultiplayerPage(QWidget):
         # Disconnect from network and clean up connections
         if hasattr(self, 'network_manager') and self.network_manager:
             try:
-                self.network_manager.disconnect()
+                self.network_manager.disconnect_from_server()
                 print("🔌 Disconnected from network manager")
             except Exception as e:
                 print(f"⚠️ Error disconnecting network manager: {e}")
@@ -1041,7 +1083,7 @@ class MultiplayerPage(QWidget):
         
         # Reset color picker if it exists
         if hasattr(self, 'color_picker'):
-            self.color_picker.reset()
+            self.color_picker.reset_selection()
         if hasattr(self, 'color_scroll'):
             self.color_scroll.hide()
         
@@ -1164,6 +1206,14 @@ class MultiplayerPage(QWidget):
         # Show room and color picker section
         self.roomAndColorFrame.show()
         self.color_scroll.show()  # Explicitly show the color picker scroll area
+        
+        # CRITICAL FIX: Ensure color picker is visible and properly initialized
+        if hasattr(self, 'color_picker'):
+            self.color_picker.show()
+            # Reset color picker state to ensure it's ready for selection
+            self.color_picker.reset_selection()
+            # Update used colors to reflect current room state
+            self._update_used_colors()
         
         # Show game configuration for all players, but with different permissions
         self.gameConfigFrame.show()

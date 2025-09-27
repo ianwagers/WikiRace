@@ -139,8 +139,8 @@ class SoloGamePage(QWidget):
         profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
         profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
         
-        # Set up URL interceptor to handle useskin=vector-2022 before navigation
-        self.url_interceptor = WikipediaUrlInterceptor()
+        # Set up URL interceptor to handle useskin=vector-2022 and external links
+        self.url_interceptor = WikipediaUrlInterceptor(self.webView)
         profile.setUrlRequestInterceptor(self.url_interceptor)
         
         # Use default profile but clear its state aggressively

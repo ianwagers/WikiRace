@@ -95,6 +95,14 @@ async def get_room(room_code: str) -> Dict[str, Any]:
             detail=f"Room {room_code} not found"
         )
     
+    # CRITICAL FIX: Handle case where host_id doesn't exist in players dict
+    host_name = "Unknown"
+    if room.host_id and room.host_id in room.players:
+        host_name = room.players[room.host_id].display_name
+    elif room.players:
+        # If no valid host, use first player as fallback
+        host_name = next(iter(room.players.values())).display_name
+    
     return {
         "success": True,
         "room_code": room.room_code,
@@ -102,7 +110,7 @@ async def get_room(room_code: str) -> Dict[str, Any]:
         "player_count": room.player_count,
         "max_players": 10,
         "is_full": room.is_full,
-        "host_name": room.players[room.host_id].display_name,
+        "host_name": host_name,
         "players": [
             {
                 "display_name": player.display_name,

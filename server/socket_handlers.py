@@ -5,6 +5,7 @@ Handles real-time communication between clients and server.
 """
 
 import logging
+import traceback
 from datetime import datetime
 from typing import Dict, Any
 
@@ -16,6 +17,39 @@ except ImportError:
     from room_manager import RoomManager
 
 logger = logging.getLogger(__name__)
+
+# CRITICAL FIX: Enhanced error handling decorator
+def handle_socket_error(operation_name: str):
+    """Decorator for consistent error handling in socket operations"""
+    def decorator(func):
+        async def wrapper(*args, **kwargs):
+            try:
+                return await func(*args, **kwargs)
+            except Exception as e:
+                logger.error(f"Error in {operation_name}: {e}")
+                logger.error(f"Error traceback: {traceback.format_exc()}")
+                
+                # Extract socket ID if available
+                socket_id = None
+                if len(args) > 0:
+                    socket_id = args[0]
+                
+                # Try to emit error to client if socket is available
+                if socket_id and len(args) > 1:
+                    sio = args[1]  # Assuming sio is second argument
+                    try:
+                        await sio.emit('error', {
+                            'message': f'Server error in {operation_name}',
+                            'operation': operation_name,
+                            'timestamp': datetime.utcnow().isoformat()
+                        }, room=socket_id)
+                    except Exception as emit_error:
+                        logger.error(f"Failed to emit error to client: {emit_error}")
+                
+                # Re-raise the exception for upstream handling
+                raise
+        return wrapper
+    return decorator
 
 
 async def broadcast_room_progress(sio, room, skip_sid=None):
@@ -50,8 +84,16 @@ async def check_inactive_players(sio, room_manager: RoomManager):
             
             current_time = datetime.utcnow()
             
-            # Check all rooms for inactive players
+            # Check all rooms for inactive players and empty rooms
             for room_code, room in list(room_manager.rooms.items()):
+                # CRITICAL FIX: Close empty rooms after 5 minutes
+                if room.player_count == 0:
+                    time_since_creation = current_time - room.created_at
+                    if time_since_creation > timedelta(minutes=5):
+                        logger.info(f"Closing empty room {room_code} after {time_since_creation.total_seconds():.1f} seconds")
+                        room_manager.close_room(room_code)
+                        continue
+                
                 inactive_players = []
                 
                 for socket_id, player in list(room.players.items()):
@@ -84,8 +126,8 @@ async def check_inactive_players(sio, room_manager: RoomManager):
                         'reason': 'timeout'
                     }, room=socket_id)
                     
-                    # Remove player from room
-                    updated_room = room_manager.leave_room(socket_id)
+                    # Remove player from room (now async)
+                    updated_room = await room_manager.leave_room(socket_id)
                     
                     if updated_room:
                         # Notify remaining players
@@ -163,8 +205,9 @@ def register_socket_handlers(sio, room_manager: RoomManager):
         }, room=sid)
     
     @sio.event
+    @handle_socket_error("disconnect")
     async def disconnect(sid):
-        """Handle client disconnection"""
+        """Handle client disconnection with enhanced error handling"""
         logger.info(f"Client disconnected: {sid}")
         
         # Handle player leaving their room
@@ -221,12 +264,15 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         room_manager.close_room(room_code)
                         logger.info(f"Closed room {room_code} due to all players disconnecting during game")
                 else:
-                    # Normal disconnection (not during active game)
-                    # Remove player from room
-                    updated_room = room_manager.leave_room(sid)
+                    # CRITICAL FIX: For non-active games, remove player completely to prevent ghost players
+                    # Get remaining players before removing the player
+                    remaining_players = [p for p in room.players.values() if p.socket_id != sid]
                     
-                    if updated_room:
-                        # Room still exists, notify remaining players
+                    # Remove player from room (now async)
+                    updated_room = await room_manager.leave_room(sid)
+                    
+                    # CRITICAL FIX: Always notify remaining players, even if room becomes empty
+                    if remaining_players:
                         await sio.emit('player_left', {
                             'socket_id': sid,
                             'player_name': player.display_name,
@@ -235,14 +281,11 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                                 'display_name': p.display_name,
                                 'is_host': p.is_host,
                                 'player_color': p.player_color
-                            } for p in updated_room.players.values()]
+                            } for p in remaining_players]
                         }, room=room_code, skip_sid=sid)
                         
-                        # Broadcast updated room progress to all remaining players
-                        await broadcast_room_progress(sio, updated_room, skip_sid=sid)
-                        
-                        # If host left and room still exists, notify about new host
-                        if was_host and updated_room.host_id:
+                        # If host left and there are remaining players, notify about new host
+                        if was_host and updated_room and updated_room.host_id:
                             new_host = updated_room.get_player(updated_room.host_id)
                             if new_host:
                                 await sio.emit('host_transferred', {
@@ -250,9 +293,13 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                                     'new_host_name': new_host.display_name,
                                     'message': f"{new_host.display_name} is now the room leader"
                                 }, room=room_code)
+                        
+                        # Broadcast updated room progress to all remaining players
+                        if updated_room:
+                            await broadcast_room_progress(sio, updated_room, skip_sid=sid)
                     else:
-                        # Room was deleted (last player left)
-                        logger.info(f"Room {room_code} was deleted - last player disconnected")
+                        # Room is now empty but kept open for potential rejoin
+                        logger.info(f"Room {room_code} is now empty but kept open for potential rejoin")
     
     @sio.event
     async def create_room(sid, data):
@@ -377,8 +424,9 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             await sio.emit('error', {'message': 'Failed to join room'}, room=sid)
     
     @sio.event
+    @handle_socket_error("leave_room")
     async def leave_room(sid):
-        """Handle room leave request"""
+        """Handle room leave request with enhanced error handling"""
         try:
             room = room_manager.get_room_by_player(sid)
             if not room:
@@ -397,8 +445,8 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             # Leave room namespace
             await sio.leave_room(sid, room_code)
             
-            # Remove from room
-            updated_room = room_manager.leave_room(sid)
+            # Remove from room (now async)
+            updated_room = await room_manager.leave_room(sid)
             
             if updated_room:
                 # Room still exists, notify remaining players

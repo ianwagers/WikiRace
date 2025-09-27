@@ -6,6 +6,7 @@ Handles creation, storage, and lifecycle of game rooms.
 
 import random
 import string
+import asyncio
 from datetime import datetime, timedelta
 from typing import Dict, Optional, List
 import logging
@@ -29,6 +30,82 @@ class RoomManager:
         self.rooms: Dict[str, GameRoom] = {}
         self.player_to_room: Dict[str, str] = {}  # socket_id -> room_code mapping
         self.use_redis = False  # Will be set to True when Redis is available
+        
+        # CRITICAL FIX: Add locks for atomic operations
+        self._room_locks: Dict[str, asyncio.Lock] = {}  # room_code -> lock
+        self._player_locks: Dict[str, asyncio.Lock] = {}  # socket_id -> lock
+        self._global_lock = asyncio.Lock()  # Global lock for cross-room operations
+    
+    async def _get_room_lock(self, room_code: str) -> asyncio.Lock:
+        """Get or create a lock for a specific room"""
+        if room_code not in self._room_locks:
+            async with self._global_lock:
+                if room_code not in self._room_locks:
+                    self._room_locks[room_code] = asyncio.Lock()
+        return self._room_locks[room_code]
+    
+    async def _get_player_lock(self, socket_id: str) -> asyncio.Lock:
+        """Get or create a lock for a specific player"""
+        if socket_id not in self._player_locks:
+            async with self._global_lock:
+                if socket_id not in self._player_locks:
+                    self._player_locks[socket_id] = asyncio.Lock()
+        return self._player_locks[socket_id]
+    
+    async def _validate_room_state(self, room: GameRoom, operation: str) -> bool:
+        """Validate room state before performing operations"""
+        try:
+            if not room:
+                logger.error(f"Room validation failed for {operation}: room is None")
+                return False
+            
+            if not room.room_code:
+                logger.error(f"Room validation failed for {operation}: room_code is empty")
+                return False
+            
+            # Validate room state transitions
+            valid_transitions = {
+                'join': [GameState.LOBBY, GameState.COMPLETED],
+                'leave': [GameState.LOBBY, GameState.IN_PROGRESS, GameState.STARTING, GameState.COMPLETED],
+                'start_game': [GameState.LOBBY],
+                'end_game': [GameState.IN_PROGRESS, GameState.STARTING]
+            }
+            
+            if operation in valid_transitions:
+                if room.game_state not in valid_transitions[operation]:
+                    logger.warning(f"Invalid state transition for {operation}: room {room.room_code} is in {room.game_state.value}")
+                    return False
+            
+            # Validate player count
+            if room.player_count < 0:
+                logger.error(f"Room validation failed for {operation}: negative player count {room.player_count}")
+                return False
+            
+            if room.player_count > settings.MAX_PLAYERS_PER_ROOM:
+                logger.error(f"Room validation failed for {operation}: player count {room.player_count} exceeds max {settings.MAX_PLAYERS_PER_ROOM}")
+                return False
+            
+            # Validate host exists if there are players
+            if room.player_count > 0 and not room.host_id:
+                logger.error(f"Room validation failed for {operation}: room has players but no host")
+                return False
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Room validation error for {operation}: {e}")
+            return False
+    
+    async def _cleanup_locks(self, room_code: str = None, socket_id: str = None):
+        """Clean up locks when rooms/players are removed"""
+        try:
+            async with self._global_lock:
+                if room_code and room_code in self._room_locks:
+                    del self._room_locks[room_code]
+                if socket_id and socket_id in self._player_locks:
+                    del self._player_locks[socket_id]
+        except Exception as e:
+            logger.error(f"Error cleaning up locks: {e}")
     
     async def initialize_redis(self) -> bool:
         """Initialize Redis connection and enable Redis storage"""
@@ -121,8 +198,9 @@ class RoomManager:
             logger.warning(f"Room {room_code} is full, cannot join")
             return None
         
-        if room.game_state != GameState.LOBBY:
-            logger.warning(f"Room {room_code} is not in lobby state, cannot join")
+        # CRITICAL FIX: Allow joining rooms in LOBBY or COMPLETED state for rejoins
+        if room.game_state not in [GameState.LOBBY, GameState.COMPLETED]:
+            logger.warning(f"Room {room_code} is in {room.game_state.value} state, cannot join")
             return None
         
         # Check if player name already exists in room
@@ -151,59 +229,112 @@ class RoomManager:
                 return None
         
         # Create player
+        # CRITICAL FIX: If room is empty, make the first player the host
+        is_host = room.player_count == 0
         player = Player(
             socket_id=player_socket_id,
             display_name=display_name,
-            is_host=False
+            is_host=is_host
         )
         
         # Add player to room
         if room.add_player(player):
+            # If this is the first player in an empty room, set them as host
+            if is_host:
+                room.host_id = player_socket_id
+                logger.info(f"Player {display_name} joined empty room {room_code} and became host")
+            else:
+                logger.info(f"Player {display_name} joined room {room_code}")
+            
             self.player_to_room[player_socket_id] = room_code
-            logger.info(f"Player {display_name} joined room {room_code}")
             return room
         
         return None
     
-    def leave_room(self, socket_id: str) -> Optional[GameRoom]:
-        """Remove a player from their room"""
-        room_code = self.player_to_room.get(socket_id)
-        if not room_code:
-            return None
-        
-        room = self.get_room(room_code)
-        if not room:
-            return None
-        
-        # Get player before removal
-        player = room.get_player(socket_id)
-        if not player:
-            return None
-        
-        # Remove player
-        room.remove_player(socket_id)
-        del self.player_to_room[socket_id]
-        
-        logger.info(f"Player {player.display_name} left room {room_code}")
-        
-        # Handle host leaving
-        if room.is_host(socket_id):
-            new_host_id = room.transfer_host()
-            if new_host_id:
-                logger.info(f"Transferred host to {room.players[new_host_id].display_name} in room {room_code}")
-            else:
-                # No other players, close room
-                self.close_room(room_code)
-                logger.info(f"Closed empty room {room_code}")
+    async def leave_room(self, socket_id: str) -> Optional[GameRoom]:
+        """Remove a player from their room with atomic operations and state validation"""
+        try:
+            # Get room code and acquire locks
+            room_code = self.player_to_room.get(socket_id)
+            if not room_code:
+                logger.warning(f"Player {socket_id} not in any room")
                 return None
-        
-        # Close room if empty
-        if room.player_count == 0:
-            self.close_room(room_code)
-            logger.info(f"Closed empty room {room_code}")
+            
+            room_lock = await self._get_room_lock(room_code)
+            player_lock = await self._get_player_lock(socket_id)
+            
+            async with room_lock, player_lock:
+                # Re-validate room exists (may have changed during lock acquisition)
+                room = self.get_room(room_code)
+                if not room:
+                    logger.warning(f"Room {room_code} no longer exists during leave operation")
+                    await self._cleanup_locks(room_code=room_code, socket_id=socket_id)
+                    return None
+                
+                # Validate room state for leave operation
+                if not await self._validate_room_state(room, 'leave'):
+                    logger.error(f"Room state validation failed for leave operation in room {room_code}")
+                    return None
+                
+                # Get player before removal
+                player = room.get_player(socket_id)
+                if not player:
+                    logger.warning(f"Player {socket_id} not found in room {room_code}")
+                    return None
+                
+                player_name = player.display_name
+                was_host = room.is_host(socket_id)
+                game_state = room.game_state
+                
+                logger.info(f"Player {player_name} leaving room {room_code} (host: {was_host}, state: {game_state.value})")
+                
+                # CRITICAL FIX: Handle different scenarios based on game state
+                if game_state == GameState.IN_PROGRESS:
+                    # During active game, mark as disconnected but keep in room for potential rejoin
+                    player.disconnected = True
+                    player.last_activity = datetime.utcnow()
+                    logger.info(f"Player {player_name} marked as disconnected during active game")
+                    
+                    # Don't remove from player_to_room mapping during active games
+                    # This allows for potential reconnection
+                    
+                else:
+                    # Remove player completely for non-active games
+                    room.remove_player(socket_id)
+                    del self.player_to_room[socket_id]
+                    await self._cleanup_locks(socket_id=socket_id)
+                    logger.info(f"Player {player_name} completely removed from room {room_code}")
+                
+                # Handle host leaving
+                if was_host and not player.disconnected:
+                    new_host_id = room.transfer_host()
+                    if new_host_id:
+                        new_host = room.get_player(new_host_id)
+                        if new_host:
+                            logger.info(f"Transferred host to {new_host.display_name} in room {room_code}")
+                    else:
+                        # No other players, clear host_id but keep room open
+                        room.host_id = None
+                        logger.info(f"Room {room_code} has no host but kept open for potential rejoin")
+                
+                # Check if room is now empty (excluding disconnected players)
+                active_players = [p for p in room.players.values() if not p.disconnected]
+                if len(active_players) == 0:
+                    # Room is effectively empty, clear host_id
+                    room.host_id = None
+                    logger.info(f"Room {room_code} is now empty but kept open for potential rejoin")
+                
+                # Sync to Redis if available
+                await self._sync_room_to_redis(room)
+                
+                logger.info(f"Player {player_name} leave operation completed for room {room_code}")
+                return room
+                
+        except Exception as e:
+            logger.error(f"Error in leave_room for socket {socket_id}: {e}")
+            import traceback
+            logger.error(f"Leave room traceback: {traceback.format_exc()}")
             return None
-        
-        return room
     
     def get_room(self, room_code: str) -> Optional[GameRoom]:
         """Get a room by code"""
