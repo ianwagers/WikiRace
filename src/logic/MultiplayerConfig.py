@@ -16,7 +16,7 @@ from PyQt6.QtCore import QObject, pyqtSignal
 @dataclass
 class ServerConfig:
     """Server connection configuration"""
-    host: str = "127.0.0.1"
+    host: str = "wikirace.duckdns.org"  # Updated to use DDNS domain for external access
     port: int = 8001
     use_https: bool = False
     connection_timeout: float = 10.0

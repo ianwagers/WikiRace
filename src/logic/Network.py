@@ -38,7 +38,7 @@ class NetworkManager(QObject):
     player_disconnected = pyqtSignal(str, str)  # player_name, message
     player_reconnected = pyqtSignal(str, str)  # player_name, message
     
-    def __init__(self, server_url: str = "http://127.0.0.1:8000"):  # Fixed to match server port
+    def __init__(self, server_url: str = "http://127.0.0.1:8001"):  # Fixed to match server port
         super().__init__()
         self.server_url = server_url
         self.sio = socketio.Client()
@@ -1071,6 +1071,85 @@ class NetworkManager(QObject):
         except Exception as e:
             print(f"❌ Error getting room info: {e}")
             return None
+    
+    def auto_discover_servers(self, possible_servers=None) -> list:
+        """Try to automatically discover available WikiRace servers"""
+        import requests
+        import socket
+        import time
+        
+        if possible_servers is None:
+            possible_servers = [
+                "127.0.0.1:8001",  # Localhost
+                "localhost:8001",  # Localhost alternative
+                "71.237.25.28:8001",  # Your external IP
+                "wikirace.duckdns.org:8001",  # Your dynamic DNS domain
+            ]
+        
+        working_servers = []
+        
+        print("🔍 Auto-discovering WikiRace servers...")
+        
+        for server in possible_servers:
+            try:
+                host, port = server.split(':')
+                port = int(port)
+                
+                # Test connection with short timeout
+                response = requests.get(f"http://{host}:{port}/health", timeout=3)
+                if response.status_code == 200:
+                    working_servers.append({
+                        'address': server,
+                        'url': f"http://{host}:{port}",
+                        'host': host,
+                        'port': port,
+                        'status': 'healthy'
+                    })
+                    print(f"✅ Found server: {server}")
+                else:
+                    print(f"⚠️ Server {server} responded with status {response.status_code}")
+            except requests.exceptions.Timeout:
+                print(f"⏰ Server {server} timeout")
+            except requests.exceptions.ConnectionError:
+                print(f"❌ Server {server} connection refused")
+            except Exception as e:
+                print(f"❌ Server {server} error: {e}")
+        
+        if working_servers:
+            print(f"🎉 Found {len(working_servers)} working server(s)")
+        else:
+            print("❌ No working servers found")
+        
+        return working_servers
+    
+    def auto_connect_to_best_server(self, possible_servers=None) -> bool:
+        """Automatically connect to the best available server"""
+        working_servers = self.auto_discover_servers(possible_servers)
+        
+        if not working_servers:
+            print("❌ No servers available for auto-connection")
+            return False
+        
+        # Try to connect to the first working server
+        best_server = working_servers[0]
+        print(f"🚀 Auto-connecting to: {best_server['address']}")
+        
+        # Update server URL and try to connect
+        self.server_url = best_server['url']
+        return self.connect_to_server()
+    
+    def test_server_connection(self, server_address: str) -> bool:
+        """Test if a specific server is reachable"""
+        try:
+            import requests
+            if ':' not in server_address:
+                server_address += ':8001'  # Default port
+            
+            host, port = server_address.split(':')
+            response = requests.get(f"http://{host}:{port}/health", timeout=3)
+            return response.status_code == 200
+        except:
+            return False
 
 
 # Legacy Network class for backward compatibility

@@ -8,7 +8,7 @@ from the client interface.
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
                             QLineEdit, QPushButton, QSpinBox, QCheckBox,
                             QGroupBox, QFormLayout, QMessageBox, QTabWidget,
-                            QWidget, QSlider, QSpacerItem, QSizePolicy)
+                            QWidget, QSlider, QSpacerItem, QSizePolicy, QComboBox)
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFont, QIntValidator
 from src.logic.ThemeManager import theme_manager
@@ -36,13 +36,14 @@ class ServerConfigDialog(QDialog):
     def get_default_config(self):
         """Get default configuration values"""
         return {
-            'server_host': '127.0.0.1',
+            'server_host': 'wikirace.duckdns.org',  # Updated to use your DDNS domain
             'server_port': 8001,  # Changed to match server default
             'auto_reconnect': True,
             'max_reconnection_attempts': 5,
             'reconnection_delay': 2.0,
             'max_reconnection_delay': 30.0,
-            'connection_timeout': 10.0
+            'connection_timeout': 10.0,
+            'auto_discovery': True  # Enable auto-discovery by default
         }
     
     def initUI(self):
@@ -74,6 +75,9 @@ class ServerConfigDialog(QDialog):
         
         # Advanced tab
         self.create_advanced_tab()
+        
+        # Auto-discovery tab
+        self.create_auto_discovery_tab()
         
         # Buttons with improved layout for better readability
         button_layout = QHBoxLayout()
@@ -246,6 +250,98 @@ class ServerConfigDialog(QDialog):
         layout.addStretch()
         
         self.tab_widget.addTab(tab, "Advanced")
+    
+    def create_auto_discovery_tab(self):
+        """Create auto-discovery tab for finding available servers"""
+        tab = QWidget()
+        layout = QVBoxLayout(tab)
+        layout.setSpacing(15)
+        
+        # Auto-discovery section
+        discovery_group = QGroupBox("🔍 Auto-Discovery")
+        discovery_layout = QVBoxLayout()
+        
+        # Description
+        desc_label = QLabel("Automatically find and connect to available WikiRace servers")
+        desc_label.setWordWrap(True)
+        desc_label.setStyleSheet("color: #666; font-style: italic;")
+        discovery_layout.addWidget(desc_label)
+        
+        # Discover button
+        self.discover_button = QPushButton("🔍 Discover Available Servers")
+        self.discover_button.clicked.connect(self.discover_servers)
+        discovery_layout.addWidget(self.discover_button)
+        
+        # Server list
+        self.server_list = QComboBox()
+        self.server_list.setPlaceholderText("No servers discovered yet")
+        discovery_layout.addWidget(self.server_list)
+        
+        # Connect button
+        self.connect_button = QPushButton("🚀 Connect to Selected Server")
+        self.connect_button.clicked.connect(self.connect_to_selected_server)
+        self.connect_button.setEnabled(False)
+        discovery_layout.addWidget(self.connect_button)
+        
+        # Enable server selection when combo box changes
+        self.server_list.currentTextChanged.connect(
+            lambda: self.connect_button.setEnabled(bool(self.server_list.currentText()))
+        )
+        
+        discovery_group.setLayout(discovery_layout)
+        layout.addWidget(discovery_group)
+        
+        # Manual entry section
+        manual_group = QGroupBox("✏️ Manual Entry")
+        manual_layout = QFormLayout()
+        
+        self.manual_host = QLineEdit()
+        self.manual_host.setPlaceholderText("wikirace.duckdns.org")
+        self.manual_host.setText("wikirace.duckdns.org")  # Default to your domain
+        manual_layout.addRow("Server Address:", self.manual_host)
+        
+        self.manual_port = QSpinBox()
+        self.manual_port.setRange(1, 65535)
+        self.manual_port.setValue(8001)
+        manual_layout.addRow("Port:", self.manual_port)
+        
+        self.manual_connect = QPushButton("Connect Manually")
+        self.manual_connect.clicked.connect(self.connect_manually)
+        manual_layout.addWidget(self.manual_connect)
+        
+        manual_group.setLayout(manual_layout)
+        layout.addWidget(manual_group)
+        
+        # Quick connect section
+        quick_group = QGroupBox("⚡ Quick Connect")
+        quick_layout = QVBoxLayout()
+        
+        quick_desc = QLabel("One-click connection to common WikiRace servers:")
+        quick_desc.setWordWrap(True)
+        quick_desc.setStyleSheet("color: #666; font-style: italic;")
+        quick_layout.addWidget(quick_desc)
+        
+        # Quick connect buttons
+        quick_buttons_layout = QHBoxLayout()
+        
+        self.quick_local = QPushButton("🏠 Local Server")
+        self.quick_local.clicked.connect(lambda: self.quick_connect("127.0.0.1:8001"))
+        quick_buttons_layout.addWidget(self.quick_local)
+        
+        self.quick_domain = QPushButton("🌐 WikiRace Server")
+        self.quick_domain.clicked.connect(lambda: self.quick_connect("wikirace.duckdns.org:8001"))
+        quick_buttons_layout.addWidget(self.quick_domain)
+        
+        self.quick_ip = QPushButton("📡 Direct IP")
+        self.quick_ip.clicked.connect(lambda: self.quick_connect("71.237.25.28:8001"))
+        quick_buttons_layout.addWidget(self.quick_ip)
+        
+        quick_layout.addLayout(quick_buttons_layout)
+        quick_group.setLayout(quick_layout)
+        layout.addWidget(quick_group)
+        
+        layout.addStretch()
+        self.tab_widget.addTab(tab, "Auto-Discovery")
     
     def on_auto_reconnect_toggled(self, enabled):
         """Handle auto-reconnect toggle"""
@@ -471,6 +567,110 @@ class ServerConfigDialog(QDialog):
                 border-radius: 4px;
             """)
     
+    def discover_servers(self):
+        """Discover available WikiRace servers"""
+        from src.logic.Network import NetworkManager
+        
+        # Disable button during discovery
+        self.discover_button.setEnabled(False)
+        self.discover_button.setText("🔍 Discovering...")
+        
+        # Clear previous results
+        self.server_list.clear()
+        
+        try:
+            # Create a temporary NetworkManager for discovery
+            temp_network = NetworkManager()
+            
+            # Get list of possible servers (including your specific ones)
+            possible_servers = [
+                "127.0.0.1:8001",  # Localhost
+                "localhost:8001",  # Localhost alternative
+                "71.237.25.28:8001",  # Your external IP
+                "wikirace.duckdns.org:8001",  # Your dynamic DNS domain
+            ]
+            
+            # Discover working servers
+            working_servers = temp_network.auto_discover_servers(possible_servers)
+            
+            if working_servers:
+                for server in working_servers:
+                    display_text = f"{server['address']} ({server['status']})"
+                    self.server_list.addItem(display_text, server)
+                
+                # Select first server by default
+                self.server_list.setCurrentIndex(0)
+                self.connect_button.setEnabled(True)
+                
+                QMessageBox.information(self, "Discovery Complete", 
+                                      f"Found {len(working_servers)} working server(s)!")
+            else:
+                self.server_list.addItem("No servers found")
+                QMessageBox.warning(self, "No Servers Found", 
+                                  "No WikiRace servers are currently available.\n"
+                                  "Make sure the server is running and accessible.")
+                
+        except Exception as e:
+            QMessageBox.critical(self, "Discovery Error", f"Error discovering servers: {e}")
+        finally:
+            # Re-enable button
+            self.discover_button.setEnabled(True)
+            self.discover_button.setText("🔍 Discover Available Servers")
+    
+    def connect_to_selected_server(self):
+        """Connect to the selected server from discovery"""
+        if not self.server_list.currentData():
+            QMessageBox.warning(self, "No Server Selected", "Please select a server first.")
+            return
+        
+        server_data = self.server_list.currentData()
+        host = server_data['host']
+        port = server_data['port']
+        
+        # Update the main configuration
+        self.host_input.setText(host)
+        self.port_input.setValue(port)
+        self.update_server_url()
+        
+        QMessageBox.information(self, "Server Selected", 
+                              f"Connected to {host}:{port}\n\n"
+                              f"Click 'Save & Apply' to use this server.")
+    
+    def connect_manually(self):
+        """Connect to manually entered server"""
+        host = self.manual_host.text().strip()
+        port = self.manual_port.value()
+        
+        if not host:
+            QMessageBox.warning(self, "Invalid Input", "Please enter a server address.")
+            return
+        
+        # Update the main configuration
+        self.host_input.setText(host)
+        self.port_input.setValue(port)
+        self.update_server_url()
+        
+        QMessageBox.information(self, "Manual Server Set", 
+                              f"Server set to {host}:{port}\n\n"
+                              f"Click 'Save & Apply' to use this server.")
+    
+    def quick_connect(self, server_address: str):
+        """Quick connect to a predefined server"""
+        if ':' not in server_address:
+            server_address += ':8001'
+        
+        host, port = server_address.split(':')
+        port = int(port)
+        
+        # Update the main configuration
+        self.host_input.setText(host)
+        self.port_input.setValue(port)
+        self.update_server_url()
+        
+        QMessageBox.information(self, "Quick Connect", 
+                              f"Connected to {server_address}\n\n"
+                              f"Click 'Save & Apply' to use this server.")
+
     @staticmethod
     def get_saved_config():
         """Static method to get saved configuration"""

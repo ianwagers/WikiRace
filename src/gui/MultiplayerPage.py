@@ -24,6 +24,10 @@ class MultiplayerPage(QWidget):
         self.apply_config_to_network_manager()
         self.connect_network_signals()
         
+        # Try auto-discovery if enabled and no server is configured
+        if self.server_config.get('auto_discovery', True) and self.server_config.get('server_host') == 'wikirace.duckdns.org':
+            self.try_auto_discovery()
+        
         # UI state
         self.current_room_code = None
         self.player_name = None
@@ -979,7 +983,7 @@ class MultiplayerPage(QWidget):
             print(f"🔄 Fetching fresh room state from server for {self.current_room_code}")
             # Use the network manager to get fresh room info via REST API
             import requests
-            server_url = getattr(self.network_manager, 'server_url', 'http://127.0.0.1:8000')
+            server_url = getattr(self.network_manager, 'server_url', 'http://wikirace.duckdns.org:8001')
             url = f"{server_url}/api/rooms/{self.current_room_code}"
             
             try:
@@ -1541,6 +1545,29 @@ class MultiplayerPage(QWidget):
         # CRITICAL FIX: Clean up any active countdown dialogs when page is hidden
         self.cleanup_countdown_dialogs()
     
+    def try_auto_discovery(self):
+        """Try to auto-discover and connect to the best available server"""
+        try:
+            print("🔍 Attempting auto-discovery of WikiRace servers...")
+            
+            # Try auto-discovery
+            success = self.network_manager.auto_connect_to_best_server()
+            
+            if success:
+                print("✅ Auto-discovery successful! Connected to best available server.")
+                # Update server config with the discovered server
+                from urllib.parse import urlparse
+                parsed = urlparse(self.network_manager.server_url)
+                self.server_config['server_host'] = parsed.hostname
+                self.server_config['server_port'] = parsed.port
+                print(f"📡 Updated server config to: {parsed.hostname}:{parsed.port}")
+            else:
+                print("⚠️ Auto-discovery failed, using configured server")
+                
+        except Exception as e:
+            print(f"❌ Auto-discovery error: {e}")
+            print("⚠️ Falling back to configured server")
+    
     def showEvent(self, event):
         """Handle page show event - clean up any lingering countdown dialogs"""
         super().showEvent(event)
@@ -1749,19 +1776,21 @@ class MultiplayerPage(QWidget):
                 'max_reconnection_attempts': self.multiplayer_config.reconnection.max_attempts,
                 'reconnection_delay': self.multiplayer_config.reconnection.initial_delay,
                 'max_reconnection_delay': self.multiplayer_config.reconnection.max_delay,
-                'connection_timeout': self.multiplayer_config.server.connection_timeout
+                'connection_timeout': self.multiplayer_config.server.connection_timeout,
+                'auto_discovery': True  # Enable auto-discovery by default
             }
         except Exception as e:
             print(f"Failed to load server config: {e}")
             # Use default configuration
             self.server_config = {
-                'server_host': '127.0.0.1',
+                'server_host': 'wikirace.duckdns.org',  # Default to your DDNS domain
                 'server_port': 8001,
                 'auto_reconnect': True,
                 'max_reconnection_attempts': 5,
                 'reconnection_delay': 2.0,
                 'max_reconnection_delay': 30.0,
-                'connection_timeout': 10.0
+                'connection_timeout': 10.0,
+                'auto_discovery': True  # Enable auto-discovery by default
             }
     
     def apply_config_to_network_manager(self):
