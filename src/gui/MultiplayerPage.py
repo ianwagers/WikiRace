@@ -652,12 +652,13 @@ class MultiplayerPage(QWidget):
         if not self.is_leader:
             return
         
-        # Enable/disable custom input fields based on selection
+        # Enable/disable custom input fields based on selection AND leadership status
         start_is_custom = self.startPageCombo.currentText() == 'Custom'
         end_is_custom = self.endPageCombo.currentText() == 'Custom'
         
-        self.customStartPageEdit.setEnabled(start_is_custom)
-        self.customEndPageEdit.setEnabled(end_is_custom)
+        # Only enable custom edit boxes if we're the leader AND the combo is set to Custom
+        self.customStartPageEdit.setEnabled(start_is_custom and self.is_leader)
+        self.customEndPageEdit.setEnabled(end_is_custom and self.is_leader)
         
         # Update the Start Game button state based on configuration validity
         self.update_start_game_button_state()
@@ -886,6 +887,9 @@ class MultiplayerPage(QWidget):
         # CRITICAL FIX: Properly clean up state when leaving room to prevent rejoin bugs
         print(f"🔄 WikiRace: [{time.time():.3f}] Leaving room - cleaning up state")
         
+        # CRITICAL FIX: Clean up countdown dialogs before leaving room
+        self.cleanup_countdown_dialogs()
+        
         # Leave the room via network manager first
         if hasattr(self.network_manager, 'leave_room') and self.current_room_code:
             try:
@@ -903,18 +907,19 @@ class MultiplayerPage(QWidget):
     def reset_for_new_game(self):
         """Reset the multiplayer page state to allow starting new games after play again"""
         print("🔄 Resetting multiplayer page for new game...")
+        print(f"🔍 DEBUG: current_room_code = {self.current_room_code}")
+        print(f"🔍 DEBUG: network_manager exists = {hasattr(self, 'network_manager')}")
+        if hasattr(self, 'network_manager'):
+            print(f"🔍 DEBUG: network_manager.current_room = {getattr(self.network_manager, 'current_room', 'None')}")
         
-        # CRITICAL FIX: Force refresh room state to prevent ghost players
-        if self.current_room_code and hasattr(self, 'network_manager'):
-            try:
-                # Request current room state from server to ensure we have the latest player list
-                print(f"🔄 Requesting fresh room state for room {self.current_room_code}")
-                # The network manager should automatically sync room state when we reconnect
-                # But let's also trigger a manual refresh if possible
-                if hasattr(self.network_manager, 'request_room_state'):
-                    self.network_manager.request_room_state(self.current_room_code)
-            except Exception as e:
-                print(f"⚠️ Error refreshing room state: {e}")
+        # SIMPLIFIED FIX: Just ensure signal connections are active for real-time updates
+        # The existing player_left event handling should work automatically
+        if hasattr(self, 'network_manager') and self.network_manager.connected_to_server:
+            print("🔄 Ensuring real-time event listeners are active after play again")
+            # Force a refresh of the player list to catch any missed events
+            self._refresh_player_list_if_needed()
+        else:
+            print("⚠️ Cannot ensure event listeners - network manager not available")
         
         # Reset game configuration to defaults
         if hasattr(self, 'startPageCombo'):
@@ -946,6 +951,74 @@ class MultiplayerPage(QWidget):
             self._send_config_update()
         
         print("✅ Multiplayer page reset for new game")
+    
+    def _refresh_player_list_if_needed(self):
+        """Simple refresh to catch any missed player_left events"""
+        try:
+            print("🔄 Checking if player list refresh is needed...")
+            
+            # Request fresh room state from server to ensure we have the latest player list
+            if self.current_room_code and hasattr(self, 'network_manager'):
+                print(f"🔄 Requesting fresh room state for room {self.current_room_code}")
+                self._refresh_room_state_from_server()
+            
+            # The existing player_left event handling should work automatically
+            # This is just a safety check to ensure we're in sync
+            if hasattr(self, 'update_start_game_button_state'):
+                self.update_start_game_button_state()
+            print("✅ Player list refresh check completed")
+        except Exception as e:
+            print(f"⚠️ Error refreshing player list: {e}")
+    
+    def _refresh_room_state_from_server(self):
+        """Refresh room state from server to get updated player list"""
+        if not self.current_room_code or not hasattr(self, 'network_manager'):
+            return
+        
+        try:
+            print(f"🔄 Fetching fresh room state from server for {self.current_room_code}")
+            # Use the network manager to get fresh room info via REST API
+            import requests
+            server_url = getattr(self.network_manager, 'server_url', 'http://127.0.0.1:8000')
+            url = f"{server_url}/api/rooms/{self.current_room_code}"
+            
+            try:
+                response = requests.get(url, timeout=5)
+                if response.status_code == 200:
+                    room_info = response.json()
+                    print(f"📡 Received fresh room state: {room_info}")
+                    # Update our local state with fresh data
+                    self._update_room_state_from_server_data(room_info)
+                else:
+                    print(f"⚠️ Room info request failed with status {response.status_code}")
+            except Exception as e:
+                print(f"⚠️ Error fetching room info via REST API: {e}")
+                
+        except Exception as e:
+            print(f"⚠️ Error refreshing room state from server: {e}")
+    
+    def _update_room_state_from_server_data(self, room_data):
+        """Update UI state based on fresh server room data"""
+        try:
+            if 'players' in room_data:
+                # Update player list with fresh data
+                players = room_data['players']
+                print(f"👥 Updating player list with {len(players)} players from server")
+                
+                # Update the player list display
+                if hasattr(self, 'update_player_list'):
+                    self.update_player_list(players)
+                
+                # Update player count
+                if hasattr(self, 'playerCountLabel'):
+                    self.playerCountLabel.setText(f"Players: {len(players)}")
+                
+                # Update start game button state based on fresh player count
+                if hasattr(self, 'update_start_game_button_state'):
+                    self.update_start_game_button_state()
+                    
+        except Exception as e:
+            print(f"⚠️ Error updating room state from server data: {e}")
     
     def reset_for_leave_room(self):
         """Reset UI state when leaving room but keep network connection for rejoining"""
@@ -1158,6 +1231,7 @@ class MultiplayerPage(QWidget):
         """Update the players grid display"""
         print(f"🎨 DEBUG: update_players_grid called with players: {players}")
         print(f"🎨 DEBUG: Current player_colors: {self.player_colors}")
+        print(f"🎨 DEBUG: Number of player labels: {len(self.playerLabels)}")
         
         # Clear all labels first
         for label in self.playerLabels:
@@ -1195,7 +1269,9 @@ class MultiplayerPage(QWidget):
                     }}
                 """)
                 label.show()
+                print(f"🎨 DEBUG: Updated label {i} with player: {player}")
         
+        print(f"🎨 DEBUG: Grid update completed. Showing {len(players)} players")
         # Don't show any empty slots - only show boxes when players actually join
     
     def show_room_info(self, title, players):
@@ -1220,14 +1296,20 @@ class MultiplayerPage(QWidget):
         
         if self.is_leader:
             # Leader can modify settings
+            print(f"🏆 LEADERSHIP: Enabling leader controls - is_leader={self.is_leader}")
             self.gameSelectionDisplay.hide()
             self.startGameButton.show()
             self.startPageCombo.setEnabled(True)
             self.endPageCombo.setEnabled(True)
+            # CRITICAL FIX: Also enable custom edit boxes for leader
+            self.customStartPageEdit.setEnabled(True)
+            self.customEndPageEdit.setEnabled(True)
+            print(f"🏆 LEADERSHIP: Custom edit boxes enabled: start={self.customStartPageEdit.isEnabled()}, end={self.customEndPageEdit.isEnabled()}")
             # Update start game button state based on players and configuration
             self.update_start_game_button_state()
         else:
             # Non-leader can see but not modify settings
+            print(f"🏆 LEADERSHIP: Disabling non-leader controls - is_leader={self.is_leader}")
             self.gameSelectionDisplay.show()
             self.startGameButton.hide()
             self.startPageCombo.setEnabled(False)  # Disabled but visible
@@ -1345,13 +1427,17 @@ class MultiplayerPage(QWidget):
     
     def on_player_left(self, player_name, players_list):
         """Handle player leave event"""
-        print(f"🔄 Player {player_name} left the room. Remaining players: {[p['display_name'] for p in players_list]}")
+        print(f"🔄 CRITICAL: on_player_left called - Player {player_name} left the room")
+        print(f"🔄 CRITICAL: Remaining players: {[p['display_name'] for p in players_list]}")
+        print(f"🔄 CRITICAL: Current players_in_room before update: {self.players_in_room}")
         
         # Update our local player list with the server's authoritative list
         self.players_in_room = [p['display_name'] for p in players_list]
+        print(f"🔄 CRITICAL: Updated players_in_room to: {self.players_in_room}")
         
         # Update the players grid display
         if hasattr(self, 'update_players_grid'):
+            print(f"🔄 CRITICAL: Calling update_players_grid with {len(players_list)} players")
             # Format players list with leader tag
             formatted_players = []
             for p in players_list:
@@ -1360,7 +1446,10 @@ class MultiplayerPage(QWidget):
                 else:
                     formatted_players.append(p['display_name'])
             
+            print(f"🔄 CRITICAL: Formatted players for grid: {formatted_players}")
             self.update_players_grid(formatted_players)
+        else:
+            print(f"🔄 CRITICAL: update_players_grid method not found!")
         
         # Update start game button state
         self.update_start_game_button_state()
@@ -1371,18 +1460,25 @@ class MultiplayerPage(QWidget):
     
     def on_host_transferred(self, new_host_id, new_host_name):
         """Handle host transfer event"""
+        print(f"🏆 LEADERSHIP: MultiplayerPage received host_transferred - new_host_id: {new_host_id}, new_host_name: {new_host_name}")
+        print(f"🏆 LEADERSHIP: Current player_name: {self.player_name}")
+        
         # Update our leadership status
         if hasattr(self, 'network_manager') and hasattr(self.network_manager, 'sio'):
             # Check if we are the new host (this is a simple check, in real implementation
             # you'd want to track socket IDs properly)
             if new_host_name == self.player_name:
                 self.is_leader = True
+                print(f"🏆 LEADERSHIP: Player {self.player_name} is now the leader")
                 QMessageBox.information(self, "Leadership Transferred", 
                                       "You are now the room leader!")
             else:
                 self.is_leader = False
+                print(f"🏆 LEADERSHIP: Player {new_host_name} is now the leader, {self.player_name} is not leader")
                 QMessageBox.information(self, "Leadership Transferred", 
                                       f"{new_host_name} is now the room leader.")
+        else:
+            print(f"🏆 LEADERSHIP: No network manager available for leadership transfer")
         
         # Update the players list to reflect the new leader
         if hasattr(self, 'players_in_room') and self.players_in_room:
@@ -1396,7 +1492,12 @@ class MultiplayerPage(QWidget):
                     updated_players.append(player_name)
             
             self.players_in_room = updated_players
+            print(f"🎯 DEBUG: Refreshing room info after host transfer - is_leader={self.is_leader}")
             self.show_room_info(f"Room Code: {self.current_room_code}", self.players_in_room)
+            
+            # CRITICAL FIX: Update custom edit boxes based on current combo selections and leadership
+            if self.is_leader:
+                self.on_game_config_changed()
     
     def on_room_deleted(self):
         """Handle room deletion event"""
@@ -1408,6 +1509,9 @@ class MultiplayerPage(QWidget):
     
     def cleanup_countdown_dialogs(self):
         """Clean up any existing countdown dialogs"""
+        print(f"🎬 DEBUG: Cleaning up {len(self.countdown_dialogs)} countdown dialogs")
+        
+        # Close and remove all countdown dialogs from the list
         for dialog in self.countdown_dialogs:
             try:
                 if hasattr(dialog, 'close'):
@@ -1417,7 +1521,31 @@ class MultiplayerPage(QWidget):
             except:
                 pass
         self.countdown_dialogs.clear()
-        print(f"🎬 DEBUG: Cleaned up {len(self.countdown_dialogs)} countdown dialogs")
+        
+        # Also clear the single dialog reference if it exists
+        if hasattr(self, 'countdown_dialog'):
+            try:
+                if self.countdown_dialog and hasattr(self.countdown_dialog, 'close'):
+                    print(f"🎬 DEBUG: Closing single countdown dialog reference")
+                    self.countdown_dialog.close()
+                    self.countdown_dialog.deleteLater()
+            except:
+                pass
+            self.countdown_dialog = None
+        
+        print(f"🎬 DEBUG: Cleaned up all countdown dialogs")
+    
+    def hideEvent(self, event):
+        """Handle page hide event - clean up countdown dialogs"""
+        super().hideEvent(event)
+        # CRITICAL FIX: Clean up any active countdown dialogs when page is hidden
+        self.cleanup_countdown_dialogs()
+    
+    def showEvent(self, event):
+        """Handle page show event - clean up any lingering countdown dialogs"""
+        super().showEvent(event)
+        # CRITICAL FIX: Clean up any lingering countdown dialogs when page is shown
+        self.cleanup_countdown_dialogs()
     
     def show_debug_countdown_info(self):
         """Debug method to show information about active countdown dialogs"""
@@ -1435,8 +1563,13 @@ class MultiplayerPage(QWidget):
         # Lock colors during game
         self.lock_colors()
         
-        # Clean up any existing countdown dialogs first
+        # CRITICAL FIX: Clean up any existing countdown dialogs first
         self.cleanup_countdown_dialogs()
+        
+        # CRITICAL FIX: Check if we already have a countdown dialog active
+        if hasattr(self, 'countdown_dialog') and self.countdown_dialog and not self.countdown_dialog.isHidden():
+            print(f"🎬 DEBUG: Countdown dialog already active, skipping duplicate")
+            return
         
         try:
             from src.gui.CountdownDialog import CountdownDialog

@@ -288,6 +288,25 @@ class RoomManager:
                 
                 logger.info(f"Player {player_name} leaving room {room_code} (host: {was_host}, state: {game_state.value})")
                 
+                # CRITICAL FIX: Handle host transfer BEFORE removing the player
+                if was_host:
+                    logger.info(f"LEADERSHIP: Host {player_name} is leaving room {room_code}")
+                    logger.info(f"LEADERSHIP: Current players before transfer: {[p.display_name for p in room.players.values()]}")
+                    
+                    # CRITICAL FIX: Transfer host BEFORE removing the player
+                    new_host_id = room.transfer_host()
+                    if new_host_id:
+                        new_host = room.get_player(new_host_id)
+                        if new_host:
+                            logger.info(f"LEADERSHIP: Successfully transferred host to {new_host.display_name} in room {room_code}")
+                            logger.info(f"LEADERSHIP: New host socket_id: {new_host_id}, is_host: {new_host.is_host}")
+                        else:
+                            logger.error(f"LEADERSHIP: Failed to get new host player object for socket_id {new_host_id}")
+                    else:
+                        # No other players, clear host_id but keep room open
+                        room.host_id = None
+                        logger.info(f"LEADERSHIP: Room {room_code} has no host but kept open for potential rejoin")
+                
                 # CRITICAL FIX: Handle different scenarios based on game state
                 if game_state == GameState.IN_PROGRESS:
                     # During active game, mark as disconnected but keep in room for potential rejoin
@@ -304,18 +323,6 @@ class RoomManager:
                     del self.player_to_room[socket_id]
                     await self._cleanup_locks(socket_id=socket_id)
                     logger.info(f"Player {player_name} completely removed from room {room_code}")
-                
-                # Handle host leaving
-                if was_host and not player.disconnected:
-                    new_host_id = room.transfer_host()
-                    if new_host_id:
-                        new_host = room.get_player(new_host_id)
-                        if new_host:
-                            logger.info(f"Transferred host to {new_host.display_name} in room {room_code}")
-                    else:
-                        # No other players, clear host_id but keep room open
-                        room.host_id = None
-                        logger.info(f"Room {room_code} has no host but kept open for potential rejoin")
                 
                 # Check if room is now empty (excluding disconnected players)
                 active_players = [p for p in room.players.values() if not p.disconnected]

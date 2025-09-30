@@ -154,6 +154,8 @@ class NetworkManager(QObject):
         def room_created(data):
             print(f"Room created: {data}")
             self.current_room = data['room_code']
+            # CRITICAL FIX: Store last known room for completion fallback
+            self._last_known_room = data['room_code']
             
             # Create current player instance
             players_data = data.get('players', [])
@@ -173,6 +175,8 @@ class NetworkManager(QObject):
         def room_joined(data):
             print(f"Room joined: {data}")
             self.current_room = data['room_code']
+            # CRITICAL FIX: Store last known room for completion fallback
+            self._last_known_room = data['room_code']
             
             # Create current player instance
             self.current_player = self.create_player(
@@ -222,10 +226,14 @@ class NetworkManager(QObject):
         
         @self.sio.event
         def player_left(data):
-            print(f"Player left: {data}")
+            print(f"🔄 CRITICAL: Network received player_left event: {data}")
+            print(f"🔄 CRITICAL: Current room: {getattr(self, 'current_room', 'None')}")
+            print(f"🔄 CRITICAL: Connected to server: {getattr(self, 'connected_to_server', False)}")
             # Remove Player instance
             self.remove_room_player(data['player_name'])
+            print(f"🔄 CRITICAL: Emitting player_left signal with player_name: {data['player_name']}, players: {data.get('players', [])}")
             self.player_left.emit(data['player_name'], data.get('players', []))
+            print(f"🔄 CRITICAL: player_left signal emitted successfully")
         
         @self.sio.event
         def error(data):
@@ -234,9 +242,10 @@ class NetworkManager(QObject):
         
         @self.sio.event
         def host_transferred(data):
-            print(f"Host transferred: {data}")
+            print(f"🏆 LEADERSHIP: Client received host_transferred: {data}")
             new_host_id = data.get('new_host_id', '')
             new_host_name = data.get('new_host_name', '')
+            print(f"🏆 LEADERSHIP: Emitting host_transferred signal with new_host_id: {new_host_id}, new_host_name: {new_host_name}")
             self.host_transferred.emit(new_host_id, new_host_name)
         
         @self.sio.event
@@ -317,6 +326,24 @@ class NetworkManager(QObject):
             self.player_reconnected.emit(player_name, message)
         
         @self.sio.event
+        def players_removed(data):
+            print(f"🔌 Players removed: {data}")
+            removed_players = data.get('removed_players', [])
+            message = data.get('message', '')
+            players = data.get('players', [])
+            
+            # Update our local player list
+            if players:
+                self.players_in_room = [p['display_name'] for p in players]
+            
+            # Emit signal for UI update
+            self.player_left.emit(f"{', '.join(removed_players)} (removed)", players)
+            
+            # Show notification
+            from PyQt6.QtWidgets import QMessageBox
+            QMessageBox.information(None, "Players Removed", f"{message}")
+        
+        @self.sio.event
         def room_progress_sync(data):
             print(f"Room progress sync: {data}")
             # This could be used for additional synchronization if needed
@@ -380,16 +407,32 @@ class NetworkManager(QObject):
             # Clear reconnection state
             self.current_reconnection_attempts = 0
             
-            # Disconnect socket if connected
+            # CRITICAL FIX: Disconnect socket with timeout to prevent hanging
             if self.connected_to_server:
                 try:
                     if hasattr(self.sio, 'connected') and self.sio.connected:
+                        print(f"🔌 CRITICAL: Disconnecting socket with timeout...")
+                        
+                        # Use a timer to force disconnect if it takes too long
+                        from PyQt6.QtCore import QTimer
+                        disconnect_timer = QTimer()
+                        disconnect_timer.timeout.connect(lambda: self._force_disconnect_cleanup())
+                        disconnect_timer.setSingleShot(True)
+                        disconnect_timer.start(2000)  # 2 second timeout
+                        
+                        # Attempt normal disconnect
                         self.sio.disconnect()
-                        print(f"🔌 Socket disconnected")
+                        print(f"🔌 Socket disconnect initiated")
+                        
+                        # Clean up timer after successful disconnect
+                        disconnect_timer.stop()
+                        
                 except Exception as disconnect_error:
                     print(f"⚠️ Error during socket disconnect: {disconnect_error}")
+                    # Force cleanup if normal disconnect fails
+                    self._force_disconnect_cleanup()
             
-            # Reset connection state
+            # Reset connection state immediately
             self.connected_to_server = False
             
             # Clear room state
@@ -406,6 +449,30 @@ class NetworkManager(QObject):
             print(f"❌ Error during disconnection: {e}")
             import traceback
             print(f"❌ Disconnect traceback: {traceback.format_exc()}")
+            # Force cleanup on error
+            self._force_disconnect_cleanup()
+    
+    def _force_disconnect_cleanup(self):
+        """Force cleanup of connection state if normal disconnect fails"""
+        try:
+            print(f"🔌 CRITICAL: Force cleaning up connection state")
+            
+            # Force reset all connection states
+            self.connected_to_server = False
+            self.current_room = None
+            self.player_name = None
+            self.current_player = None
+            self.room_players.clear()
+            self.reconnection_enabled = False
+            self.current_reconnection_attempts = 0
+            
+            # Stop any remaining timers
+            self.stop_heartbeat()
+            
+            print(f"✅ CRITICAL: Force cleanup completed")
+            
+        except Exception as e:
+            print(f"❌ Error in force cleanup: {e}")
     
     def cleanup_network_resources(self):
         """Clean up all network resources and prevent memory leaks"""
@@ -617,13 +684,166 @@ class NetworkManager(QObject):
             return True
     
     def leave_room(self):
-        """Leave the current room"""
+        """Leave the current room but stay connected to server"""
         try:
+            print(f"🚪 CRITICAL: Attempting to leave room")
+            print(f"🚪 CRITICAL: Connection state check:")
+            print(f"   - connected_to_server: {self.connected_to_server}")
+            print(f"   - current_room: {self.current_room}")
+            print(f"   - sio.connected: {getattr(self.sio, 'connected', 'N/A')}")
+            print(f"   - connection_healthy: {self._is_connection_healthy()}")
+            
             if self.connected_to_server and self.current_room:
-                self.sio.emit('leave_room')
-                self.current_room = None
+                room_code = self.current_room
+                print(f"🚪 CRITICAL: Attempting to leave room {room_code}")
+                
+                # STRATEGY 1: Try Socket.IO event first
+                socketio_success = False
+                try:
+                    print(f"🚪 CRITICAL: Attempting Socket.IO leave_room event")
+                    
+                    # Test connection with a ping first
+                    try:
+                        print(f"🚪 CRITICAL: Testing connection with ping before leave_room")
+                        self.sio.emit('ping')
+                        print(f"✅ CRITICAL: Ping sent successfully, connection appears healthy")
+                    except Exception as ping_error:
+                        print(f"⚠️ CRITICAL: Ping failed: {ping_error}")
+                        print(f"⚠️ CRITICAL: Connection may be broken, but trying leave_room anyway")
+                    
+                    # SIMPLE FIX: Just try Socket.IO once
+                    print(f"🚪 SIMPLE: Attempting Socket.IO leave_room event...")
+                    self.sio.emit('leave_room')
+                    print(f"✅ SIMPLE: Socket.IO leave_room event sent")
+                    socketio_success = True
+                except Exception as emit_error:
+                    print(f"⚠️ SIMPLE: Socket.IO leave_room failed: {emit_error}")
+                    print(f"⚠️ SIMPLE: Socket.IO connection appears broken, trying REST API fallback")
+                    socketio_success = False
+                
+                # SIMPLE FIX: Use REST API as primary method (more reliable)
+                print(f"🚪 SIMPLE: Using REST API as primary method for leave_room")
+                try:
+                    print(f"🚪 SIMPLE: Attempting REST API leave_room")
+                    response = requests.post(
+                        f"{self.server_url}/api/rooms/{room_code}/leave",
+                        json={"player_name": self.player_name},
+                        timeout=5
+                    )
+                    if response.status_code == 200:
+                        print(f"✅ SIMPLE: REST API leave_room successful for {room_code}")
+                    else:
+                        print(f"⚠️ SIMPLE: REST API leave_room failed with status {response.status_code}")
+                        print(f"⚠️ SIMPLE: Response: {response.text}")
+                except Exception as rest_error:
+                    print(f"⚠️ SIMPLE: REST API leave_room failed: {rest_error}")
+                
+                # SIMPLE FIX: Just wait a bit and clear local state
+                print(f"🚪 SIMPLE: Waiting for server to process leave_room event...")
+                from PyQt6.QtCore import QTimer
+                QTimer.singleShot(2000, lambda: self._complete_leave_room(room_code))
+                
+                # CRITICAL FIX: Keep connection to server for future room joins
+                # DO NOT call disconnect_from_server() here
+                
+            else:
+                print(f"⚠️ Cannot leave room - not connected or no current room")
+                print(f"   - connected_to_server: {self.connected_to_server}")
+                print(f"   - current_room: {self.current_room}")
         except Exception as e:
             print(f"❌ Failed to leave room: {e}")
+            import traceback
+            print(f"❌ Leave room traceback: {traceback.format_exc()}")
+    
+    def _start_leave_room_retry(self, room_code: str, attempt: int = 1):
+        """Start retry mechanism for leave_room with exponential backoff"""
+        try:
+            max_attempts = 3
+            base_delay = 500  # 500ms base delay
+            
+            if attempt > max_attempts:
+                print(f"🚪 SHOTGUN: Max retry attempts reached, completing leave room")
+                self._complete_leave_room(room_code)
+                return
+            
+            delay = base_delay * (2 ** (attempt - 1))  # Exponential backoff: 500ms, 1000ms, 2000ms
+            print(f"🚪 SHOTGUN: Retry attempt {attempt}/{max_attempts} in {delay}ms")
+            
+            from PyQt6.QtCore import QTimer
+            QTimer.singleShot(delay, lambda: self._retry_leave_room(room_code, attempt))
+            
+        except Exception as e:
+            print(f"❌ Error starting leave room retry: {e}")
+            self._complete_leave_room(room_code)
+    
+    def _retry_leave_room(self, room_code: str, attempt: int):
+        """Retry leave_room with different strategies"""
+        try:
+            print(f"🚪 SHOTGUN: Retry attempt {attempt} for {room_code}")
+            
+            # Strategy 1: Try REST API again
+            try:
+                print(f"🚪 SHOTGUN: Retry {attempt} - REST API attempt")
+                response = requests.post(
+                    f"{self.server_url}/api/rooms/{room_code}/leave",
+                    json={"player_name": self.player_name},
+                    timeout=5
+                )
+                if response.status_code == 200:
+                    print(f"✅ SHOTGUN: Retry {attempt} - REST API successful")
+                    self._complete_leave_room(room_code)
+                    return
+                else:
+                    print(f"⚠️ SHOTGUN: Retry {attempt} - REST API failed: {response.status_code}")
+            except Exception as e:
+                print(f"⚠️ SHOTGUN: Retry {attempt} - REST API error: {e}")
+            
+            # Strategy 2: Try Socket.IO again
+            try:
+                print(f"🚪 SHOTGUN: Retry {attempt} - Socket.IO attempt")
+                self.sio.emit('leave_room')
+                print(f"✅ SHOTGUN: Retry {attempt} - Socket.IO sent")
+            except Exception as e:
+                print(f"⚠️ SHOTGUN: Retry {attempt} - Socket.IO error: {e}")
+            
+            # Strategy 3: Nuclear option - force disconnect/reconnect on final attempt
+            if attempt == 3:
+                try:
+                    print(f"🚪 SHOTGUN: NUCLEAR OPTION - Force disconnect/reconnect")
+                    # Force disconnect
+                    if hasattr(self.sio, 'disconnect'):
+                        self.sio.disconnect()
+                    # Force reconnect
+                    self.connect_to_server()
+                    # Try REST API one more time
+                    response = requests.post(
+                        f"{self.server_url}/api/rooms/{room_code}/leave",
+                        json={"player_name": self.player_name},
+                        timeout=5
+                    )
+                    if response.status_code == 200:
+                        print(f"✅ SHOTGUN: NUCLEAR OPTION - REST API successful after reconnect")
+                        self._complete_leave_room(room_code)
+                        return
+                except Exception as nuclear_error:
+                    print(f"⚠️ SHOTGUN: NUCLEAR OPTION failed: {nuclear_error}")
+            
+            # Schedule next retry
+            self._start_leave_room_retry(room_code, attempt + 1)
+            
+        except Exception as e:
+            print(f"❌ Error in retry leave room: {e}")
+            self._complete_leave_room(room_code)
+    
+    def _complete_leave_room(self, room_code: str):
+        """Complete the leave room process after server has had time to process the event"""
+        try:
+            print(f"🚪 SHOTGUN: Completing leave room for {room_code}")
+            print(f"🚪 SHOTGUN: Clearing local room state for {room_code}")
+            self.current_room = None
+            print(f"✅ SHOTGUN: Local room state cleared for {room_code}")
+        except Exception as e:
+            print(f"❌ Error completing leave room: {e}")
     
     def get_server_status(self) -> Dict[str, Any]:
         """Get server status via REST API"""
@@ -690,16 +910,22 @@ class NetworkManager(QObject):
     def send_game_completion(self, completion_time: float, links_used: int):
         """Send game completion to server"""
         try:
-            if self.connected_to_server and self.current_room and self.sio.connected:
+            # CRITICAL FIX: Check if we have room info even if current_room is None
+            room_code = self.current_room
+            if not room_code and hasattr(self, '_last_known_room'):
+                room_code = self._last_known_room
+                print(f"🏆 CRITICAL FIX: Using last known room {room_code} for completion")
+            
+            if self.connected_to_server and room_code and self.sio.connected:
                 self.sio.emit('game_complete', {
-                    'room_code': self.current_room,
+                    'room_code': room_code,
                     'player_name': self.player_name,
                     'completion_time': completion_time,
                     'links_used': links_used
                 })
-                print(f"🏆 Sent completion: {completion_time:.2f}s, {links_used} links")
+                print(f"🏆 Sent completion: {completion_time:.2f}s, {links_used} links to room {room_code}")
             else:
-                print(f"⚠️ Cannot send completion - not connected (connected: {self.connected_to_server}, room: {self.current_room})")
+                print(f"⚠️ Cannot send completion - not connected (connected: {self.connected_to_server}, room: {room_code}, sio_connected: {self.sio.connected})")
         except Exception as e:
             print(f"❌ Failed to send completion: {e}")
     
@@ -743,29 +969,36 @@ class NetworkManager(QObject):
         try:
             # Basic connection checks
             if not self.connected_to_server:
+                print(f"🔍 CONNECTION HEALTH: connected_to_server is False")
                 return False
             
             if not self.current_room:
+                print(f"🔍 CONNECTION HEALTH: current_room is None")
                 return False
             
             # Socket.IO connection checks
             if not hasattr(self.sio, 'connected') or not self.sio.connected:
+                print(f"🔍 CONNECTION HEALTH: sio.connected is False")
                 return False
             
             # Engine.IO state checks
             if hasattr(self.sio, 'eio'):
                 if self.sio.eio.state != 'connected':
+                    print(f"🔍 CONNECTION HEALTH: sio.eio.state is {self.sio.eio.state}")
                     return False
                 
                 # Additional transport checks
                 if hasattr(self.sio.eio, 'transport') and self.sio.eio.transport:
                     if hasattr(self.sio.eio.transport, 'state') and self.sio.eio.transport.state != 'connected':
+                        print(f"🔍 CONNECTION HEALTH: transport.state is {self.sio.eio.transport.state}")
                         return False
             
             # Check if we're in the middle of reconnection
             if self.current_reconnection_attempts > 0:
+                print(f"🔍 CONNECTION HEALTH: Currently reconnecting (attempt {self.current_reconnection_attempts})")
                 return False
             
+            print(f"🔍 CONNECTION HEALTH: Connection appears healthy")
             return True
             
         except Exception as e:
@@ -819,6 +1052,25 @@ class NetworkManager(QObject):
             print(f"🏁 Sent completion update: {completion_time}s, {links_used} links")
         except Exception as e:
             print(f"❌ Error sending completion update: {e}")
+    
+    async def get_room_info(self, room_code: str) -> Optional[Dict[str, Any]]:
+        """Get current room information including player list"""
+        if not self.server_url or not room_code:
+            return None
+        
+        try:
+            url = f"{self.server_url}/api/rooms/{room_code}"
+            import aiohttp
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as response:
+                    if response.status == 200:
+                        return await response.json()
+                    else:
+                        print(f"❌ Room info request failed with status {response.status}")
+                        return None
+        except Exception as e:
+            print(f"❌ Error getting room info: {e}")
+            return None
 
 
 # Legacy Network class for backward compatibility

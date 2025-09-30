@@ -16,14 +16,14 @@ try:
     from .models import GameRoom, Player, GameState
     from .room_manager import RoomManager
     from .socket_handlers import register_socket_handlers
-    from .api_routes import router, set_room_manager
+    from .api_routes import router, set_room_manager, set_socketio
 except ImportError:
     # Fall back to absolute imports (when run directly)
     from config import settings
     from models import GameRoom, Player, GameState
     from room_manager import RoomManager
     from socket_handlers import register_socket_handlers
-    from api_routes import router, set_room_manager
+    from api_routes import router, set_room_manager, set_socketio
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -53,8 +53,9 @@ socket_app = socketio.ASGIApp(sio, app)
 # Initialize room manager
 room_manager = RoomManager()
 
-# Set room manager for API routes
+# Set room manager and Socket.IO instance for API routes
 set_room_manager(room_manager)
+set_socketio(sio)
 
 # Include API routes
 app.include_router(router)

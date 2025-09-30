@@ -757,19 +757,34 @@ class MultiplayerGamePage(QWidget):
             # 1. Stop all timers first to prevent further updates
             self.stop_all_timers_and_progress()
             
-            # 2. Disconnect network signals to prevent further network events
+            # 2. CRITICAL FIX: Stop WebView loading immediately to prevent resource loading stutter
+            if hasattr(self, 'solo_game') and self.solo_game:
+                try:
+                    # Stop any ongoing WebView loading
+                    if hasattr(self.solo_game, 'webView') and self.solo_game.webView:
+                        print("🛑 CRITICAL: Stopping WebView loading to prevent exit stutter")
+                        self.solo_game.webView.stop()
+                        # Load a blank page to stop all resource loading
+                        self.solo_game.webView.setHtml("")
+                        # Disable the WebView to prevent further loading
+                        self.solo_game.webView.setEnabled(False)
+                        print("✅ WebView stopped and disabled")
+                except Exception as e:
+                    print(f"⚠️ Error stopping WebView: {e}")
+            
+            # 3. Disconnect network signals to prevent further network events
             self.disconnect_network_signals()
             
-            # 3. Clear all player data and references
+            # 4. Clear all player data and references
             self.players.clear()
             self.player_instances.clear()
             
-            # 4. Reset game state flags
+            # 5. Reset game state flags
             self.game_started = False
             self.game_finished = False
             self.results_dialog_shown = False
             
-            # 5. Clean up solo game if it exists
+            # 6. Clean up solo game if it exists
             if hasattr(self, 'solo_game') and self.solo_game:
                 try:
                     self.solo_game.setEnabled(False)
@@ -783,7 +798,7 @@ class MultiplayerGamePage(QWidget):
                 except Exception as e:
                     print(f"⚠️ Error cleaning up solo game: {e}")
             
-            # 6. Reset multiplayer page state when exiting game
+            # 7. Reset multiplayer page state when exiting game
             if hasattr(self, 'tabWidget'):
                 # Find the multiplayer page tab and reset its state
                 for i in range(self.tabWidget.count()):
@@ -1547,12 +1562,102 @@ class MultiplayerGamePage(QWidget):
     def on_exit_to_home_requested(self):
         """Handle exit to home request - leave room and go to home page"""
         print("🏠 Player requested to exit to home - leaving room")
-        # Leave the room via network manager
-        if hasattr(self.network_manager, 'leave_room'):
-            self.network_manager.leave_room()
         
-        # Close the game tab and switch to home page
-        self.close_game_tab_and_go_home()
+        # CRITICAL FIX: Proper exit order - notify server FIRST, then disconnect
+        self.exit_to_home_with_proper_cleanup()
+    
+    def exit_to_home_with_proper_cleanup(self):
+        """Handle exit to home with proper cleanup order - notify server first, then exit quickly"""
+        try:
+            print("🔄 CRITICAL: Starting proper exit process - room exit only")
+            
+            # 1. CRITICAL FIX: Notify server that player is leaving the room (but stay connected to server)
+            if hasattr(self.network_manager, 'leave_room') and self.network_manager.current_room:
+                print("🔄 CRITICAL: Notifying server that player is leaving room")
+                try:
+                    # Send leave_room event to server
+                    self.network_manager.leave_room()
+                    print("✅ CRITICAL: Server notified of player leaving room")
+                    
+                    # Network manager now handles the delay internally
+                    # Complete the exit immediately since Network.py handles the timing
+                    self._complete_room_exit_only()
+                    return
+                    
+                except Exception as e:
+                    print(f"⚠️ Error notifying server of leave: {e}")
+                    # Continue with exit even if server notification fails
+            
+            # If no room or error, proceed directly to exit
+            self._complete_room_exit_only()
+            
+        except Exception as e:
+            print(f"❌ Error in proper exit cleanup: {e}")
+            # Fallback to immediate exit
+            self._complete_room_exit_only()
+    
+    def _complete_room_exit_only(self):
+        """Complete the room exit process - stay connected to server for future room joins"""
+        try:
+            print("🔄 CRITICAL: Completing room exit only - staying connected to server")
+            
+            # 1. Stop WebView loading immediately to prevent stutter
+            if hasattr(self, 'solo_game') and self.solo_game:
+                try:
+                    if hasattr(self.solo_game, 'webView') and self.solo_game.webView:
+                        print("🛑 CRITICAL: Stopping WebView loading for smooth exit")
+                        self.solo_game.webView.stop()
+                        self.solo_game.webView.setHtml("")
+                        self.solo_game.webView.setEnabled(False)
+                        print("✅ WebView stopped for exit")
+                except Exception as e:
+                    print(f"⚠️ Error stopping WebView for exit: {e}")
+            
+            # 2. Close tabs immediately for responsive UI
+            self._close_tabs_quickly()
+            
+            # 3. CRITICAL FIX: DO NOT disconnect from server - keep connection for future room joins
+            print("✅ CRITICAL: Room exit completed - staying connected to server for future room joins")
+            
+        except Exception as e:
+            print(f"❌ Error completing room exit: {e}")
+            # Fallback to basic exit
+            self._close_tabs_quickly()
+    
+    def _close_tabs_quickly(self):
+        """Close tabs quickly for responsive UI"""
+        try:
+            # Find and close multiplayer tab first
+            multiplayer_tab_index = None
+            for i in range(self.tabWidget.count()):
+                widget = self.tabWidget.widget(i)
+                if (hasattr(widget, 'reset_for_exit') and 
+                    hasattr(widget, 'network_manager') and 
+                    hasattr(widget, 'current_room_code')):
+                    multiplayer_tab_index = i
+                    break
+            
+            # Close current game tab
+            current_index = self.tabWidget.indexOf(self)
+            if current_index >= 0:
+                self.tabWidget.removeTab(current_index)
+                print("🔄 CRITICAL: Game tab closed")
+            
+            # Close multiplayer tab if found
+            if multiplayer_tab_index is not None:
+                # Adjust index if game tab was removed before multiplayer tab
+                if multiplayer_tab_index > current_index:
+                    multiplayer_tab_index -= 1
+                
+                self.tabWidget.removeTab(multiplayer_tab_index)
+                print("🔄 CRITICAL: Multiplayer tab closed")
+            
+            # Switch to home tab immediately
+            self.tabWidget.setCurrentIndex(0)
+            print("🔄 CRITICAL: Returned to home page - ready for new games")
+            
+        except Exception as e:
+            print(f"❌ Error closing tabs: {e}")
     
     def close_game_tab(self):
         """Close the current game tab and return to multiplayer page"""
@@ -1570,7 +1675,10 @@ class MultiplayerGamePage(QWidget):
                     # Reset the multiplayer page state to allow starting new games
                     multiplayer_widget = self.tabWidget.widget(2)
                     if hasattr(multiplayer_widget, 'reset_for_new_game'):
+                        print("🔄 CRITICAL: Calling reset_for_new_game on multiplayer widget")
                         multiplayer_widget.reset_for_new_game()
+                    else:
+                        print("⚠️ CRITICAL: Multiplayer widget does not have reset_for_new_game method")
                 
         except Exception as e:
             print(f"❌ Error closing game tab: {e}")
@@ -1578,9 +1686,24 @@ class MultiplayerGamePage(QWidget):
     def close_game_tab_and_go_home(self):
         """Close the game tab and go to home page"""
         try:
-            # CRITICAL FIX: Close tabs first, then disconnect from server
-            # Find the multiplayer page and close its tab
+            # CRITICAL FIX: Optimize exit performance by stopping WebView first
+            print(f"🔄 CRITICAL: Starting optimized exit process")
+            
+            # 1. Stop WebView loading immediately to prevent stutter
+            if hasattr(self, 'solo_game') and self.solo_game:
+                try:
+                    if hasattr(self.solo_game, 'webView') and self.solo_game.webView:
+                        print("🛑 CRITICAL: Stopping WebView loading for smooth exit")
+                        self.solo_game.webView.stop()
+                        self.solo_game.webView.setHtml("")
+                        self.solo_game.webView.setEnabled(False)
+                        print("✅ WebView stopped for exit")
+                except Exception as e:
+                    print(f"⚠️ Error stopping WebView for exit: {e}")
+            
+            # 2. Find the multiplayer page and prepare for cleanup
             multiplayer_tab_index = None
+            multiplayer_widget = None
             for i in range(self.tabWidget.count()):
                 widget = self.tabWidget.widget(i)
                 # Check if this is the MultiplayerPage by looking for specific attributes
@@ -1589,39 +1712,40 @@ class MultiplayerGamePage(QWidget):
                     hasattr(widget, 'current_room_code')):
                     print(f"🔄 CRITICAL: Found multiplayer tab for exit")
                     multiplayer_tab_index = i
+                    multiplayer_widget = widget
                     break
             
-            # Find the current game tab index
+            # 3. Close the current game tab first (most important for UI responsiveness)
             current_index = self.tabWidget.indexOf(self)
             if current_index >= 0:
-                # Close the game tab first
                 self.tabWidget.removeTab(current_index)
                 print(f"🔄 CRITICAL: Game tab closed")
             
-            # Close the multiplayer tab if found
+            # 4. Close the multiplayer tab if found
             if multiplayer_tab_index is not None:
                 # Adjust index if game tab was removed before multiplayer tab
                 if multiplayer_tab_index > current_index:
                     multiplayer_tab_index -= 1
                 
-                # Get the multiplayer widget before removing the tab
-                multiplayer_widget = self.tabWidget.widget(multiplayer_tab_index)
-                
-                # Close the multiplayer tab first
+                # Close the multiplayer tab
                 self.tabWidget.removeTab(multiplayer_tab_index)
                 print(f"🔄 CRITICAL: Multiplayer tab closed")
                 
-                # Disconnect from server after closing tab
+                # 5. Disconnect from server after closing tabs (non-blocking)
                 if hasattr(multiplayer_widget, 'network_manager') and multiplayer_widget.network_manager:
-                    print(f"🔄 CRITICAL: Disconnecting from server after closing multiplayer tab")
-                    multiplayer_widget.network_manager.disconnect_from_server()
+                    print(f"🔄 CRITICAL: Disconnecting from server after closing tabs")
+                    # Use a timer to make this non-blocking
+                    from PyQt6.QtCore import QTimer
+                    QTimer.singleShot(100, lambda: multiplayer_widget.network_manager.disconnect_from_server())
             
-            # Switch to home tab (index 0)
+            # 6. Switch to home tab immediately for responsive UI
             self.tabWidget.setCurrentIndex(0)
             print(f"🔄 CRITICAL: Returned to home page - ready for new games")
                 
         except Exception as e:
             print(f"❌ Error closing game tab and going home: {e}")
+            import traceback
+            print(f"❌ Exit traceback: {traceback.format_exc()}")
     
     def get_game_results(self):
         """Get current game results"""

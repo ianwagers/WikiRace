@@ -29,11 +29,17 @@ router = APIRouter(prefix="/api", tags=["rooms"])
 
 # Room manager instance (will be injected)
 room_manager: RoomManager = None
+sio = None  # Socket.IO instance for broadcasting events
 
 def set_room_manager(manager: RoomManager):
     """Set the room manager instance for the API routes"""
     global room_manager
     room_manager = manager
+
+def set_socketio(socketio_instance):
+    """Set the Socket.IO instance for the API routes"""
+    global sio
+    sio = socketio_instance
 
 
 @router.post("/rooms", response_model=Dict[str, Any])
@@ -205,6 +211,123 @@ async def leave_room(room_code: str, socket_id: str) -> Dict[str, Any]:
             "success": True,
             "message": f"Successfully left room {room_code}",
             "remaining_players": room.player_count
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to leave room: {str(e)}"
+        )
+
+@router.post("/rooms/{room_code}/leave", response_model=Dict[str, Any])
+async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[str, Any]:
+    """Leave a room by player name (REST API fallback for Socket.IO failures)"""
+    if not room_manager:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Room manager not available"
+        )
+    
+    # Validate room code format
+    if len(room_code) != 4 or not room_code.isalpha():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid room code format"
+        )
+    
+    room_code = room_code.upper()
+    player_name = request.get("player_name")
+    
+    if not player_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Player name is required"
+        )
+    
+    try:
+        # Find the room
+        room = room_manager.get_room(room_code)
+        if not room:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Room {room_code} not found"
+            )
+        
+        # Find player by name in the room
+        player_to_remove = None
+        for player in room.players.values():
+            if player.display_name == player_name:
+                player_to_remove = player
+                break
+        
+        if not player_to_remove:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Player {player_name} not found in room {room_code}"
+            )
+        
+        # SHOTGUN FIX 3: Check if player is host BEFORE removing them
+        was_host = player_to_remove.is_host
+        print(f"SHOTGUN: REST API removing player {player_name} from room {room_code} (was_host: {was_host})")
+        updated_room = await room_manager.leave_room(player_to_remove.socket_id)
+        
+        # CRITICAL FIX: REST API must broadcast player_left event to remaining players
+        if updated_room:
+            print(f"SHOTGUN: Successfully removed player {player_name} from room {room_code}")
+            print(f"SHOTGUN: Room now has {updated_room.player_count} remaining players")
+            
+            # Use the Socket.IO instance to broadcast the event
+            if sio:
+                # CRITICAL FIX: Also emit host_transferred event if the removed player was the host
+                print(f"REST API: DEBUG - was_host: {was_host}")
+                print(f"REST API: DEBUG - updated_room.host_id: {updated_room.host_id}")
+                if was_host and updated_room.host_id:
+                    new_host = updated_room.get_player(updated_room.host_id)
+                    print(f"REST API: DEBUG - new_host: {new_host}")
+                    if new_host:
+                        print(f"REST API: Broadcasting host_transferred event - {new_host.display_name} is now the room leader")
+                        await sio.emit('host_transferred', {
+                            'new_host_id': updated_room.host_id,
+                            'new_host_name': new_host.display_name,
+                            'message': f"{new_host.display_name} is now the room leader"
+                        }, room=room_code, skip_sid=player_to_remove.socket_id)
+                        print(f"REST API: host_transferred event broadcasted successfully")
+                    else:
+                        print(f"REST API: DEBUG - new_host is None, cannot emit host_transferred event")
+                else:
+                    print(f"REST API: DEBUG - Not emitting host_transferred event - was_host: {was_host}, host_id: {updated_room.host_id}")
+                
+                print(f"REST API: Broadcasting player_left event to room {room_code}")
+                remaining_players = [{
+                    'socket_id': p.socket_id,
+                    'display_name': p.display_name,
+                    'is_host': p.is_host,
+                    'player_color': p.player_color
+                } for p in updated_room.players.values()]
+                
+                await sio.emit('player_left', {
+                    'socket_id': player_to_remove.socket_id,
+                    'player_name': player_name,
+                    'players': remaining_players
+                }, room=room_code)
+                print(f"REST API: player_left event broadcasted successfully")
+            
+            else:
+                print(f"WARNING: REST API: Socket.IO instance not available, cannot broadcast player_left event")
+        
+        if not updated_room:
+            return {
+                "success": True,
+                "message": f"Successfully left room {room_code} (room was deleted)",
+                "remaining_players": 0
+            }
+        
+        return {
+            "success": True,
+            "message": f"Successfully left room {room_code}",
+            "remaining_players": updated_room.player_count
         }
         
     except HTTPException:
