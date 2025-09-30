@@ -22,7 +22,7 @@ print_header() {
     echo -e "${BLUE}"
     echo "=========================================="
     echo "   WikiRace Multiplayer Server Deploy"
-    echo "   Version 1.7.0"
+    echo "   Version 1.0.0"
     echo "=========================================="
     echo -e "${NC}"
 }

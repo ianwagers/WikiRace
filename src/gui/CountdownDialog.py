@@ -81,6 +81,14 @@ class CountdownDialog(QDialog):
         self.current_count = countdown_seconds
         self.message = message
         
+        # Set window icon
+        from pathlib import Path
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
+        if icon_path.exists():
+            from PyQt6.QtGui import QIcon
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
         # Add unique identifier for debugging
         import time
         self.dialog_id = f"CD_{int(time.time() * 1000) % 10000}"

@@ -23,14 +23,22 @@ WikiRace is a fun and educational game that challenges you to navigate from one 
 - **Modern GUI**: Built with PyQt6 for a smooth and responsive user experience
 - **Flexible Page Selection**: Choose from categories or set custom start/end pages
 - **Comprehensive Results**: View detailed race results and navigation paths
+- **Theme Support**: Dark and light mode themes with consistent styling
+- **Automatic Reconnection**: Robust network handling with automatic reconnection
+- **External Server Support**: Connect to servers outside your local network
+- **Persistent Settings**: Settings and server configurations saved to AppData
+- **Application Branding**: Custom icons and professional appearance
 
 ## Screenshots
 
 ### Home Page
-![Home Page](images/HomePage_Beta1u6.png)
+![Home Page](images/HomePage_v1.0.0.png)
 
 ### Solo Race Game
-![Solo Race Game](images/SoloRacePage_Beta1u6.png)
+![Solo Race Game](images/SoloRacePage_v1.0.0.png)
+
+### Multiplayer Page
+![Multiplayer Page](images/MultiplayerPage_v1.0.0.png)
 
 ## How to Use
 
@@ -66,15 +74,22 @@ WikiRace is a fun and educational game that challenges you to navigate from one 
 - **Learn as You Play**: Each game teaches you about new topics and connections
 
 
-## Current Status (v1.7.0 Beta)
+## Current Status (v1.0.0)
 
 - ✅ Solo games fully functional and polished
 - ✅ Multiplayer server infrastructure complete
 - ✅ Real-time room management and player communication
 - ✅ Room creation/joining with 4-letter codes
-- 🔄 Multiplayer game flow implementation in progress
-- 🔄 Dark/Light Mode Settings (Work in Progress)
-- 🔄 UI polish and comprehensive testing ongoing
+- ✅ Complete multiplayer game flow with countdown and synchronization
+- ✅ Navigation history tracking and visualization
+- ✅ Automatic reconnection logic
+- ✅ Client configuration UI
+- ✅ Docker deployment ready
+- ✅ Dark/Light theme support with consistent theming
+- ✅ Application icon and branding
+- ✅ AppData storage for persistent settings
+- ✅ External server connectivity
+- 🔄 EXE/Installer build (in progress)
 
 ## Technical Details
 

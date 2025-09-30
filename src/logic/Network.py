@@ -59,7 +59,7 @@ class NetworkManager(QObject):
         
         # Heartbeat settings
         self.heartbeat_timer = None
-        self.heartbeat_interval = 5000  # 5 seconds
+        self.heartbeat_interval = 10000  # 10 seconds
         
         # Set up Socket.IO event handlers
         self._setup_socket_handlers()
@@ -370,7 +370,7 @@ class NetworkManager(QObject):
                     pass
                 
                 # Connect with longer timeout for stability
-                self.sio.connect(self.server_url, wait_timeout=15)
+                self.sio.connect(self.server_url, wait_timeout=30)
                 
                 # CRITICAL FIX: Wait for connection to be fully established
                 import time
@@ -576,7 +576,7 @@ class NetworkManager(QObject):
             
             # Try to reconnect with timeout
             try:
-                self.sio.connect(self.server_url, wait_timeout=5)  # Shorter timeout for faster failure detection
+                self.sio.connect(self.server_url, wait_timeout=10)  # Shorter timeout for faster failure detection
                 
                 # Wait for connection to establish with timeout
                 max_wait = 2.0  # Maximum wait time in seconds
@@ -728,7 +728,7 @@ class NetworkManager(QObject):
                     response = requests.post(
                         f"{self.server_url}/api/rooms/{room_code}/leave",
                         json={"player_name": self.player_name},
-                        timeout=5
+                        timeout=10
                     )
                     if response.status_code == 200:
                         print(f"✅ SIMPLE: REST API leave_room successful for {room_code}")
@@ -787,7 +787,7 @@ class NetworkManager(QObject):
                 response = requests.post(
                     f"{self.server_url}/api/rooms/{room_code}/leave",
                     json={"player_name": self.player_name},
-                    timeout=5
+                    timeout=10
                 )
                 if response.status_code == 200:
                     print(f"✅ SHOTGUN: Retry {attempt} - REST API successful")
@@ -819,7 +819,7 @@ class NetworkManager(QObject):
                     response = requests.post(
                         f"{self.server_url}/api/rooms/{room_code}/leave",
                         json={"player_name": self.player_name},
-                        timeout=5
+                        timeout=10
                     )
                     if response.status_code == 200:
                         print(f"✅ SHOTGUN: NUCLEAR OPTION - REST API successful after reconnect")
@@ -849,12 +849,12 @@ class NetworkManager(QObject):
         """Get server status via REST API"""
         try:
             # First check basic health
-            health_response = requests.get(f"{self.server_url}/health", timeout=5)
+            health_response = requests.get(f"{self.server_url}/health", timeout=10)
             if health_response.status_code != 200:
                 return {"error": f"Server returned status {health_response.status_code}"}
             
             # Get detailed stats including room count
-            stats_response = requests.get(f"{self.server_url}/api/stats", timeout=5)
+            stats_response = requests.get(f"{self.server_url}/api/stats", timeout=10)
             if stats_response.status_code == 200:
                 stats_data = stats_response.json()
                 room_stats = stats_data.get('room_stats', {})
@@ -875,7 +875,7 @@ class NetworkManager(QObject):
             response = requests.post(
                 f"{self.server_url}/api/rooms",
                 json={"display_name": player_name},
-                timeout=5
+                timeout=10
             )
             if response.status_code == 200:
                 return response.json()
@@ -1080,10 +1080,10 @@ class NetworkManager(QObject):
         
         if possible_servers is None:
             possible_servers = [
+                "wikirace.duckdns.org:8001",  # Your dynamic DNS domain (try first)
                 "127.0.0.1:8001",  # Localhost
                 "localhost:8001",  # Localhost alternative
                 "71.237.25.28:8001",  # Your external IP
-                "wikirace.duckdns.org:8001",  # Your dynamic DNS domain
             ]
         
         working_servers = []
@@ -1106,6 +1106,11 @@ class NetworkManager(QObject):
                         'status': 'healthy'
                     })
                     print(f"✅ Found server: {server}")
+                    
+                    # If this is the DuckDNS server, stop trying others for faster connection
+                    if server == "wikirace.duckdns.org:8001":
+                        print("🚀 DuckDNS server found - stopping discovery for faster connection")
+                        break
                 else:
                     print(f"⚠️ Server {server} responded with status {response.status_code}")
             except requests.exceptions.Timeout:

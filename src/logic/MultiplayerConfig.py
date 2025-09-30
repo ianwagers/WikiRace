@@ -19,7 +19,7 @@ class ServerConfig:
     host: str = "wikirace.duckdns.org"  # Updated to use DDNS domain for external access
     port: int = 8001
     use_https: bool = False
-    connection_timeout: float = 10.0
+    connection_timeout: float = 20.0
     
     @property
     def url(self) -> str:
@@ -33,8 +33,8 @@ class ReconnectionConfig:
     """Automatic reconnection configuration"""
     enabled: bool = True
     max_attempts: int = 5
-    initial_delay: float = 2.0
-    max_delay: float = 30.0
+    initial_delay: float = 4.0
+    max_delay: float = 60.0
     backoff_multiplier: float = 1.5
     
     def get_delay(self, attempt: int) -> float:
@@ -50,7 +50,7 @@ class GameConfig:
     default_end_category: str = "Random"
     max_players_per_room: int = 10
     room_code_length: int = 4
-    game_timeout_minutes: int = 30
+    game_timeout_minutes: int = 60
     countdown_seconds: int = 5
 
 
@@ -108,7 +108,7 @@ class MultiplayerConfig(QObject):
             'reconnection': asdict(self.reconnection),
             'game': asdict(self.game),
             'ui': asdict(self.ui),
-            'version': '1.0'
+            'version': '1.0.0'
         }
     
     def from_dict(self, data: Dict[str, Any]) -> None:

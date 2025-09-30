@@ -62,7 +62,7 @@ class HomePage(QWidget):
         self.layout.addWidget(self.logoContainer, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Title subscript with modern styling - positioned right edge with low opacity
-        self.titleSubscript = QLabel("v1.7 [BETA]")
+        self.titleSubscript = QLabel("v1.0.0")
         self.titleSubscript.setStyleSheet("""
             QLabel {
                 font-size: 10px;
@@ -545,6 +545,15 @@ class CustomGameDialog(QDialog):
         super().__init__(homePage)
         self.homePage = homePage
         self.setWindowTitle('Race Setup')
+        
+        # Set window icon
+        from pathlib import Path
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
+        if icon_path.exists():
+            from PyQt6.QtGui import QIcon
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
         self.apply_theme()
         self.layout = QVBoxLayout(self)
         self.layout.setContentsMargins(20, 20, 20, 20)
@@ -749,6 +758,15 @@ class UnderConstructionDialog(QDialog):
     def __init__(self, parent=None):
         super(UnderConstructionDialog, self).__init__(parent)
         self.setWindowTitle("Under Construction")
+        
+        # Set window icon
+        from pathlib import Path
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
+        if icon_path.exists():
+            from PyQt6.QtGui import QIcon
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
         self.apply_theme()
         self.setFixedSize(300, 180)
         self.initUI()

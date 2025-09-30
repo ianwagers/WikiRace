@@ -22,7 +22,7 @@ class MainApplication(QMainWindow):
         self.projectPath = str(project_root / 'src')
 
         # Set window icon if it exists
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'game_icon.ico'
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
         if icon_path.exists():
             self.setWindowIcon(QIcon(str(icon_path)))
         self.setWindowTitle("Wikipedia Race")
@@ -148,6 +148,13 @@ class MainApplication(QMainWindow):
 def main():
     """Main entry point for the application."""
     app = QApplication(sys.argv)
+    
+    # Set application icon for taskbar
+    project_root = Path(__file__).parent.parent
+    icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
+    if icon_path.exists():
+        app.setWindowIcon(QIcon(str(icon_path)))
+    
     mainApp = MainApplication()
     mainApp.show()
     return app.exec()

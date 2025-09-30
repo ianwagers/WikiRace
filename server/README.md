@@ -1,6 +1,6 @@
 # WikiRace Multiplayer Server
 
-FastAPI + Socket.IO server for real-time multiplayer Wikipedia racing.
+FastAPI + Socket.IO server for real-time multiplayer Wikipedia racing. Production-ready with Docker deployment support.
 
 ## Quick Start
 
@@ -32,6 +32,8 @@ MAX_PLAYERS_PER_ROOM=10
 
 - `GET /` - Health check
 - `GET /health` - Detailed server status
+- `GET /docs` - Interactive API documentation (Swagger UI)
+- `GET /redoc` - Alternative API documentation
 
 ## Socket.IO Events
 
@@ -40,6 +42,9 @@ MAX_PLAYERS_PER_ROOM=10
 - `join_room` - Join an existing room
 - `leave_room` - Leave current room
 - `set_profile` - Update player display name
+- `start_game` - Host starts the game
+- `player_progress` - Update player navigation progress
+- `player_finished` - Player completed the race
 - `ping` - Test connection
 
 ### Server → Client
@@ -47,6 +52,12 @@ MAX_PLAYERS_PER_ROOM=10
 - `room_created` - Room creation success
 - `player_joined` - Player joined room
 - `player_left` - Player left room
+- `countdown_start` - Game countdown begins
+- `countdown_tick` - Countdown timer updates
+- `game_start` - Game begins
+- `game_end` - Game completed
+- `navigation_update` - Real-time player progress
+- `room_config_update` - Host configuration changes
 - `error` - Error message
 
 ## Development

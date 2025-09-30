@@ -202,6 +202,14 @@ class MultiplayerResultsDialog(QDialog):
         self.setWindowTitle("🏆 Race Results")
         self.setMinimumSize(800, 600)
         
+        # Set window icon
+        from pathlib import Path
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
+        if icon_path.exists():
+            from PyQt6.QtGui import QIcon
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
         self.initUI()
         self.apply_theme()
         

@@ -26,6 +26,14 @@ class ServerConfigDialog(QDialog):
         super().__init__(parent)
         self.current_config = current_config or self.get_default_config()
         
+        # Set window icon
+        from pathlib import Path
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
+        if icon_path.exists():
+            from PyQt6.QtGui import QIcon
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
         self.initUI()
         self.apply_theme()
         self.load_config()
@@ -40,9 +48,9 @@ class ServerConfigDialog(QDialog):
             'server_port': 8001,  # Changed to match server default
             'auto_reconnect': True,
             'max_reconnection_attempts': 5,
-            'reconnection_delay': 2.0,
-            'max_reconnection_delay': 30.0,
-            'connection_timeout': 10.0,
+            'reconnection_delay': 4.0,
+            'max_reconnection_delay': 60.0,
+            'connection_timeout': 20.0,
             'auto_discovery': True  # Enable auto-discovery by default
         }
     
@@ -361,13 +369,13 @@ class ServerConfigDialog(QDialog):
         # Connection settings
         self.host_input.setText(config.get('server_host', '127.0.0.1'))
         self.port_input.setValue(config.get('server_port', 8001))
-        self.timeout_input.setValue(int(config.get('connection_timeout', 10)))
+        self.timeout_input.setValue(int(config.get('connection_timeout', 20)))
         
         # Reconnection settings
         self.auto_reconnect_checkbox.setChecked(config.get('auto_reconnect', True))
         self.max_attempts_input.setValue(config.get('max_reconnection_attempts', 5))
-        self.initial_delay_input.setValue(int(config.get('reconnection_delay', 2)))
-        self.max_delay_input.setValue(int(config.get('max_reconnection_delay', 30)))
+        self.initial_delay_input.setValue(int(config.get('reconnection_delay', 4)))
+        self.max_delay_input.setValue(int(config.get('max_reconnection_delay', 60)))
         
         # Update dependent UI
         self.on_auto_reconnect_toggled(self.auto_reconnect_checkbox.isChecked())

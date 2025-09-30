@@ -19,6 +19,14 @@ class PlayerNameDialog(QDialog):
         self.setWindowTitle(title)
         self.setModal(True)
         
+        # Set window icon
+        from pathlib import Path
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
+        if icon_path.exists():
+            from PyQt6.QtGui import QIcon
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
         # Store the entered name
         self.player_name = None
         self.error_label = None

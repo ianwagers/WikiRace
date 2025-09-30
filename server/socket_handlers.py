@@ -80,16 +80,16 @@ async def check_inactive_players(sio, room_manager: RoomManager):
     
     while True:
         try:
-            await asyncio.sleep(30)  # Check every 30 seconds (less frequent)
+            await asyncio.sleep(60)  # Check every 60 seconds (less frequent)
             
             current_time = datetime.utcnow()
             
             # Check all rooms for inactive players and empty rooms
             for room_code, room in list(room_manager.rooms.items()):
-                # CRITICAL FIX: Close empty rooms after 5 minutes
+                # CRITICAL FIX: Close empty rooms after 10 minutes
                 if room.player_count == 0:
                     time_since_creation = current_time - room.created_at
-                    if time_since_creation > timedelta(minutes=5):
+                    if time_since_creation > timedelta(minutes=10):
                         logger.info(f"Closing empty room {room_code} after {time_since_creation.total_seconds():.1f} seconds")
                         room_manager.close_room(room_code)
                         continue
@@ -101,13 +101,13 @@ async def check_inactive_players(sio, room_manager: RoomManager):
                     
                     # Different inactivity thresholds based on game state
                     if room.game_state == GameState.IN_PROGRESS:
-                        # During active games, be more lenient - only disconnect after 20+ minutes
-                        inactive_threshold = timedelta(minutes=20)
-                        logger.debug(f"Player {player.display_name} in active game - threshold: 20 minutes")
+                        # During active games, be more lenient - only disconnect after 40+ minutes
+                        inactive_threshold = timedelta(minutes=40)
+                        logger.debug(f"Player {player.display_name} in active game - threshold: 40 minutes")
                     else:
-                        # In lobby or other states, use 20 minute threshold
-                        inactive_threshold = timedelta(minutes=20)
-                        logger.debug(f"Player {player.display_name} in {room.game_state.value} - threshold: 20 minutes")
+                        # In lobby or other states, use 40 minute threshold
+                        inactive_threshold = timedelta(minutes=40)
+                        logger.debug(f"Player {player.display_name} in {room.game_state.value} - threshold: 40 minutes")
                     
                     if time_since_activity > inactive_threshold:
                         logger.warning(f"Player {player.display_name} inactive for {time_since_activity.total_seconds():.1f} seconds (threshold: {inactive_threshold.total_seconds():.1f}s)")

@@ -694,8 +694,15 @@ class EndGameDialog(QDialog):
         self.tabWidget = tabWidget
         self.homePageIndex = homePageIndex
         self.setWindowTitle("Game Over")
-        self.setWindowIcon(QIcon('C:/Project_Workspace/WikiRace/src/resources/icons/game_icon.ico'))
-        # self.setWindowIcon(QIcon(self.projectPath + 'resources/icons/game_icon.ico'))
+        
+        # Set window icon
+        from pathlib import Path
+        project_root = Path(__file__).parent.parent.parent
+        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
+        if icon_path.exists():
+            from PyQt6.QtGui import QIcon
+            self.setWindowIcon(QIcon(str(icon_path)))
+        
         self.apply_theme()
         self.setFixedSize(400, 280)  # Further increased size to prevent text cutoff
         self.initUI()

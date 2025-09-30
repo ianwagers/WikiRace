@@ -76,7 +76,7 @@
 ## ✨ ENHANCEMENTS (Nice to Have)
 
 ### Application Branding
-- [ ] **Application Icon**: Add icon for all dialogs, desktop shortcut, and taskbar
+- [✅] **Application Icon**: Add icon for all dialogs, desktop shortcut, and taskbar
 
 ### File Storage
 - [✅] **AppData Storage**: Move persistent files (theme & server) to %APPDATA%\wikirace
@@ -86,9 +86,9 @@
 
 
 ### Package and ship!
-- [ ] Set up server code to work for external clients
-- [ ] Figure out what ports/ip to use that I can port forward
-- [ ] Port forward so people outside of our house can Connection
+- [✅] Set up server code to work for external clients
+- [✅] Figure out what ports/ip to use that I can port forward
+- [✅] Port forward so people outside of our house can Connection
 - [ ] Build an EXE (or an installer) 
 
 
