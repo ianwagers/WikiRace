@@ -42,7 +42,7 @@ class GameLogic(QObject):
             return None
         
     # Currently supported categories:
-    # 'Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Random', 'Custom'
+    # 'Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Wacky', 'Random', 'Custom'
     def startGame(self, homePage, start_url=None, end_url=None):
         self.homePage = homePage
 
@@ -71,6 +71,8 @@ class GameLogic(QObject):
                 start_url = self.getLinkFromCategory('US Presidents')
             case 'Gaming':
                 start_url = self.getLinkFromCategory('Gaming')
+            case 'Wacky':
+                start_url = self.getLinkFromCategory('Wacky')
             case _: # Start a game with a custom Wikipedia page
                 start_url = self.findWikiPage(start_url)
 
@@ -99,6 +101,8 @@ class GameLogic(QObject):
                 end_url = self.getLinkFromCategory('US Presidents')
             case 'Gaming':
                 end_url = self.getLinkFromCategory('Gaming')
+            case 'Wacky':
+                end_url = self.getLinkFromCategory('Wacky')
             case _:
                 end_url = self.findWikiPage(end_url)
                
@@ -189,6 +193,9 @@ class GameLogic(QObject):
             case 'Gaming':
                 i = int(random() * len(self.Gaming))
                 return self.Gaming[i]
+            case 'Wacky':
+                i = int(random() * len(self.Wacky))
+                return self.Wacky[i]
             case _:
                 return self.findWikiPage("God's Plan (song)")
 
@@ -319,13 +326,19 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Dwayne_Johnson",
             "https://en.wikipedia.org/wiki/Eminem",
             "https://en.wikipedia.org/wiki/Will_Smith",
+            "https://en.wikipedia.org/wiki/Tom_Hanks",
             "https://en.wikipedia.org/wiki/Leonardo_DiCaprio",
             "https://en.wikipedia.org/wiki/Brad_Pitt",
+            "https://en.wikipedia.org/wiki/Beyonc%C3%A9",
+            "https://en.wikipedia.org/wiki/Taylor_Swift",
+            "https://en.wikipedia.org/wiki/Gordon_Ramsay",
+            "https://en.wikipedia.org/wiki/Hasan_Piker",
+            "https://en.wikipedia.org/wiki/PewDiePie"
         ]
 
         self.Gaming = [
             "https://en.wikipedia.org/wiki/League_of_Legends",
-            "https://en.wikipedia.org/wiki/World_of_Warcraft",
+            "https://en.wikipedia.org/wiki/Crazy_Taxi",
             "https://en.wikipedia.org/wiki/Counter-Strike:_Global_Offensive",
             "https://en.wikipedia.org/wiki/Fortnite",
             "https://en.wikipedia.org/wiki/Minecraft",
@@ -334,6 +347,12 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Overwatch_(video_game)",
             "https://en.wikipedia.org/wiki/Valorant",
             "https://en.wikipedia.org/wiki/Among_Us",
+            "https://en.wikipedia.org/wiki/Guitar_Hero",
+            "https://en.wikipedia.org/wiki/Petz:_Dogz_2_and_Catz_2_(adventure_games)",
+            "https://en.wikipedia.org/wiki/Roblox",
+            "https://en.wikipedia.org/wiki/Factorio",
+            "https://en.wikipedia.org/wiki/Civilization_V",
+            "https://en.wikipedia.org/wiki/SimCity_4",
         ]
 
         self.HistoricalEvents = [
@@ -348,6 +367,16 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Battle_of_Antietam",
             "https://en.wikipedia.org/wiki/Emu_War",
             "https://en.wikipedia.org/wiki/Chernobyl_disaster"
+            "https://en.wikipedia.org/wiki/Colorado_Coalfield_War",
+            "https://en.wikipedia.org/wiki/Ludlow_Massacre",
+            "https://en.wikipedia.org/wiki/Denver_streetcar_strike_of_1920",
+            "https://en.wikipedia.org/wiki/September_11_attacks",
+            "https://en.wikipedia.org/wiki/Iraq_War",
+            "https://en.wikipedia.org/wiki/January_6_United_States_Capitol_attack",
+            "https://en.wikipedia.org/wiki/COVID-19_pandemic",
+            "https://en.wikipedia.org/wiki/Space_Race",
+            "https://en.wikipedia.org/wiki/Moon_landing",
+
         ]
 
         self.Literature = [
@@ -362,7 +391,6 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Infinite_Jest",
             "https://en.wikipedia.org/wiki/Simulacra_and_Simulation",
             "https://en.wikipedia.org/wiki/Thus_Spoke_Zarathustra"
-
         ]
 
         self.Music = [
@@ -378,6 +406,7 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Shape_of_You",
             "https://en.wikipedia.org/wiki/Daft_Punk",
             "https://en.wikipedia.org/wiki/Glass_Animals"
+            "https://en.wikipedia.org/wiki/How_to_Be_a_Human_Being"
         ]
 
         self.STEM = [
@@ -482,6 +511,20 @@ class GameLogic(QObject):
             "https://en.wikipedia.org/wiki/Chernobyl_disaster",
             "https://en.wikipedia.org/wiki/Star_Wars",
             "https://en.wikipedia.org/wiki/Facebook"
+        ]
 
+        self.Wacky = [
+            "https://en.wikipedia.org/wiki/Gun-powered_mousetrap",
+            "https://en.wikipedia.org/wiki/Baby_cage",
+            "https://en.wikipedia.org/wiki/Moo_box",
+            "https://en.wikipedia.org/wiki/Gorilla_suit",
+            "https://en.wikipedia.org/wiki/Brainfuck",
+            "https://en.wikipedia.org/wiki/I_Am_Rich",
+            "https://en.wikipedia.org/wiki/Bare_minimum_Monday",
+            "https://en.wikipedia.org/wiki/Politician%27s_syllogism",
+            "https://en.wikipedia.org/wiki/Stereotypes_of_British_people",
+            "https://en.wikipedia.org/wiki/Brain_rot",
+            "https://en.wikipedia.org/wiki/Ray_cat",
+            "https://en.wikipedia.org/wiki/Guinness_World_Records",
         ]
 

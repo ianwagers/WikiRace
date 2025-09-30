@@ -554,7 +554,7 @@ class CustomGameDialog(QDialog):
         startingPageLabel = QLabel('Starting Page:')
         startingPageLabel.setObjectName("sectionLabel")
         self.startPageCombo = QComboBox()
-        self.startPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Random', 'Custom'])
+        self.startPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Wacky', 'Random', 'Custom'])
         if self.startPageCombo.currentText() == 'Custom':
             self.startPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         startingPageLayout.addWidget(startingPageLabel)
@@ -572,7 +572,7 @@ class CustomGameDialog(QDialog):
         endingPageLabel = QLabel('Ending Page:')
         endingPageLabel.setObjectName("sectionLabel")
         self.endPageCombo = QComboBox()
-        self.endPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Random', 'Custom'])
+        self.endPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 'Historical Events', 'Wacky', 'Random', 'Custom'])
         if self.endPageCombo.currentText() == 'Custom':
             self.endPageCombo.currentIndexChanged.connect(self.toggleCustomEntry)
         endingPageLayout.addWidget(endingPageLabel)

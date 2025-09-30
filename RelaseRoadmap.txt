@@ -34,12 +34,12 @@
 ### Multiplayer Stability
 - [✅] **Room Inactivity Timeout**: Increase timeout from 1-2 minutes to 20 minutes for inactivity
 - [✅] **Room Timeout Behavior**: If a room DOES timeout, all players must be consistently kicked and not have any persistent data from the room
-- [ ] **Player Disconnect Handling**: Test and fix bugs when players leave/close during games - NOT FIXED
-- [ ] **Room Management**: Test and fix joining/leaving/rejoining room bugs - NOT FIXED
+- [✅] **Player Disconnect Handling**: Test and fix bugs when players leave/close during games - NOT FIXED
+- [✅] **Room Management**: Test and fix joining/leaving/rejoining room bugs - NOT FIXED
         - Players who click "Leave Room" should be returned to the home page and the server needs to delete all data for that player
         - Players who leave a room, then rejoin the room with the same name or a new name are not shown a PlayerColorPicker
             - This is independant of rooms, creating a new room doesn't fix the issue, this happens for leaders and non-leaders
-- [ ] **Multiplayer Exit Game**: Players who click "Exit to Home" then click Multiplayer from the home page see their last room (it should be reset to Join/Host game) - HAVE THE APP FULLY CLOSE THE MULTIPLAYER TAB WHEN THIS OCCURS
+- [✅] **Multiplayer Exit Game**: Players who click "Exit to Home" then click Multiplayer from the home page see their last room (it should be reset to Join/Host game) - HAVE THE APP FULLY CLOSE THE MULTIPLAYER TAB WHEN THIS OCCURS
         - Clicking "Exit to Home" from the PlayerResultsDialog does not close the multiplayer game room
         - If one player clicks "Exit to Home" then another player clicks "Play again" the player who left the room is still shown in the game room
 
@@ -50,7 +50,7 @@
 ### Multiplayer Page Layout
 - [✅] **Join Game Width**: Cap "Join a Game" layout at ~600px width
 - [✅] **Host Game Width**: Cap "Host a Game" layout at ~600px width
-- [ ] **Verify cross-platform support**: Ensure all multiplayer pages and elements look great on laptops with 1080p displays or different aspect ratios
+- [✅] **Verify cross-platform support**: Ensure all multiplayer pages and elements look great on laptops with 1080p displays or different aspect ratios
 - [✅] **Color Picker Height**: Fix excessive height with QV layout and spacers
     - ISSUE: The color picker is still too tall. Add spacers below the color picker
 - [✅] **Color Button Sizing**: Make color selection buttons 4x larger with rounded outlines
@@ -76,15 +76,21 @@
 ## ✨ ENHANCEMENTS (Nice to Have)
 
 ### Application Branding
-- [ ] **Application Icon**: Add icon for all dialogs and taskbar
+- [ ] **Application Icon**: Add icon for all dialogs, desktop shortcut, and taskbar
 
 ### File Storage
 - [✅] **AppData Storage**: Move persistent files (theme & server) to %APPDATA%\wikirace
 
 ### Customize Wikipedia links
-- [ ] **New links**: Reduce the number of options for game links in pre-chosen categories, get a new one caled "Wacky" for wack pages
+- [✅] **New links**: Reduce the number of options for game links in pre-chosen categories, get a new one caled "Wacky" for wack pages
 
----
+
+### Package and ship!
+- [ ] Set up server code to work for external clients
+- [ ] Figure out what ports/ip to use that I can port forward
+- [ ] Port forward so people outside of our house can Connection
+- [ ] Build an EXE (or an installer) 
+
 
 ## 📋 IMPLEMENTATION NOTES
 

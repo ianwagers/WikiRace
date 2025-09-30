@@ -465,7 +465,7 @@ class MultiplayerPage(QWidget):
         self.startPageCombo.setMinimumHeight(35)  # Increased combo box height
         self.startPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 
                                      'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 
-                                     'Historical Events', 'Random', 'Custom'])
+                                     'Historical Events', 'Wacky', 'Random', 'Custom'])
         start_layout.addWidget(self.startPageCombo)
         game_config_layout.addLayout(start_layout)
         
@@ -488,7 +488,7 @@ class MultiplayerPage(QWidget):
         self.endPageCombo.setMinimumHeight(35)  # Increased combo box height
         self.endPageCombo.addItems(['Animals', 'Buildings', 'Celebrities', 'Countries', 'Gaming', 
                                    'Literature', 'Music', 'STEM', 'Most Linked', 'US Presidents', 
-                                   'Historical Events', 'Random', 'Custom'])
+                                   'Historical Events', 'Wacky', 'Random', 'Custom'])
         end_layout.addWidget(self.endPageCombo)
         game_config_layout.addLayout(end_layout)
         
