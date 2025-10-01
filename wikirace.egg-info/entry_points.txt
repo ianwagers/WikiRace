@@ -1,0 +1,2 @@
+[console_scripts]
+wikirace = src.app:main

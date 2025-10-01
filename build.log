@@ -1,0 +1,494 @@
+2025-09-30 16:14:12,474 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:14:12,474 - INFO - Checking dependencies...
+2025-09-30 16:14:12,474 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:14:12,490 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:14:12,779 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:14:12,780 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:14:12,780 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:14:12,780 - INFO - Creating license and readme files...
+2025-09-30 16:14:12,780 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:14:12,781 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:14:12,781 - INFO - Cleaning build directories...
+2025-09-30 16:14:12,805 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:14:12,806 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:14:12,806 - INFO - Installing Python dependencies...
+2025-09-30 16:14:13,101 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:14:18,898 - INFO - [OK] Project dependencies installed
+2025-09-30 16:14:18,898 - INFO - Building executable with PyInstaller...
+2025-09-30 16:14:18,898 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:15:16,581 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:15:16,581 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:15:16,653 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:15:16,653 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:15:16,654 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:15:41,024 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:15:41,024 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:15:41,024 - INFO - [OK] Installer size: 189.9 MB
+2025-09-30 16:15:41,024 - INFO - Testing installer...
+2025-09-30 16:15:41,025 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:15:41,025 - INFO - You can now run the installer to test it
+2025-09-30 16:15:41,025 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:15:41,025 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:20:18,764 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:20:18,764 - INFO - Checking dependencies...
+2025-09-30 16:20:18,765 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:20:18,780 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:20:19,092 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:20:19,092 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:20:19,092 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:20:19,092 - INFO - Creating license and readme files...
+2025-09-30 16:20:19,093 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:20:19,093 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:20:19,093 - INFO - Cleaning build directories...
+2025-09-30 16:20:19,123 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:20:19,125 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:20:19,126 - INFO - Installing Python dependencies...
+2025-09-30 16:20:19,429 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:20:25,160 - INFO - [OK] Project dependencies installed
+2025-09-30 16:20:25,161 - INFO - Building executable with PyInstaller...
+2025-09-30 16:20:25,161 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:21:23,618 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:21:23,618 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:21:23,690 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:21:23,690 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:21:23,690 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:21:47,575 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:21:47,576 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:21:47,576 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 16:21:47,576 - INFO - Testing installer...
+2025-09-30 16:21:47,576 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:21:47,576 - INFO - You can now run the installer to test it
+2025-09-30 16:21:47,576 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:21:47,576 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:22:24,152 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:22:24,152 - INFO - Checking dependencies...
+2025-09-30 16:22:24,152 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:22:24,169 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:22:24,451 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:22:24,451 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:22:24,451 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:22:24,451 - INFO - Creating license and readme files...
+2025-09-30 16:22:24,452 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:22:24,452 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:22:24,452 - INFO - Cleaning build directories...
+2025-09-30 16:22:24,477 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:22:24,478 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:22:24,479 - INFO - Installing Python dependencies...
+2025-09-30 16:22:24,771 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:22:30,112 - INFO - [OK] Project dependencies installed
+2025-09-30 16:22:30,113 - INFO - Building executable with PyInstaller...
+2025-09-30 16:22:30,113 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:23:26,796 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:23:26,796 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:23:26,846 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:23:26,846 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:23:26,846 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:23:51,104 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:23:51,104 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:23:51,104 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 16:23:51,104 - INFO - Testing installer...
+2025-09-30 16:23:51,105 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:23:51,105 - INFO - You can now run the installer to test it
+2025-09-30 16:23:51,105 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:23:51,105 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:26:09,868 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:26:09,868 - INFO - Checking dependencies...
+2025-09-30 16:26:09,868 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:26:09,887 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:26:10,247 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:26:10,247 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:26:10,248 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:26:10,248 - INFO - Creating license and readme files...
+2025-09-30 16:26:10,248 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:26:10,248 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:26:10,249 - INFO - Cleaning build directories...
+2025-09-30 16:26:10,283 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:26:10,283 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:26:10,284 - INFO - Installing Python dependencies...
+2025-09-30 16:26:10,592 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:26:16,000 - INFO - [OK] Project dependencies installed
+2025-09-30 16:26:16,000 - INFO - Building executable with PyInstaller...
+2025-09-30 16:26:16,000 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:26:16,337 - ERROR - PyInstaller failed: Command '['C:\\Project_Workspace\\WikiRace\\venv\\Scripts\\python.exe', '-m', 'PyInstaller', '--clean', '--noconfirm', 'C:\\Project_Workspace\\WikiRace\\deployment\\wikirace.spec']' returned non-zero exit status 1.
+2025-09-30 16:26:16,337 - ERROR - STDOUT: 
+2025-09-30 16:26:16,337 - ERROR - STDERR: 161 INFO: PyInstaller: 6.16.0, contrib hooks: 2025.9
+161 INFO: Python: 3.13.7
+182 INFO: Platform: Windows-11-10.0.26100-SP0
+182 INFO: Python environment: C:\Project_Workspace\WikiRace\venv
+184 INFO: Removing temporary files and cleaning cache in C:\Users\wager\AppData\Local\pyinstaller
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\__main__.py", line 321, in <module>
+    run()
+    ~~~^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\__main__.py", line 215, in run
+    run_build(pyi_config, spec_file, **vars(args))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\__main__.py", line 70, in run_build
+    PyInstaller.building.build_main.main(pyi_config, spec_file, **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\building\build_main.py", line 1272, in main
+    build(specfile, distpath, workpath, clean_build)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\building\build_main.py", line 1207, in build
+    code = compile(f.read(), spec, 'exec')
+  File "C:\Project_Workspace\WikiRace\deployment\wikirace.spec", line 329
+    noarchive=False,
+    ^^^^^^^^^^^^^^^
+SyntaxError: keyword argument repeated: noarchive
+
+2025-09-30 16:26:16,337 - ERROR - [ERROR] Build failed: Command '['C:\\Project_Workspace\\WikiRace\\venv\\Scripts\\python.exe', '-m', 'PyInstaller', '--clean', '--noconfirm', 'C:\\Project_Workspace\\WikiRace\\deployment\\wikirace.spec']' returned non-zero exit status 1.
+2025-09-30 16:26:23,528 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:26:23,528 - INFO - Checking dependencies...
+2025-09-30 16:26:23,528 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:26:23,544 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:26:23,828 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:26:23,828 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:26:23,828 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:26:23,828 - INFO - Creating license and readme files...
+2025-09-30 16:26:23,829 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:26:23,829 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:26:23,829 - INFO - Cleaning build directories...
+2025-09-30 16:26:23,829 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:26:23,830 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:26:23,830 - INFO - Installing Python dependencies...
+2025-09-30 16:26:24,109 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:26:29,360 - INFO - [OK] Project dependencies installed
+2025-09-30 16:26:29,360 - INFO - Building executable with PyInstaller...
+2025-09-30 16:26:29,360 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:26:38,561 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:26:38,562 - INFO - Checking dependencies...
+2025-09-30 16:26:38,562 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:26:38,578 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:26:38,921 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:26:38,921 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:26:38,922 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:26:38,922 - INFO - Creating license and readme files...
+2025-09-30 16:26:38,923 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:26:38,923 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:26:38,923 - INFO - Cleaning build directories...
+2025-09-30 16:26:38,923 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:26:38,924 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:26:38,924 - INFO - Installing Python dependencies...
+2025-09-30 16:26:39,297 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:26:44,490 - INFO - [OK] Project dependencies installed
+2025-09-30 16:26:44,490 - INFO - Building executable with PyInstaller...
+2025-09-30 16:26:44,490 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:27:27,752 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:27:27,752 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:27:27,824 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:27:27,824 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:27:27,824 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:27:41,843 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:27:41,843 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:27:41,844 - ERROR - [ERROR] Build failed: [WinError 32] The process cannot access the file because it is being used by another process
+2025-09-30 16:27:52,043 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:27:52,043 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:27:52,043 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 16:27:52,043 - INFO - Testing installer...
+2025-09-30 16:27:52,043 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:27:52,044 - INFO - You can now run the installer to test it
+2025-09-30 16:27:52,044 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:27:52,044 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:28:34,799 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:28:34,799 - INFO - Checking dependencies...
+2025-09-30 16:28:34,799 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:28:34,816 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:28:35,096 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:28:35,096 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:28:35,096 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:28:35,096 - INFO - Creating license and readme files...
+2025-09-30 16:28:35,097 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:28:35,097 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:28:35,097 - INFO - Cleaning build directories...
+2025-09-30 16:28:35,124 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:28:35,124 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:28:35,125 - INFO - Installing Python dependencies...
+2025-09-30 16:28:35,416 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:28:40,470 - INFO - [OK] Project dependencies installed
+2025-09-30 16:28:40,470 - INFO - Building executable with PyInstaller...
+2025-09-30 16:28:40,470 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:29:37,070 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:29:37,070 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:29:37,123 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:29:37,123 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:29:37,124 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:30:00,823 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:30:00,824 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:30:00,824 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 16:30:00,824 - INFO - Testing installer...
+2025-09-30 16:30:00,824 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:30:00,824 - INFO - You can now run the installer to test it
+2025-09-30 16:30:00,824 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:30:00,825 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:32:38,170 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:32:38,170 - INFO - Checking dependencies...
+2025-09-30 16:32:38,171 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:32:38,187 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:32:38,470 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:32:38,470 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:32:38,470 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:32:38,470 - INFO - Creating license and readme files...
+2025-09-30 16:32:38,471 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:32:38,471 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:32:38,471 - INFO - Cleaning build directories...
+2025-09-30 16:32:38,497 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:32:38,498 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:32:38,498 - INFO - Installing Python dependencies...
+2025-09-30 16:32:38,782 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:32:43,992 - INFO - [OK] Project dependencies installed
+2025-09-30 16:32:43,993 - INFO - Building executable with PyInstaller...
+2025-09-30 16:32:43,993 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:33:40,648 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:33:40,649 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:33:40,697 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:33:40,697 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:33:40,697 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:34:04,283 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:34:04,284 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:34:04,284 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 16:34:04,284 - INFO - Testing installer...
+2025-09-30 16:34:04,284 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:34:04,284 - INFO - You can now run the installer to test it
+2025-09-30 16:34:04,284 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:34:04,284 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:35:44,786 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:35:44,786 - INFO - Checking dependencies...
+2025-09-30 16:35:44,786 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:35:44,802 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:35:45,089 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:35:45,089 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:35:45,089 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:35:45,089 - INFO - Creating license and readme files...
+2025-09-30 16:35:45,090 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:35:45,090 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:35:45,090 - INFO - Cleaning build directories...
+2025-09-30 16:35:45,091 - ERROR - [ERROR] Build failed: [WinError 5] Access is denied: 'C:\\Project_Workspace\\WikiRace\\deployment\\dist\\WikiRace.exe'
+2025-09-30 16:35:52,650 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:35:52,650 - INFO - Checking dependencies...
+2025-09-30 16:35:52,650 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:35:52,667 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:35:52,939 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:35:52,939 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:35:52,939 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:35:52,939 - INFO - Creating license and readme files...
+2025-09-30 16:35:52,940 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:35:52,940 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:35:52,940 - INFO - Cleaning build directories...
+2025-09-30 16:35:52,941 - ERROR - [ERROR] Build failed: [WinError 5] Access is denied: 'C:\\Project_Workspace\\WikiRace\\deployment\\dist\\WikiRace.exe'
+2025-09-30 16:36:01,525 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:36:01,525 - INFO - Checking dependencies...
+2025-09-30 16:36:01,525 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:36:01,541 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:36:01,820 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:36:01,820 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:36:01,821 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:36:01,821 - INFO - Creating license and readme files...
+2025-09-30 16:36:01,821 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:36:01,821 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:36:01,822 - INFO - Cleaning build directories...
+2025-09-30 16:36:01,822 - ERROR - [ERROR] Build failed: [WinError 5] Access is denied: 'C:\\Project_Workspace\\WikiRace\\deployment\\dist\\WikiRace.exe'
+2025-09-30 16:36:17,449 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:36:17,449 - INFO - Checking dependencies...
+2025-09-30 16:36:17,449 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:36:17,466 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:36:17,744 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:36:17,745 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:36:17,745 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:36:17,745 - INFO - Creating license and readme files...
+2025-09-30 16:36:17,746 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:36:17,746 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:36:17,746 - INFO - Cleaning build directories...
+2025-09-30 16:36:17,759 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:36:17,760 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:36:17,760 - INFO - Installing Python dependencies...
+2025-09-30 16:36:18,047 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:36:23,297 - INFO - [OK] Project dependencies installed
+2025-09-30 16:36:23,297 - INFO - Building executable with PyInstaller...
+2025-09-30 16:36:23,298 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:37:19,813 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:37:19,814 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:37:19,865 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:37:19,865 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:37:19,866 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:37:43,668 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:37:43,669 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:37:43,669 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 16:37:43,669 - INFO - Testing installer...
+2025-09-30 16:37:43,669 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:37:43,669 - INFO - You can now run the installer to test it
+2025-09-30 16:37:43,669 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:37:43,669 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:39:49,177 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:39:49,177 - INFO - Checking dependencies...
+2025-09-30 16:39:49,177 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:39:49,194 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:39:49,473 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:39:49,473 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:39:49,473 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:39:49,474 - INFO - Creating license and readme files...
+2025-09-30 16:39:49,474 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:39:49,474 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:39:49,474 - INFO - Cleaning build directories...
+2025-09-30 16:39:49,501 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:39:49,501 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:39:49,502 - INFO - Installing Python dependencies...
+2025-09-30 16:39:49,787 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:39:55,018 - INFO - [OK] Project dependencies installed
+2025-09-30 16:39:55,018 - INFO - Building executable with PyInstaller...
+2025-09-30 16:39:55,019 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:40:24,991 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:40:24,992 - INFO - Checking dependencies...
+2025-09-30 16:40:24,992 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:40:25,008 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:40:25,289 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:40:25,290 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:40:25,290 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:40:25,290 - INFO - Creating license and readme files...
+2025-09-30 16:40:25,291 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:40:25,291 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:40:25,291 - INFO - Cleaning build directories...
+2025-09-30 16:40:25,291 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:40:25,292 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:40:25,292 - INFO - Installing Python dependencies...
+2025-09-30 16:40:25,570 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:40:30,623 - INFO - [OK] Project dependencies installed
+2025-09-30 16:40:30,624 - INFO - Building executable with PyInstaller...
+2025-09-30 16:40:30,624 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace_simple.spec
+2025-09-30 16:40:30,936 - ERROR - PyInstaller failed: Command '['C:\\Project_Workspace\\WikiRace\\venv\\Scripts\\python.exe', '-m', 'PyInstaller', '--clean', '--noconfirm', 'C:\\Project_Workspace\\WikiRace\\deployment\\wikirace_simple.spec']' returned non-zero exit status 1.
+2025-09-30 16:40:30,936 - ERROR - STDOUT: 
+2025-09-30 16:40:30,936 - ERROR - STDERR: 155 INFO: PyInstaller: 6.16.0, contrib hooks: 2025.9
+155 INFO: Python: 3.13.7
+175 INFO: Platform: Windows-11-10.0.26100-SP0
+175 INFO: Python environment: C:\Project_Workspace\WikiRace\venv
+177 INFO: Removing temporary files and cleaning cache in C:\Users\wager\AppData\Local\pyinstaller
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\__main__.py", line 321, in <module>
+    run()
+    ~~~^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\__main__.py", line 215, in run
+    run_build(pyi_config, spec_file, **vars(args))
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\__main__.py", line 70, in run_build
+    PyInstaller.building.build_main.main(pyi_config, spec_file, **kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\building\build_main.py", line 1272, in main
+    build(specfile, distpath, workpath, clean_build)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\venv\Lib\site-packages\PyInstaller\building\build_main.py", line 1210, in build
+    exec(code, spec_namespace)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Project_Workspace\WikiRace\deployment\wikirace_simple.spec", line 7, in <module>
+    project_root = Path(__file__).parent.parent
+                        ^^^^^^^^
+NameError: name '__file__' is not defined. Did you mean: '__name__'?
+
+2025-09-30 16:40:30,937 - ERROR - [ERROR] Build failed: Command '['C:\\Project_Workspace\\WikiRace\\venv\\Scripts\\python.exe', '-m', 'PyInstaller', '--clean', '--noconfirm', 'C:\\Project_Workspace\\WikiRace\\deployment\\wikirace_simple.spec']' returned non-zero exit status 1.
+2025-09-30 16:41:40,815 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:41:40,815 - INFO - Checking dependencies...
+2025-09-30 16:41:40,815 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:41:40,832 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:41:41,113 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:41:41,113 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:41:41,113 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:41:41,114 - INFO - Creating license and readme files...
+2025-09-30 16:41:41,114 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:41:41,114 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:41:41,115 - INFO - Cleaning build directories...
+2025-09-30 16:41:41,115 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:41:41,115 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:41:41,116 - INFO - Installing Python dependencies...
+2025-09-30 16:41:41,393 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:41:46,446 - INFO - [OK] Project dependencies installed
+2025-09-30 16:41:46,446 - INFO - Building executable with PyInstaller...
+2025-09-30 16:41:46,446 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:42:43,144 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:42:43,145 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:42:43,196 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:42:43,197 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:42:43,197 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:43:06,827 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:43:06,827 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:43:06,828 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 16:43:06,828 - INFO - Testing installer...
+2025-09-30 16:43:06,828 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:43:06,828 - INFO - You can now run the installer to test it
+2025-09-30 16:43:06,828 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:43:06,828 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:44:38,552 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:44:38,552 - INFO - Checking dependencies...
+2025-09-30 16:44:38,553 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:44:38,569 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:44:38,850 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:44:38,850 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:44:38,850 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:44:38,851 - INFO - Creating license and readme files...
+2025-09-30 16:44:38,851 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:44:38,851 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:44:38,852 - INFO - Cleaning build directories...
+2025-09-30 16:44:38,852 - ERROR - [ERROR] Build failed: [WinError 5] Access is denied: 'C:\\Project_Workspace\\WikiRace\\deployment\\dist\\WikiRace.exe'
+2025-09-30 16:44:48,281 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 16:44:48,281 - INFO - Checking dependencies...
+2025-09-30 16:44:48,281 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 16:44:48,299 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 16:44:48,577 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:44:48,577 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 16:44:48,577 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 16:44:48,577 - INFO - Creating license and readme files...
+2025-09-30 16:44:48,578 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 16:44:48,578 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 16:44:48,578 - INFO - Cleaning build directories...
+2025-09-30 16:44:48,603 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 16:44:48,603 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 16:44:48,604 - INFO - Installing Python dependencies...
+2025-09-30 16:44:48,892 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 16:44:54,085 - INFO - [OK] Project dependencies installed
+2025-09-30 16:44:54,085 - INFO - Building executable with PyInstaller...
+2025-09-30 16:44:54,085 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 16:45:51,330 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 16:45:51,330 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 16:45:51,382 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 16:45:51,382 - INFO - Creating installer with Inno Setup...
+2025-09-30 16:45:51,382 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 16:46:14,873 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 16:46:14,873 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:46:14,873 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 16:46:14,873 - INFO - Testing installer...
+2025-09-30 16:46:14,874 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 16:46:14,874 - INFO - You can now run the installer to test it
+2025-09-30 16:46:14,874 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 16:46:14,874 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 17:25:28,195 - INFO - [START] Starting WikiRace installer build process...
+2025-09-30 17:25:28,196 - INFO - Checking dependencies...
+2025-09-30 17:25:28,196 - INFO - [INFO] Using venv Python from C:\Project_Workspace\WikiRace\venv\Scripts\python.exe
+2025-09-30 17:25:28,214 - INFO - [OK] Venv Python version: Python 3.13.7
+2025-09-30 17:25:28,506 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 17:25:28,507 - INFO - [OK] Inno Setup found at C:\Program Files (x86)\Inno Setup 6\ISCC.exe
+2025-09-30 17:25:28,507 - INFO - [OK] Favicon found at C:\Project_Workspace\WikiRace\src\resources\icons\favicon.ico
+2025-09-30 17:25:28,507 - INFO - Creating license and readme files...
+2025-09-30 17:25:28,508 - INFO - [OK] Created C:\Project_Workspace\WikiRace\LICENSE.txt
+2025-09-30 17:25:28,508 - INFO - [OK] Using existing C:\Project_Workspace\WikiRace\README.md
+2025-09-30 17:25:28,508 - INFO - Cleaning build directories...
+2025-09-30 17:25:28,523 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\dist
+2025-09-30 17:25:28,523 - INFO - [OK] Cleaned C:\Project_Workspace\WikiRace\deployment\build
+2025-09-30 17:25:28,524 - INFO - Installing Python dependencies...
+2025-09-30 17:25:28,817 - INFO - [OK] PyInstaller 6.16.0
+2025-09-30 17:25:34,243 - INFO - [OK] Project dependencies installed
+2025-09-30 17:25:34,243 - INFO - Building executable with PyInstaller...
+2025-09-30 17:25:34,243 - INFO - Running: C:\Project_Workspace\WikiRace\venv\Scripts\python.exe -m PyInstaller --clean --noconfirm C:\Project_Workspace\WikiRace\deployment\wikirace.spec
+2025-09-30 17:26:30,866 - INFO - [OK] PyInstaller build completed successfully
+2025-09-30 17:26:30,867 - INFO - [OK] Executable created: C:\Project_Workspace\WikiRace\dist\WikiRace.exe
+2025-09-30 17:26:30,922 - INFO - [OK] Copied executable to: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace.exe
+2025-09-30 17:26:30,922 - INFO - Creating installer with Inno Setup...
+2025-09-30 17:26:30,923 - INFO - Running: C:\Program Files (x86)\Inno Setup 6\ISCC.exe C:\Project_Workspace\WikiRace\deployment\WikiRace_Installer.iss
+2025-09-30 17:26:54,619 - INFO - [OK] Inno Setup compilation completed successfully
+2025-09-30 17:26:54,619 - INFO - [OK] Installer created: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 17:26:54,619 - INFO - [OK] Installer size: 190.0 MB
+2025-09-30 17:26:54,619 - INFO - Testing installer...
+2025-09-30 17:26:54,619 - INFO - [OK] Installer ready for testing: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe
+2025-09-30 17:26:54,619 - INFO - You can now run the installer to test it
+2025-09-30 17:26:54,620 - INFO - [SUCCESS] WikiRace installer build completed successfully!
+2025-09-30 17:26:54,620 - INFO - [OUTPUT] Installer location: C:\Project_Workspace\WikiRace\deployment\dist\WikiRace_Setup.exe

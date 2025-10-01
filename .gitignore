@@ -12,7 +12,9 @@ __pycache__/
 /deployment/Python313/
 /venv/
 /logs/
-build_portable/
+/build/
+/deployment/
+/dist/
 /Python313/
 
 # Other files
