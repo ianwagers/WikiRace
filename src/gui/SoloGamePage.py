@@ -119,7 +119,6 @@ class SoloGamePage(QWidget):
         # DO NOT REMOVE: This ensures clean state for theme switching
         self.webView = QWebEngineView()
         
-        # OPTIMIZED: Set up persistent profile with disk cache for better performance
         profile = QWebEngineProfile.defaultProfile()
         profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
         profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
@@ -166,7 +165,6 @@ class SoloGamePage(QWidget):
         # Start loading the page
         self.webView.load(QUrl(self.start_url))
         
-        # OPTIMIZED: No delay needed - theme is applied instantly at DocumentCreation
         self.webView.setVisible(True)
         
         self.mainContentLayout.addWidget(self.webView, 3)
@@ -281,7 +279,6 @@ class SoloGamePage(QWidget):
             
             # Skip verification for performance - theme should be working via cookies
             
-            # OPTIMIZED: Scroll to top after page load to fix CSS injection scroll issues
             # This runs asynchronously to not slow down page loading
             scroll_to_top_script = """
             try {
@@ -309,7 +306,6 @@ class SoloGamePage(QWidget):
         # Emit signal for multiplayer integration
         self.urlChanged.emit(url_str)
         
-        # OPTIMIZED: URL interceptor handles useskin=vector-2022 automatically
         # No need to reload - prevents redirect loops and double loading
         self.darkModeApplied = False  # Reset flag for new page
         
@@ -323,7 +319,6 @@ class SoloGamePage(QWidget):
                 # Emit link clicked signal for multiplayer integration
                 self.linkClicked.emit(url_str, self.linksUsed)
                 
-                # OPTIMIZED: Use fast URL path parser to get page title
                 titleString = self.getTitleFromUrlPath(url_str)
                 
                 # Add the title to previous links if it's not already there
@@ -362,7 +357,6 @@ class SoloGamePage(QWidget):
             
             QTimer.singleShot(1000, lambda: self.getExactTitleFromJavaScript(update_starting_title))
         
-        # OPTIMIZED: Navigation hiding should be handled by DocumentReady script
 
     def showWebView(self):
         """Show the webview after theme has been applied"""
@@ -469,7 +463,6 @@ class SoloGamePage(QWidget):
         # Check for exact match (case-insensitive to handle minor differences)
         if currentPage.lower().strip() == destinationPage.lower().strip():
             
-            # CRITICAL FIX: Stop the timer immediately and store game end time
             self.timer.stop()
             self.game_end_time = time.time()
             
@@ -490,7 +483,6 @@ class SoloGamePage(QWidget):
                     
                     if exact_current_normalized == destination_normalized:
                         
-                        # CRITICAL FIX: Stop the timer immediately and store game end time
                         self.timer.stop()
                         self.game_end_time = time.time()
                         
@@ -505,7 +497,6 @@ class SoloGamePage(QWidget):
     def startGame(self):
         """Start the game - for multiplayer integration"""
         
-        # CRITICAL FIX: Reset game state for new game - ensure links reset to 0 between multiple games
         self.linksUsed = 0
         self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
         self.startTime = time.time()  # Reset start time for multiplayer games
@@ -526,7 +517,6 @@ class SoloGamePage(QWidget):
     
     def showConfettiAndDialog(self):
         """Show confetti first, then dialog after confetti finishes"""
-        # CRITICAL FIX: Stop the timer immediately when confetti starts to exclude confetti time from total
         if hasattr(self, 'timer') and self.timer.isActive():
             self.timer.stop()
             # Store the exact time when the timer stopped to use in dialog calculation
@@ -669,7 +659,6 @@ class EndGameDialog(QDialog):
         layout.addWidget(closeButton)
 
     def returnToHomePage(self):
-        # CRITICAL FIX: Close the Solo Game tab after "Continue" button clicked
         try:
             # Find the current game tab index
             current_index = self.tabWidget.indexOf(self.gamePage)

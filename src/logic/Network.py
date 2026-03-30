@@ -144,7 +144,6 @@ class NetworkManager(QObject):
         @self.sio.event
         def room_created(data):
             self.current_room = data['room_code']
-            # CRITICAL FIX: Store last known room for completion fallback
             self._last_known_room = data['room_code']
             
             # Create current player instance
@@ -164,7 +163,6 @@ class NetworkManager(QObject):
         @self.sio.event
         def room_joined(data):
             self.current_room = data['room_code']
-            # CRITICAL FIX: Store last known room for completion fallback
             self._last_known_room = data['room_code']
             
             # Create current player instance
@@ -332,7 +330,6 @@ class NetworkManager(QObject):
                 # Connect with longer timeout for stability
                 self.sio.connect(self.server_url, wait_timeout=30)
                 
-                # CRITICAL FIX: Wait for connection to be fully established
                 import time
                 max_wait = 3.0  # Maximum wait time in seconds
                 wait_interval = 0.1  # Check every 100ms
@@ -363,7 +360,6 @@ class NetworkManager(QObject):
             # Clear reconnection state
             self.current_reconnection_attempts = 0
             
-            # CRITICAL FIX: Disconnect socket with timeout to prevent hanging
             if self.connected_to_server:
                 try:
                     if hasattr(self.sio, 'connected') and self.sio.connected:
@@ -649,7 +645,6 @@ class NetworkManager(QObject):
                 from PyQt6.QtCore import QTimer
                 QTimer.singleShot(2000, lambda: self._complete_leave_room(room_code))
                 
-                # CRITICAL FIX: Keep connection to server for future room joins
                 # DO NOT call disconnect_from_server() here
                 
             else:
@@ -790,7 +785,6 @@ class NetworkManager(QObject):
     def send_game_completion(self, completion_time: float, links_used: int):
         """Send game completion to server"""
         try:
-            # CRITICAL FIX: Check if we have room info even if current_room is None
             room_code = self.current_room
             if not room_code and hasattr(self, '_last_known_room'):
                 room_code = self._last_known_room

@@ -123,7 +123,6 @@ class HomePage(QWidget):
         self.webView = QWebEngineView()
         self.webView.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         
-        # OPTIMIZED: Set up persistent profile with disk cache for better performance
         profile = QWebEngineProfile.defaultProfile()
         profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
         profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
@@ -141,7 +140,6 @@ class HomePage(QWidget):
         self.webView.page().loadFinished.connect(self.onPageLoaded)
         self.webView.urlChanged.connect(self.onUrlChanged)
         
-        # OPTIMIZED: Set up Wikipedia theme with navigation hiding BEFORE loading
         # This ensures theme is applied before page content loads
         WikipediaTheme.setupThemeWithNavigation(self.webView, theme_manager.get_theme())
         
@@ -154,7 +152,6 @@ class HomePage(QWidget):
         
         self.layout.addWidget(self.contentFrame)
         
-        # OPTIMIZED: No delay needed - theme is applied instantly at DocumentCreation
         self.webView.setVisible(True)
         
         # Apply initial styling after all widgets are created
@@ -206,10 +203,8 @@ class HomePage(QWidget):
             # Also check what cookies are actually in the browser
             # Cookie checking is now handled automatically by setupThemeWithNavigation
             
-            # OPTIMIZED: Theme setup is already handled by setupThemeWithNavigation during initialization
             # No need to force it again here as the DocumentCreation script should handle it
             
-            # OPTIMIZED: Navigation elements are hidden automatically by DOMContentLoaded script
             
             self.darkModeApplied = True
 
@@ -217,7 +212,6 @@ class HomePage(QWidget):
         """Handle URL changes - URL interceptor handles useskin parameter automatically"""
         url_str = url.toString()
         
-        # OPTIMIZED: URL interceptor handles useskin=vector-2022 automatically
         # No need to reload - prevents redirect loops and double loading
         self.darkModeApplied = False  # Reset flag for new page
         
@@ -229,7 +223,6 @@ class HomePage(QWidget):
             from PyQt6.QtCore import QTimer
             QTimer.singleShot(500, lambda: WikipediaTheme.applyMainPageCustomization(self.webView))
         
-        # OPTIMIZED: Theme setup is already handled by setupThemeWithNavigation during initialization
         # No need to call it again here as it will be handled automatically by the DocumentReady script
 
     def showWebView(self):
@@ -284,7 +277,6 @@ class HomePage(QWidget):
         # Uncheck the button immediately after click
         self.multiplayerButton.setChecked(False)
         
-        # CRITICAL FIX: Always create a new multiplayer tab to ensure clean state
         # The previous tab may have been closed and the attribute deleted
         self.mainApplication.addMultiplayerTab()
         
@@ -436,7 +428,6 @@ class HomePage(QWidget):
         if hasattr(self, 'webView') and self.webView:
             current_url = self.webView.url().toString()
             if current_url and "wikipedia.org" in current_url:
-                # OPTIMIZED: Re-setup theme with navigation hiding in one go
                 WikipediaTheme.setupThemeWithNavigation(self.webView, theme_manager.get_theme())
                 # Reload the page
                 self.webView.reload()

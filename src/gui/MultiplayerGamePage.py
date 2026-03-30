@@ -47,7 +47,6 @@ class PlayerProgressWidget(QWidget):
         self.initUI()
         self.apply_theme()
         
-        # CRITICAL FIX: Ensure color is properly applied after theme is set
         if self.player_color and self.player_color != "#CCCCCC":
             self._apply_progress_bar_theme()
         
@@ -733,12 +732,10 @@ class MultiplayerGamePage(QWidget):
     def closeEvent(self, event):
         """Handle widget close event - disconnect signals to prevent memory leaks"""
         
-        # CRITICAL FIX: Proper cleanup order to prevent signal ordering issues
         try:
             # 1. Stop all timers first to prevent further updates
             self.stop_all_timers_and_progress()
             
-            # 2. CRITICAL FIX: Stop WebView loading immediately to prevent resource loading stutter
             if hasattr(self, 'solo_game') and self.solo_game:
                 try:
                     # Stop any ongoing WebView loading
@@ -925,7 +922,6 @@ class MultiplayerGamePage(QWidget):
                 )
                 self.network_manager.add_room_player(player_instance)
             
-            # CRITICAL FIX: Ensure color is set on Player instance BEFORE creating widget
             if player_color != '#CCCCCC':
                 player_instance.update_color(player_color)
             else:
@@ -934,7 +930,6 @@ class MultiplayerGamePage(QWidget):
             # Create player progress widget with Player instance
             player_widget = PlayerProgressWidget(player_instance)
             
-            # CRITICAL FIX: Ensure color is properly applied to the widget after creation
             if player_color != '#CCCCCC':
                 player_widget.update_color(player_color)
             
@@ -948,7 +943,6 @@ class MultiplayerGamePage(QWidget):
             self.players_layout.addWidget(player_widget)
         
         
-        # CRITICAL FIX: Ensure all player colors are properly applied after initialization
         self._refresh_all_player_colors()
         
         # Update all player widgets for dynamic sizing
@@ -1102,7 +1096,6 @@ class MultiplayerGamePage(QWidget):
         if not self.game_finished:
             self.game_finished = True
             
-            # CRITICAL FIX: Stop all timers immediately when local player completes
             self.stop_all_timers_and_progress()
             
             # Calculate completion time
@@ -1137,7 +1130,6 @@ class MultiplayerGamePage(QWidget):
         # Start the multiplayer game
         self.start_game()
         
-        # CRITICAL FIX: Ensure all player colors are properly applied after game start
         self._refresh_all_player_colors()
         
     
@@ -1187,7 +1179,6 @@ class MultiplayerGamePage(QWidget):
                 completion_time
             )
             
-            # CRITICAL FIX: Stop all timers and progress bars when any player wins
             self.stop_all_timers_and_progress()
             self.stop_all_progress_bars()
     
@@ -1306,7 +1297,6 @@ class MultiplayerGamePage(QWidget):
             player_instance = self.player_instances[player_name]
             player_instance.update_color(color_hex, color_name)
         
-        # CRITICAL FIX: Also update the PlayerProgressWidget directly
         if player_name in self.players:
             player_widget = self.players[player_name]
             player_widget.update_color(color_hex)
@@ -1314,7 +1304,7 @@ class MultiplayerGamePage(QWidget):
             pass
     
     def stop_all_timers_and_progress(self):
-        """CRITICAL FIX: Stop all timers when game ends to prevent non-winners from continuing to tick"""
+        """Stop all timers when game ends to prevent non-winners from continuing to tick"""
         
         try:
             # Stop the solo game timer if it exists
@@ -1449,14 +1439,12 @@ class MultiplayerGamePage(QWidget):
     def on_exit_to_home_requested(self):
         """Handle exit to home request - leave room and go to home page"""
         
-        # CRITICAL FIX: Proper exit order - notify server FIRST, then disconnect
         self.exit_to_home_with_proper_cleanup()
     
     def exit_to_home_with_proper_cleanup(self):
         """Handle exit to home with proper cleanup order - notify server first, then exit quickly"""
         try:
             
-            # 1. CRITICAL FIX: Notify server that player is leaving the room (but stay connected to server)
             if hasattr(self.network_manager, 'leave_room') and self.network_manager.current_room:
                 try:
                     # Send leave_room event to server
@@ -1495,7 +1483,6 @@ class MultiplayerGamePage(QWidget):
             # 2. Close tabs immediately for responsive UI
             self._close_tabs_quickly()
             
-            # 3. CRITICAL FIX: DO NOT disconnect from server - keep connection for future room joins
             
         except Exception as e:
             # Fallback to basic exit
@@ -1559,7 +1546,6 @@ class MultiplayerGamePage(QWidget):
     def close_game_tab_and_go_home(self):
         """Close the game tab and go to home page"""
         try:
-            # CRITICAL FIX: Optimize exit performance by stopping WebView first
             
             # 1. Stop WebView loading immediately to prevent stutter
             if hasattr(self, 'solo_game') and self.solo_game:

@@ -60,7 +60,6 @@ class MainApplication(QMainWindow):
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
 
     def addMultiplayerTab(self):
-        # CRITICAL FIX: Always create a new multiplayer tab to ensure clean state
         # Remove any existing multiplayer tab first
         if hasattr(self, 'multiplayerPage'):
             try:

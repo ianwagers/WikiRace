@@ -53,7 +53,6 @@ async def check_inactive_players(sio, room_manager: RoomManager):
             
             # Check all rooms for inactive players and empty rooms
             for room_code, room in list(room_manager.rooms.items()):
-                # CRITICAL FIX: Close empty rooms after 10 minutes
                 if room.player_count == 0:
                     time_since_creation = current_time - room.created_at
                     if time_since_creation > timedelta(minutes=10):
@@ -85,7 +84,7 @@ async def check_inactive_players(sio, room_manager: RoomManager):
                 # Remove inactive players
                 for socket_id, player in inactive_players:
                     logger.warning(f"Removing inactive player {player.display_name} from room {room_code}")
-                    logger.warning(f"DEBUG: Player {player.display_name} (sid: {socket_id}) was inactive for {time_since_activity.total_seconds():.1f} seconds")
+                    logger.warning(f"Player {player.display_name} (sid: {socket_id}) was inactive for {time_since_activity.total_seconds():.1f} seconds")
                     
                     # Notify the inactive player they're being kicked due to timeout
                     await sio.emit('kicked_for_inactivity', {
@@ -125,7 +124,6 @@ async def check_inactive_players(sio, room_manager: RoomManager):
                         # Room was closed, notify all remaining players and ensure complete cleanup
                         logger.info(f"Room {room_code} was closed due to inactivity")
                         
-                        # CRITICAL FIX: Ensure all players in the room are properly notified and kicked
                         # Get all remaining players before room is deleted
                         remaining_players = list(room.players.values()) if room else []
                         
@@ -152,7 +150,7 @@ async def check_inactive_players(sio, room_manager: RoomManager):
 def register_socket_handlers(sio, room_manager: RoomManager):
     """Register all Socket.IO event handlers"""
     
-    logger.error("FORCE LOG: Socket handlers being registered!")
+    logger.info("Socket handlers registered")
     
     # Start the inactive player checker
     import asyncio
@@ -172,25 +170,24 @@ def register_socket_handlers(sio, room_manager: RoomManager):
     @sio.event
     async def disconnect(sid):
         """Handle client disconnection with enhanced error handling"""
-        logger.info(f"DISCONNECT: Client disconnected: {sid}")
+        logger.info(f"Client disconnected: {sid}")
         
         # Handle player leaving their room
         room = room_manager.get_room_by_player(sid)
         if room:
             player = room.get_player(sid)
             if player:
-                logger.info(f"DISCONNECT: Player {player.display_name} disconnected from room {room.room_code}")
+                logger.info(f"Player {player.display_name} disconnected from room {room.room_code}")
                 
                 # Check if player was host before removing
                 was_host = room.is_host(sid)
                 room_code = room.room_code
                 game_state = room.game_state
                 
-                # CRITICAL FIX: Handle disconnection during active games
                 if game_state == GameState.IN_PROGRESS:
                     # Mark player as disconnected but keep them in room for potential rejoin
                     player.disconnected = True
-                    logger.info(f"DISCONNECT: Player {player.display_name} disconnected during active game - marked for potential rejoin")
+                    logger.info(f"Player {player.display_name} disconnected during active game - marked for potential rejoin")
                     
                     # Notify remaining players about disconnection
                     await sio.emit('player_disconnected', {
@@ -210,12 +207,11 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                                 'message': f"{new_host.display_name} is now the room leader"
                             }, room=room_code)
                     
-                    # CRITICAL FIX: Check if all players are now disconnected during game
                     active_players = [p for p in room.players.values() if not p.disconnected]
                     if len(active_players) == 0:
-                        logger.warning(f"DISCONNECT: All players disconnected during game in room {room_code} - ending game")
+                        logger.warning(f"All players disconnected during game in room {room_code} - ending game")
                         # End the game and close the room
-                        room.game_state = GameState.FINISHED
+                        room.game_state = GameState.COMPLETED
                         await sio.emit('game_ended', {
                             'message': 'Game ended - all players disconnected',
                             'reason': 'all_disconnected',
@@ -226,21 +222,19 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         import asyncio
                         await asyncio.sleep(5)  # Give time for clients to process
                         room_manager.close_room(room_code)
-                        logger.info(f"DISCONNECT: Closed room {room_code} due to all players disconnecting during game")
+                        logger.info(f"Closed room {room_code} due to all players disconnecting during game")
                 else:
-                    # CRITICAL FIX: For non-active games, remove player completely to prevent ghost players
-                    logger.info(f"DISCONNECT: Removing player {player.display_name} from room {room_code} (non-active game)")
+                    logger.info(f"Removing player {player.display_name} from room {room_code} (non-active game)")
                     
                     # Get remaining players before removing the player
                     remaining_players = [p for p in room.players.values() if p.socket_id != sid]
-                    logger.info(f"DISCONNECT: Remaining players after {player.display_name} leaves: {[p.display_name for p in remaining_players]}")
+                    logger.info(f"Remaining players after {player.display_name} leaves: {[p.display_name for p in remaining_players]}")
                     
                     # Remove player from room (now async)
                     updated_room = await room_manager.leave_room(sid)
                     
-                    # CRITICAL FIX: Always notify remaining players about the player leaving
                     if remaining_players:
-                        logger.info(f"DISCONNECT: Notifying {len(remaining_players)} remaining players about {player.display_name} leaving")
+                        logger.info(f"Notifying {len(remaining_players)} remaining players about {player.display_name} leaving")
                         await sio.emit('player_left', {
                             'socket_id': sid,
                             'player_name': player.display_name,
@@ -256,7 +250,7 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         if was_host and updated_room and updated_room.host_id:
                             new_host = updated_room.get_player(updated_room.host_id)
                             if new_host:
-                                logger.info(f"DISCONNECT: Host transfer - {new_host.display_name} is now the room leader")
+                                logger.info(f"Host transfer - {new_host.display_name} is now the room leader")
                                 await sio.emit('host_transferred', {
                                     'new_host_id': updated_room.host_id,
                                     'new_host_name': new_host.display_name,
@@ -268,11 +262,11 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                             await broadcast_room_progress(sio, updated_room, skip_sid=sid)
                     else:
                         # Room is now empty but kept open for potential rejoin
-                        logger.info(f"DISCONNECT: Room {room_code} is now empty but kept open for potential rejoin")
+                        logger.info(f"Room {room_code} is now empty but kept open for potential rejoin")
             else:
-                logger.warning(f"DISCONNECT: Player not found for socket {sid} in room {room.room_code}")
+                logger.warning(f"Player not found for socket {sid} in room {room.room_code}")
         else:
-            logger.info(f"DISCONNECT: Socket {sid} was not in any room")
+            logger.info(f"Socket {sid} was not in any room")
     
     @sio.event
     async def create_room(sid, data):
@@ -328,7 +322,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 # Check if it's a name conflict by trying to get the room first
                 existing_room = room_manager.get_room(room_code)
                 if existing_room and existing_room.get_player_by_name(display_name):
-                    # CRITICAL FIX: Handle rejoin scenario - use improved room manager logic
                     existing_player = existing_room.get_player_by_name(display_name)
                     if existing_player and (existing_player.socket_id == sid or existing_player.disconnected):
                         # This is a rejoin - let room manager handle the logic
@@ -349,7 +342,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             if player:
                 from datetime import datetime
                 player.last_activity = datetime.utcnow()
-                # CRITICAL FIX: Reset disconnected flag if player rejoins
                 if player.disconnected:
                     player.disconnected = False
                     logger.info(f"Player {player.display_name} rejoined room {room_code} - reset disconnected flag")
@@ -382,7 +374,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 } for p in room.players.values()]
             }, room=room.room_code, skip_sid=sid)
             
-            # CRITICAL FIX: If player was disconnected and rejoined, notify about reconnection
             if player and player.disconnected == False and room.game_state == GameState.IN_PROGRESS:
                 await sio.emit('player_reconnected', {
                     'socket_id': sid,
@@ -469,19 +460,19 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 if was_host and updated_room.host_id:
                     new_host = updated_room.get_player(updated_room.host_id)
                     if new_host:
-                        logger.info(f"LEADERSHIP: Emitting host_transferred event - {new_host.display_name} is now the room leader")
+                        logger.info(f"Emitting host_transferred event - {new_host.display_name} is now the room leader")
                         await sio.emit('host_transferred', {
                             'new_host_id': updated_room.host_id,
                             'new_host_name': new_host.display_name,
                             'message': f"{new_host.display_name} is now the room leader"
                         }, room=room_code)
-                        logger.info(f"LEADERSHIP: host_transferred event emitted successfully")
+                        logger.info(f"host_transferred event emitted successfully")
                     else:
-                        logger.error(f"LEADERSHIP: Failed to get new host player object for socket_id {updated_room.host_id}")
+                        logger.error(f"Failed to get new host player object for socket_id {updated_room.host_id}")
                 elif was_host:
-                    logger.info(f"LEADERSHIP: Host left but no new host assigned (room.host_id: {updated_room.host_id})")
+                    logger.info(f"Host left but no new host assigned (room.host_id: {updated_room.host_id})")
                 else:
-                    logger.info(f"LEADERSHIP: Non-host player left, no leadership transfer needed")
+                    logger.info(f"Non-host player left, no leadership transfer needed")
             else:
                 # Room was deleted (last player left)
                 logger.info(f"CRITICAL: Room {room_code} was deleted - last player left")
@@ -571,7 +562,7 @@ def register_socket_handlers(sio, room_manager: RoomManager):
     @sio.event
     async def start_game(sid, data):
         """Handle game start request (host only)"""
-        logger.info(f"DEBUG: Received start_game request from {sid} with data: {data}")
+        logger.info(f"Received start_game request from {sid} with data: {data}")
         logger.error(f"FORCE ERROR LOG: start_game handler was definitely called!")
         
         # Force flush logs
@@ -580,34 +571,33 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             handler.flush()
         try:
             # Debug: Log current room manager state
-            logger.info(f"DEBUG: Room manager has {len(room_manager.rooms)} rooms")
-            logger.info(f"DEBUG: Player-to-room mapping: {room_manager.player_to_room}")
+            logger.info(f"Room manager has {len(room_manager.rooms)} rooms")
+            logger.info(f"Player-to-room mapping: {room_manager.player_to_room}")
             
             room = room_manager.get_room_by_player(sid)
             if not room:
-                logger.warning(f"DEBUG: Player {sid} not in any room")
-                logger.warning(f"DEBUG: Available rooms: {list(room_manager.rooms.keys())}")
-                logger.warning(f"DEBUG: Player mappings: {room_manager.player_to_room}")
+                logger.warning(f"Player {sid} not in any room")
+                logger.warning(f"Available rooms: {list(room_manager.rooms.keys())}")
+                logger.warning(f"Player mappings: {room_manager.player_to_room}")
                 await sio.emit('error', {'message': 'Not in a room'}, room=sid)
                 return
             
-            logger.info(f"DEBUG: Found room {room.room_code} for player {sid}")
+            logger.info(f"Found room {room.room_code} for player {sid}")
             
             # Check if player is host
-            logger.info(f"DEBUG: Checking if player {sid} is host in room {room.room_code}")
+            logger.info(f"Checking if player {sid} is host in room {room.room_code}")
             if not room.is_host(sid):
-                logger.warning(f"DEBUG: Player {sid} is not host, rejecting start_game")
+                logger.warning(f"Player {sid} is not host, rejecting start_game")
                 await sio.emit('error', {'message': 'Only the room host can start the game'}, room=sid)
                 return
             
-            logger.info(f"DEBUG: Player {sid} is host, checking player count")
+            logger.info(f"Player {sid} is host, checking player count")
             # Check if enough players
             if room.player_count < 2:
-                logger.warning(f"DEBUG: Not enough players ({room.player_count}), need at least 2")
+                logger.warning(f"Not enough players ({room.player_count}), need at least 2")
                 await sio.emit('error', {'message': 'At least 2 players required to start'}, room=sid)
                 return
             
-            # CRITICAL FIX: Check for disconnected players and prevent game start
             active_players = []
             disconnected_players = []
             for player in room.players.values():
@@ -616,10 +606,10 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 else:
                     active_players.append(player.display_name)
             
-            logger.info(f"DEBUG: Active players: {active_players}, Disconnected players: {disconnected_players}")
+            logger.info(f"Active players: {active_players}, Disconnected players: {disconnected_players}")
             
             if len(active_players) < 2:
-                logger.warning(f"DEBUG: Not enough active players ({len(active_players)}), need at least 2")
+                logger.warning(f"Not enough active players ({len(active_players)}), need at least 2")
                 if disconnected_players:
                     await sio.emit('error', {'message': f'Cannot start game - {", ".join(disconnected_players)} have disconnected'}, room=sid)
                 else:
@@ -627,18 +617,18 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 return
             
             if disconnected_players:
-                logger.warning(f"DEBUG: Found disconnected players: {disconnected_players} - removing them from room")
+                logger.warning(f"Found disconnected players: {disconnected_players} - removing them from room")
                 # Remove disconnected players from the room
                 for player in list(room.players.values()):
                     if hasattr(player, 'disconnected') and player.disconnected:
-                        logger.info(f"DEBUG: Removing disconnected player {player.display_name} from room")
+                        logger.info(f"Removing disconnected player {player.display_name} from room")
                         del room.players[player.socket_id]
                         if player.socket_id in room_manager.player_to_room:
                             del room_manager.player_to_room[player.socket_id]
                 
                 # Update room player count
                 room.player_count = len(room.players)
-                logger.info(f"DEBUG: Room {room.room_code} now has {room.player_count} active players")
+                logger.info(f"Room {room.room_code} now has {room.player_count} active players")
                 
                 # Notify remaining players about disconnected players being removed
                 if room.players:
@@ -653,33 +643,33 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         } for p in room.players.values()]
                     }, room=room.room_code)
             
-            logger.info(f"DEBUG: All validations passed, proceeding with game start")
+            logger.info(f"All validations passed, proceeding with game start")
             
             # Extract game configuration
-            logger.info(f"DEBUG: Extracting game configuration from data: {data}")
+            logger.info(f"Extracting game configuration from data: {data}")
             start_page = data.get('start_page', 'Random')
             end_page = data.get('end_page', 'Random')
             custom_start = data.get('custom_start')
             custom_end = data.get('custom_end')
-            logger.info(f"DEBUG: Config - start: {start_page}, end: {end_page}, custom_start: {custom_start}, custom_end: {custom_end}")
+            logger.info(f"Config - start: {start_page}, end: {end_page}, custom_start: {custom_start}, custom_end: {custom_end}")
             
             # Use server-side GameLogic to select pages
-            logger.info(f"DEBUG: Starting page selection process...")
+            logger.info(f"Starting page selection process...")
             try:
                 # Try relative import first, then absolute import as fallback
                 try:
                     from .game_logic import server_game_logic
                 except ImportError:
                     from game_logic import server_game_logic
-                logger.info(f"DEBUG: Imported game_logic successfully")
+                logger.info(f"Imported game_logic successfully")
                 
                 start_url, end_url, start_title, end_title = server_game_logic.select_game_pages(
                     start_page, end_page, custom_start, custom_end
                 )
-                logger.info(f"DEBUG: Page selection completed - start: {start_title}, end: {end_title}")
+                logger.info(f"Page selection completed - start: {start_title}, end: {end_title}")
                 
                 if not start_url or not end_url:
-                    logger.error(f"DEBUG: Invalid pages selected - start_url: {start_url}, end_url: {end_url}")
+                    logger.error(f"Invalid pages selected - start_url: {start_url}, end_url: {end_url}")
                     await sio.emit('error', {'message': 'Failed to select valid game pages'}, room=sid)
                     return
                 
@@ -687,27 +677,27 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                 room.end_url = end_url
                 room.start_title = start_title or "Unknown Page"
                 room.end_title = end_title or "Unknown Page"
-                logger.info(f"DEBUG: Room URLs set successfully")
+                logger.info(f"Room URLs set successfully")
                 
             except Exception as e:
-                logger.error(f"DEBUG: Exception in page selection: {e}")
+                logger.error(f"Exception in page selection: {e}")
                 import traceback
-                logger.error(f"DEBUG: Page selection traceback: {traceback.format_exc()}")
+                logger.error(f"Page selection traceback: {traceback.format_exc()}")
                 # Fallback to placeholder pages
                 room.start_url = "https://en.wikipedia.org/wiki/Main_Page"
                 room.end_url = "https://en.wikipedia.org/wiki/Special:Random"
                 room.start_title = "Main Page"
                 room.end_title = "Random Page"
-                logger.info(f"DEBUG: Using fallback pages")
+                logger.info(f"Using fallback pages")
             
             # Update room state to starting (countdown phase)
-            logger.info(f"DEBUG: Setting room state to STARTING")
+            logger.info(f"Setting room state to STARTING")
             room.game_state = GameState.STARTING
             
             # Send countdown start event
-            logger.info(f"DEBUG: About to send game_starting event to room {room.room_code}")
-            logger.info(f"DEBUG: Room has {room.player_count} players")
-            logger.info(f"DEBUG: Event data: start_url={room.start_url}, end_url={room.end_url}")
+            logger.info(f"About to send game_starting event to room {room.room_code}")
+            logger.info(f"Room has {room.player_count} players")
+            logger.info(f"Event data: start_url={room.start_url}, end_url={room.end_url}")
             
             try:
                 await sio.emit('game_starting', {
@@ -719,7 +709,7 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     'countdown_seconds': 5,
                     'message': 'Get ready! Game starting in 5 seconds...'
                 }, room=room.room_code)
-                logger.info(f"DEBUG: game_starting emit completed successfully")
+                logger.info(f"game_starting emit completed successfully")
             except Exception as emit_error:
                 logger.error(f"ERROR DEBUG: Error emitting game_starting: {emit_error}")
                 raise
@@ -729,9 +719,9 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             
             async def start_game_after_countdown():
                 try:
-                    logger.info(f"DEBUG: Starting countdown for room {room.room_code}")
+                    logger.info(f"Starting countdown for room {room.room_code}")
                     await asyncio.sleep(5)
-                    logger.info(f"DEBUG: Countdown finished, starting game for room {room.room_code}")
+                    logger.info(f"Countdown finished, starting game for room {room.room_code}")
                     
                     # Update room state to in progress
                     room.game_state = GameState.IN_PROGRESS
@@ -758,9 +748,8 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         player.last_activity = datetime.utcnow()
                         
                         logger.info(f"RESET SERVER DEBUG: After reset - {player.display_name}: links_clicked={player.links_clicked}, history_count={len(player.navigation_history)}")
-                        logger.info(f"DEBUG: Reset player {player.display_name} data for new game")
+                        logger.info(f"Reset player {player.display_name} data for new game")
                     
-                    # CRITICAL: Wait a moment to ensure all previous progress updates are processed
                     await asyncio.sleep(0.1)
                     
                     # Broadcast initial progress reset to all players to ensure synchronization
@@ -772,7 +761,7 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     logger.info(f"PROGRESS SERVER DEBUG: Broadcasting second progress reset to {len(room.players)} players")
                     await broadcast_room_progress(sio, room, skip_sid=None)
                     
-                    logger.info(f"DEBUG: Sending game_started event to room {room.room_code}")
+                    logger.info(f"Sending game_started event to room {room.room_code}")
                     # Prepare players data with colors
                     players_data = []
                     for player in room.players.values():
@@ -793,7 +782,7 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                         'players': players_data,
                         'message': 'GO! Race to the destination!'
                     }, room=room.room_code)
-                    logger.info(f"DEBUG: game_started emit completed successfully")
+                    logger.info(f"game_started emit completed successfully")
                     
                 except Exception as e:
                     logger.error(f"ERROR DEBUG: Error in countdown task: {e}")
@@ -803,13 +792,13 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             # Start the countdown task in the background with error handling
             try:
                 asyncio.create_task(start_game_after_countdown())
-                logger.info(f"DEBUG: Countdown task created successfully for room {room.room_code}")
+                logger.info(f"Countdown task created successfully for room {room.room_code}")
             except Exception as task_error:
                 logger.error(f"ERROR DEBUG: Failed to create countdown task: {task_error}")
                 await sio.emit('error', {'message': 'Failed to start countdown'}, room=sid)
                 return
             
-            logger.info(f"DEBUG: Game start handler completed successfully for room {room.room_code}")
+            logger.info(f"Game start handler completed successfully for room {room.room_code}")
             
         except Exception as e:
             logger.error(f"ERROR DEBUG: CRITICAL ERROR in start_game handler: {e}")
@@ -817,7 +806,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             logger.error(f"ERROR DEBUG: Start game traceback: {traceback.format_exc()}")
             await sio.emit('error', {'message': 'Failed to start game'}, room=sid)
         
-        logger.info(f"DEBUG: start_game handler exiting for {sid}")
     
     
     @sio.event
@@ -842,7 +830,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             # Update player progress in room
             player = room.get_player_by_name(player_name)
             if player:
-                # DEBUG: Log before adding entry
                 
                 # Check if this is a duplicate of the last navigation entry
                 should_add_entry = True

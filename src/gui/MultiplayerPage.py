@@ -876,9 +876,7 @@ class MultiplayerPage(QWidget):
     
     def on_leave_room_clicked(self):
         """Handle leave room button click"""
-        # CRITICAL FIX: Properly clean up state when leaving room to prevent rejoin bugs
         
-        # CRITICAL FIX: Clean up countdown dialogs before leaving room
         self.cleanup_countdown_dialogs()
         
         # Leave the room via network manager first
@@ -888,7 +886,6 @@ class MultiplayerPage(QWidget):
             except Exception as e:
                 pass
         
-        # CRITICAL FIX: Reset UI state but keep network connection for rejoining
         self.reset_for_leave_room()
         
         QMessageBox.information(self, "Left Room", "You have left the room.")
@@ -1062,7 +1059,7 @@ class MultiplayerPage(QWidget):
         
     
     def reset_for_exit(self):
-        """CRITICAL FIX: Complete state reset when exiting multiplayer games"""
+        """Complete state reset when exiting multiplayer games"""
         
         # Disconnect from network and clean up connections
         if hasattr(self, 'network_manager') and self.network_manager:
@@ -1243,7 +1240,6 @@ class MultiplayerPage(QWidget):
         self.roomAndColorFrame.show()
         self.color_scroll.show()  # Explicitly show the color picker scroll area
         
-        # CRITICAL FIX: Ensure color picker is visible and properly initialized
         if hasattr(self, 'color_picker'):
             self.color_picker.show()
             # Reset color picker state to ensure it's ready for selection
@@ -1260,7 +1256,6 @@ class MultiplayerPage(QWidget):
             self.startGameButton.show()
             self.startPageCombo.setEnabled(True)
             self.endPageCombo.setEnabled(True)
-            # CRITICAL FIX: Also enable custom edit boxes for leader
             self.customStartPageEdit.setEnabled(True)
             self.customEndPageEdit.setEnabled(True)
             # Update start game button state based on players and configuration
@@ -1433,7 +1428,6 @@ class MultiplayerPage(QWidget):
             self.players_in_room = updated_players
             self.show_room_info(f"Room Code: {self.current_room_code}", self.players_in_room)
             
-            # CRITICAL FIX: Update custom edit boxes based on current combo selections and leadership
             if self.is_leader:
                 self.on_game_config_changed()
     
@@ -1441,7 +1435,6 @@ class MultiplayerPage(QWidget):
         """Handle room deletion event"""
         QMessageBox.information(self, "Room Closed", 
                               "The room has been closed because all players have left.")
-        # CRITICAL FIX: Reset to initial state with complete cleanup to prevent rejoin bugs
         self.on_leave_room_clicked()
     
     def cleanup_countdown_dialogs(self):
@@ -1472,7 +1465,6 @@ class MultiplayerPage(QWidget):
     def hideEvent(self, event):
         """Handle page hide event - clean up countdown dialogs"""
         super().hideEvent(event)
-        # CRITICAL FIX: Clean up any active countdown dialogs when page is hidden
         self.cleanup_countdown_dialogs()
     
     def try_auto_discovery(self):
@@ -1497,7 +1489,6 @@ class MultiplayerPage(QWidget):
     def showEvent(self, event):
         """Handle page show event - clean up any lingering countdown dialogs"""
         super().showEvent(event)
-        # CRITICAL FIX: Clean up any lingering countdown dialogs when page is shown
         self.cleanup_countdown_dialogs()
     
     def show_debug_countdown_info(self):
@@ -1514,10 +1505,8 @@ class MultiplayerPage(QWidget):
         # Lock colors during game
         self.lock_colors()
         
-        # CRITICAL FIX: Clean up any existing countdown dialogs first
         self.cleanup_countdown_dialogs()
         
-        # CRITICAL FIX: Check if we already have a countdown dialog active
         if hasattr(self, 'countdown_dialog') and self.countdown_dialog and not self.countdown_dialog.isHidden():
             return
         
@@ -1653,7 +1642,6 @@ class MultiplayerPage(QWidget):
         """Handle failed reconnection"""
         self.show_server_status("❌ Connection Lost", "Could not reconnect to server", "error")
         
-        # CRITICAL FIX: If we were in a room, perform complete cleanup to prevent rejoin bugs
         if self.current_room_code:
             self.on_leave_room_clicked()
         

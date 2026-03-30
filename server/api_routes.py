@@ -101,7 +101,6 @@ async def get_room(room_code: str) -> Dict[str, Any]:
             detail=f"Room {room_code} not found"
         )
     
-    # CRITICAL FIX: Handle case where host_id doesn't exist in players dict
     host_name = "Unknown"
     if room.host_id and room.host_id in room.players:
         host_name = room.players[room.host_id].display_name
@@ -182,7 +181,7 @@ async def join_room(room_code: str, request: RoomJoinRequest) -> Dict[str, Any]:
 
 @router.delete("/rooms/{room_code}/leave", response_model=Dict[str, Any])
 async def leave_room(room_code: str, socket_id: str) -> Dict[str, Any]:
-    """Leave a room (for testing purposes)"""
+    """Leave a room"""
     if not room_manager:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -272,7 +271,6 @@ async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[st
         was_host = player_to_remove.is_host
         updated_room = await room_manager.leave_room(player_to_remove.socket_id)
         
-        # CRITICAL FIX: REST API must broadcast player_left event to remaining players
         if updated_room:
             # Use the Socket.IO instance to broadcast the event
             if sio:
