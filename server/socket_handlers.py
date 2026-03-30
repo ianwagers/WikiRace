@@ -861,9 +861,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     # Use the existing last entry for broadcasting
                     navigation_entry = player.navigation_history[-1]
                 
-                # DEBUG: Log after adding entry
-                for i, entry in enumerate(player.navigation_history):
-                
                 # Broadcast progress to OTHER players only (exclude sender to prevent feedback loop)
                 await sio.emit('player_progress', {
                     'player_name': player_name,

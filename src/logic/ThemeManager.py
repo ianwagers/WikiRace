@@ -43,7 +43,6 @@ class ThemeManager(QObject):
                 with open(self.settings_file, 'r', encoding='utf-8') as f:
                     settings = json.load(f)
                     self.current_theme = settings.get('theme', 'dark')
-            else:
         except Exception as e:
             self.current_theme = "dark"
     
@@ -57,8 +56,9 @@ class ThemeManager(QObject):
             with open(self.settings_file, 'w', encoding='utf-8') as f:
                 json.dump(settings, f, indent=2)
             
-        except Exception as e:
-    
+        except Exception:
+            pass
+
     def set_theme(self, theme: str):
         """Set the current theme and save to settings"""
         if theme not in ['dark', 'light']:

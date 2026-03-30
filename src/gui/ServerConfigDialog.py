@@ -458,8 +458,9 @@ class ServerConfigDialog(QDialog):
             if config_file.exists():
                 with open(config_file, 'r') as f:
                     return json.load(f)
-        except Exception as e:
-        
+        except Exception:
+            pass
+
         return self.get_default_config()
     
     def apply_theme(self):

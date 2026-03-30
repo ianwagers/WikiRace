@@ -152,7 +152,8 @@ class MultiplayerConfig(QObject):
             # Keep default values and try to save them
             try:
                 self.save_config()
-            except Exception as save_error:
+            except Exception:
+                pass
             return False
     
     def save_config(self) -> bool:

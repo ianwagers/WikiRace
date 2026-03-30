@@ -91,9 +91,6 @@ class WikipediaTheme:
             # No query parameters, add useskin only
             url += "?useskin=vector-2022"
             
-        if url != original_url:
-        else:
-            
         return url
     
     
@@ -503,7 +500,6 @@ class WikipediaTheme:
                     # Allow Wikipedia's own modules even if they contain "analytics"
                     if 'wikipedia.org' in url.lower():
                         # Debug: Log if this is an analytics-related module
-                        if 'analytics' in url.lower() or 'xlab' in url.lower():
                         return  # Don't block Wikipedia's own resources
                     
                     # Block external analytics/tracking services
@@ -516,9 +512,9 @@ class WikipediaTheme:
             interceptor = FastLoadingInterceptor()
             profile.setUrlRequestInterceptor(interceptor)
             
-        except Exception as e:
-            # Continue without interceptor - not critical
-    
+        except Exception:
+            pass  # Continue without interceptor - not critical
+
     @staticmethod
     def _clearThemeState(webView: QWebEngineView):
         """
@@ -586,9 +582,7 @@ class WikipediaTheme:
             for script_to_remove in scripts_to_remove:
                 existing_scripts.remove(script_to_remove)
             
-            if scripts_to_remove:
-            
-            # CRITICAL: Force clear any cached theme state via JavaScript
+            # Force clear any cached theme state via JavaScript
             # DO NOT REMOVE: Browser may cache theme state that needs clearing
             clear_js = """
             try {
@@ -650,8 +644,9 @@ class WikipediaTheme:
             # Set SameSite policy if supported
             try:
                 cookie.setSameSitePolicy(QNetworkCookie.SameSite.Lax)
-            except Exception as e:
-            
+            except Exception:
+                pass
+
             # Set the cookie for all Wikipedia domains
             domains = [
                 "https://en.wikipedia.org/",
@@ -820,6 +815,7 @@ class WikipediaTheme:
         try:
             profile.scripts().insert(script)
         except Exception as e:
+            pass
     
     @staticmethod
     def setupDarkTheme(webView: QWebEngineView):
@@ -892,7 +888,9 @@ class WikipediaTheme:
         
         def handleResult(result):
             if result and 'error' not in result:
+                pass
             else:
+                pass
             
             if callback:
                 callback(result)
@@ -900,6 +898,7 @@ class WikipediaTheme:
         try:
             webView.page().runJavaScript(verification_js, handleResult)
         except Exception as e:
+            pass
     
     @staticmethod
     def checkCookiesInBrowser(webView: QWebEngineView):
@@ -939,11 +938,14 @@ class WikipediaTheme:
         
         def handleCookieResult(result):
             if result and 'error' not in result:
+                pass
             else:
+                pass
         
         try:
             webView.page().runJavaScript(cookie_check_js, handleCookieResult)
         except Exception as e:
+            pass
     
     @staticmethod
     def forceTheme(webView: QWebEngineView, theme: str = 'dark'):
@@ -1040,11 +1042,14 @@ class WikipediaTheme:
         
         def handleForceResult(result):
             if result and 'error' not in result:
+                pass
             else:
+                pass
         
         try:
             webView.page().runJavaScript(force_theme_js, handleForceResult)
         except Exception as e:
+            pass
     
     @staticmethod
     def forceDarkTheme(webView: QWebEngineView):
@@ -1246,5 +1251,6 @@ class WikipediaTheme:
         try:
             webView.page().runJavaScript(inject_js)
         except Exception as e:
+            pass
     
     

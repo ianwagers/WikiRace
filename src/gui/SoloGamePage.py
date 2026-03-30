@@ -300,7 +300,6 @@ class SoloGamePage(QWidget):
             QTimer.singleShot(50, lambda: self.webView.page().runJavaScript(scroll_to_top_script))
             
             self.darkModeApplied = True
-        else:
 
     def onUrlChanged(self, url):
         """Handle URL changes - URL interceptor handles useskin parameter automatically"""
@@ -676,9 +675,9 @@ class EndGameDialog(QDialog):
             current_index = self.tabWidget.indexOf(self.gamePage)
             if current_index >= 0:
                 self.tabWidget.removeTab(current_index)
-            else:
-        except Exception as e:
-        
+        except Exception:
+            pass
+
         # Switch to home page
         self.tabWidget.setCurrentIndex(self.homePageIndex)
         self.close()

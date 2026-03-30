@@ -212,7 +212,6 @@ class HomePage(QWidget):
             # OPTIMIZED: Navigation elements are hidden automatically by DOMContentLoaded script
             
             self.darkModeApplied = True
-        else:
 
     def onUrlChanged(self, url):
         """Handle URL changes - URL interceptor handles useskin parameter automatically"""
@@ -293,8 +292,7 @@ class HomePage(QWidget):
         index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
         if index >= 0:
             self.tabWidget.setCurrentIndex(index)
-        else:
-    
+
     def onSettingsClicked(self):
         # Uncheck the button immediately after click
         self.settingsButton.setChecked(False)

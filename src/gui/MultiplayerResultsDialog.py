@@ -564,7 +564,8 @@ class MultiplayerResultsDialog(QDialog):
                     self.parent().solo_game.webView.stop()
                     self.parent().solo_game.webView.setHtml("")
                     self.parent().solo_game.webView.setEnabled(False)
-        except Exception as e:
-        
+        except Exception:
+            pass
+
         self.accept()  # Close the dialog immediately
         self.exit_to_home_requested.emit()  # Emit signal after closing

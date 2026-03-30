@@ -299,8 +299,6 @@ async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[st
                     'players': remaining_players
                 }, room=room_code)
             
-            else:
-        
         if not updated_room:
             return {
                 "success": True,
