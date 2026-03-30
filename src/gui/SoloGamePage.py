@@ -10,6 +10,7 @@ from src.gui.components.WikipediaTheme import WikipediaTheme
 from src.gui.components.ConfettiEffect import ConfettiWidget
 from src.gui.components.UrlInterceptor import WikipediaUrlInterceptor
 from src.logic.ThemeManager import theme_manager
+from src.gui.utils import set_window_icon, configure_web_profile
 
 class SoloGamePage(QWidget):
     
@@ -119,10 +120,7 @@ class SoloGamePage(QWidget):
         # DO NOT REMOVE: This ensures clean state for theme switching
         self.webView = QWebEngineView()
         
-        profile = QWebEngineProfile.defaultProfile()
-        profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
-        profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
-        profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
+        configure_web_profile()
         
         # Set up URL interceptor to handle useskin=vector-2022 and external links
         self.url_interceptor = WikipediaUrlInterceptor(self.webView)
@@ -559,13 +557,7 @@ class EndGameDialog(QDialog):
         self.homePageIndex = homePageIndex
         self.setWindowTitle("Game Over")
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         self.apply_theme()
         self.setFixedSize(400, 280)  # Further increased size to prevent text cutoff

@@ -67,7 +67,7 @@ class MainApplication(QMainWindow):
                 if existing_index >= 0:
                     self.tabWidget.removeTab(existing_index)
                 delattr(self, 'multiplayerPage')
-            except:
+            except Exception:
                 pass  # Ignore errors if tab doesn't exist
         
         # Create new multiplayer tab

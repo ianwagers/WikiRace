@@ -14,6 +14,7 @@ from PyQt6.QtGui import QFont, QIntValidator
 from src.logic.ThemeManager import theme_manager
 import json
 import os
+from src.gui.utils import set_window_icon
 
 
 class ServerConfigDialog(QDialog):
@@ -26,13 +27,7 @@ class ServerConfigDialog(QDialog):
         super().__init__(parent)
         self.current_config = current_config or self.get_default_config()
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         self.initUI()
         self.apply_theme()

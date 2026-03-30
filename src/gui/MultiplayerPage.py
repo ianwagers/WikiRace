@@ -149,7 +149,7 @@ class MultiplayerPage(QWidget):
         try:
             self.network_manager.player_color_updated.disconnect()
             self.network_manager.player_color_updated.connect(self.on_player_color_updated)
-        except:
+        except Exception:
             pass
     
     def test_server_connection(self):
@@ -1121,7 +1121,7 @@ class MultiplayerPage(QWidget):
             for dialog in self.countdown_dialogs:
                 try:
                     dialog.close()
-                except:
+                except Exception:
                     pass
             self.countdown_dialogs.clear()
         
@@ -1447,7 +1447,7 @@ class MultiplayerPage(QWidget):
                     dialog.close()
                 if hasattr(dialog, 'deleteLater'):
                     dialog.deleteLater()
-            except:
+            except Exception:
                 pass
         self.countdown_dialogs.clear()
         
@@ -1457,7 +1457,7 @@ class MultiplayerPage(QWidget):
                 if self.countdown_dialog and hasattr(self.countdown_dialog, 'close'):
                     self.countdown_dialog.close()
                     self.countdown_dialog.deleteLater()
-            except:
+            except Exception:
                 pass
             self.countdown_dialog = None
         

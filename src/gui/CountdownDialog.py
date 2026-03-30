@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QWidget
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QSize
 from PyQt6.QtGui import QFont, QPainter, QColor, QPen
 from src.logic.ThemeManager import theme_manager
+from src.gui.utils import set_window_icon
 
 
 class DragRaceLight(QWidget):
@@ -81,13 +82,7 @@ class CountdownDialog(QDialog):
         self.current_count = countdown_seconds
         self.message = message
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         # Add unique identifier for debugging
         import time

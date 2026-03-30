@@ -42,6 +42,16 @@ def set_socketio(socketio_instance):
     sio = socketio_instance
 
 
+def _validate_room_code(room_code: str) -> str:
+    """Validate and normalize room code. Returns uppercased code or raises HTTPException."""
+    if len(room_code) != 4 or not room_code.isalpha():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid room code format"
+        )
+    return room_code.upper()
+
+
 @router.post("/rooms", response_model=Dict[str, Any])
 async def create_room(request: RoomCreateRequest) -> Dict[str, Any]:
     """Create a new game room"""
@@ -85,14 +95,7 @@ async def get_room(room_code: str) -> Dict[str, Any]:
             detail="Room manager not available"
         )
     
-    # Validate room code format
-    if len(room_code) != 4 or not room_code.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid room code format"
-        )
-    
-    room_code = room_code.upper()
+    room_code = _validate_room_code(room_code)
     room = room_manager.get_room(room_code)
     
     if not room:
@@ -137,14 +140,7 @@ async def join_room(room_code: str, request: RoomJoinRequest) -> Dict[str, Any]:
             detail="Room manager not available"
         )
     
-    # Validate room code format
-    if len(room_code) != 4 or not room_code.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid room code format"
-        )
-    
-    room_code = room_code.upper()
+    room_code = _validate_room_code(room_code)
     
     try:
         # For REST API, we need a temporary socket ID
@@ -188,14 +184,7 @@ async def leave_room(room_code: str, socket_id: str) -> Dict[str, Any]:
             detail="Room manager not available"
         )
     
-    # Validate room code format
-    if len(room_code) != 4 or not room_code.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid room code format"
-        )
-    
-    room_code = room_code.upper()
+    room_code = _validate_room_code(room_code)
     
     try:
         room = room_manager.leave_room(socket_id)
@@ -229,14 +218,7 @@ async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[st
             detail="Room manager not available"
         )
     
-    # Validate room code format
-    if len(room_code) != 4 or not room_code.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid room code format"
-        )
-    
-    room_code = room_code.upper()
+    room_code = _validate_room_code(room_code)
     player_name = request.get("player_name")
     
     if not player_name:

@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QRect
 from PyQt6.QtGui import QColor, QFont
 from src.logic.ThemeManager import theme_manager
+from src.gui.utils import set_window_icon
 
 
 class PlayerNameDialog(QDialog):
@@ -19,13 +20,7 @@ class PlayerNameDialog(QDialog):
         self.setWindowTitle(title)
         self.setModal(True)
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         # Store the entered name
         self.player_name = None

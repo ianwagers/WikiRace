@@ -13,6 +13,7 @@ from PyQt6.QtCore import Qt, QTimer, pyqtSignal
 from PyQt6.QtGui import QFont, QIcon
 from src.logic.ThemeManager import theme_manager
 import json
+from src.gui.utils import set_window_icon
 
 
 class PathViewerWidget(QWidget):
@@ -202,13 +203,7 @@ class MultiplayerResultsDialog(QDialog):
         self.setWindowTitle("🏆 Race Results")
         self.setMinimumSize(800, 600)
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         self.initUI()
         self.apply_theme()
@@ -402,7 +397,7 @@ class MultiplayerResultsDialog(QDialog):
                         ts = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
                         # For now, just show the page title
                         item_text = page_title
-                    except:
+                    except Exception:
                         item_text = page_title
                 else:
                     item_text = page_title

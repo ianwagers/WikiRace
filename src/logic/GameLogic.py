@@ -113,14 +113,14 @@ class GameLogic(QObject):
             # This is a custom page from search, try to get the title
             try:
                 start_title = self._getTitleFromSearchUrl(start_url)
-            except:
+            except Exception:
                 pass
         
         if end_url and ("curid=" in end_url):
             # This is a custom page from search, try to get the title
             try:
                 end_title = self._getTitleFromSearchUrl(end_url)
-            except:
+            except Exception:
                 pass
         
         # Notify the UI to open a new game tab with the start and end URLs and titles
@@ -151,7 +151,7 @@ class GameLogic(QObject):
                 pages = data.get("query", {}).get("pages", {})
                 for page_data in pages.values():
                     return page_data.get("title", None)
-            except:
+            except Exception:
                 pass
         
         return None

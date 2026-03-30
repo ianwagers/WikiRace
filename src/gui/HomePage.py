@@ -11,6 +11,7 @@ from src.logic.ThemeManager import theme_manager
 
 # Import the URL interceptor
 from src.gui.components.UrlInterceptor import WikipediaUrlInterceptor
+from src.gui.utils import set_window_icon, configure_web_profile
 
 
 class HomePage(QWidget):
@@ -123,10 +124,7 @@ class HomePage(QWidget):
         self.webView = QWebEngineView()
         self.webView.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         
-        profile = QWebEngineProfile.defaultProfile()
-        profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
-        profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
-        profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
+        configure_web_profile()
         
         # Set up URL interceptor to handle useskin=vector-2022 and external links
         self.url_interceptor = WikipediaUrlInterceptor(self.webView)
@@ -518,13 +516,7 @@ class CustomGameDialog(QDialog):
         self.homePage = homePage
         self.setWindowTitle('Race Setup')
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         self.apply_theme()
         self.layout = QVBoxLayout(self)
@@ -731,13 +723,7 @@ class UnderConstructionDialog(QDialog):
         super(UnderConstructionDialog, self).__init__(parent)
         self.setWindowTitle("Under Construction")
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         self.apply_theme()
         self.setFixedSize(300, 180)

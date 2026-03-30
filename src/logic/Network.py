@@ -324,7 +324,7 @@ class NetworkManager(QObject):
                         self.sio.disconnect()
                         import time
                         time.sleep(0.1)  # Brief pause after disconnect
-                except:
+                except Exception:
                     pass
                 
                 # Connect with longer timeout for stability
@@ -1003,7 +1003,7 @@ class NetworkManager(QObject):
             host, port = server_address.split(':')
             response = requests.get(f"http://{host}:{port}/health", timeout=3)
             return response.status_code == 200
-        except:
+        except Exception:
             return False
 
 

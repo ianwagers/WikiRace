@@ -60,7 +60,7 @@ class RedisManager:
         try:
             await self.redis_client.ping()
             return True
-        except:
+        except Exception:
             self.connected = False
             return False
     
