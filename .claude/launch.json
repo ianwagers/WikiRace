@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "WikiRace Multiplayer Server",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["server/start_server.py"],
+      "port": 8001
+    },
+    {
+      "name": "WikiRace Client",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["bin/main.py"],
+      "port": 0
+    }
+  ]
+}
