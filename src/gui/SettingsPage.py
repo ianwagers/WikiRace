@@ -158,12 +158,10 @@ class SettingsPage(QWidget):
     def on_theme_combo_changed(self, theme_text):
         """Handle theme change from combo box"""
         theme = theme_text.lower()
-        print(f"🎨 WikiRace: Settings page - Theme changed to: {theme}")
         theme_manager.set_theme(theme)
     
     def on_theme_changed(self, theme):
         """Handle theme change from theme manager"""
-        print(f"🎨 WikiRace: Settings page - Theme changed to: {theme}")
         # Update the combo box to reflect the new theme
         if hasattr(self, 'themeCombo'):
             self.themeCombo.setCurrentText(theme.title())

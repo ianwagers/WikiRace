@@ -459,7 +459,6 @@ class ServerConfigDialog(QDialog):
                 with open(config_file, 'r') as f:
                     return json.load(f)
         except Exception as e:
-            print(f"Failed to load config: {e}")
         
         return self.get_default_config()
     

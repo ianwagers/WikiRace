@@ -18,39 +18,6 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-# CRITICAL FIX: Enhanced error handling decorator
-def handle_socket_error(operation_name: str):
-    """Decorator for consistent error handling in socket operations"""
-    def decorator(func):
-        async def wrapper(*args, **kwargs):
-            try:
-                return await func(*args, **kwargs)
-            except Exception as e:
-                logger.error(f"Error in {operation_name}: {e}")
-                logger.error(f"Error traceback: {traceback.format_exc()}")
-                
-                # Extract socket ID if available
-                socket_id = None
-                if len(args) > 0:
-                    socket_id = args[0]
-                
-                # Try to emit error to client if socket is available
-                if socket_id and len(args) > 1:
-                    sio = args[1]  # Assuming sio is second argument
-                    try:
-                        await sio.emit('error', {
-                            'message': f'Server error in {operation_name}',
-                            'operation': operation_name,
-                            'timestamp': datetime.utcnow().isoformat()
-                        }, room=socket_id)
-                    except Exception as emit_error:
-                        logger.error(f"Failed to emit error to client: {emit_error}")
-                
-                # Re-raise the exception for upstream handling
-                raise
-        return wrapper
-    return decorator
-
 
 async def broadcast_room_progress(sio, room, skip_sid=None):
     """Broadcast current progress of all players in a room"""
@@ -185,7 +152,6 @@ async def check_inactive_players(sio, room_manager: RoomManager):
 def register_socket_handlers(sio, room_manager: RoomManager):
     """Register all Socket.IO event handlers"""
     
-    print("CONSOLE: Registering Socket.IO handlers...")
     logger.error("FORCE LOG: Socket handlers being registered!")
     
     # Start the inactive player checker
@@ -195,7 +161,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
     @sio.event
     async def connect(sid, environ, auth):
         """Handle client connection"""
-        print(f"CONSOLE: Client connected: {sid}")
         logger.info(f"Client connected: {sid}")
         
         # Send connection confirmation
@@ -205,7 +170,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
         }, room=sid)
     
     @sio.event
-    @handle_socket_error("disconnect")
     async def disconnect(sid):
         """Handle client disconnection with enhanced error handling"""
         logger.info(f"DISCONNECT: Client disconnected: {sid}")
@@ -452,13 +416,10 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             logger.error(f"PONG ERROR: Error handling pong: {e}")
 
     @sio.event
-    @handle_socket_error("leave_room")
     async def leave_room(sid):
         """Handle room leave request with enhanced error handling"""
         try:
-            print(f"CRITICAL: Server received leave_room request from socket {sid}")
             logger.info(f"CRITICAL: Received leave_room request from socket {sid}")
-            print(f"CRITICAL: Processing leave_room for socket {sid}...")
             
             room = room_manager.get_room_by_player(sid)
             if not room:
@@ -493,9 +454,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     'player_color': p.player_color
                 } for p in updated_room.players.values()]
                 
-                print(f"CRITICAL: Broadcasting player_left to room {room_code}")
-                print(f"CRITICAL: Remaining players: {[p['display_name'] for p in remaining_players]}")
-                print(f"CRITICAL: Skipping socket {sid}")
                 
                 await sio.emit('player_left', {
                     'socket_id': sid,
@@ -503,7 +461,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     'players': remaining_players
                 }, room=room_code, skip_sid=sid)
                 
-                print(f"CRITICAL: player_left event sent to room {room_code}")
                 
                 # Broadcast updated room progress to all remaining players
                 await broadcast_room_progress(sio, updated_room, skip_sid=sid)
@@ -513,7 +470,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     new_host = updated_room.get_player(updated_room.host_id)
                     if new_host:
                         logger.info(f"LEADERSHIP: Emitting host_transferred event - {new_host.display_name} is now the room leader")
-                        print(f"LEADERSHIP: Emitting host_transferred event - {new_host.display_name} is now the room leader")
                         await sio.emit('host_transferred', {
                             'new_host_id': updated_room.host_id,
                             'new_host_name': new_host.display_name,
@@ -615,7 +571,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
     @sio.event
     async def start_game(sid, data):
         """Handle game start request (host only)"""
-        print(f"CONSOLE: start_game handler called! sid={sid}, data={data}")
         logger.info(f"DEBUG: Received start_game request from {sid} with data: {data}")
         logger.error(f"FORCE ERROR LOG: start_game handler was definitely called!")
         
@@ -864,27 +819,18 @@ def register_socket_handlers(sio, room_manager: RoomManager):
         
         logger.info(f"DEBUG: start_game handler exiting for {sid}")
     
-    @sio.event
-    async def test_event(sid, data):
-        """TEST EVENT to verify Socket.IO is working"""
-        print(f"CONSOLE: TEST EVENT RECEIVED! sid={sid}, data={data}")
-        logger.error(f"FORCE LOG: TEST EVENT RECEIVED!")
-        await sio.emit('test_response', {'received': data}, room=sid)
     
     @sio.event
     async def player_progress(sid, data):
         """Handle player progress updates with detailed navigation tracking"""
-        print(f"PROGRESS DEBUG: Received player_progress from {sid}: {data}")
         try:
             room_code = data.get('room_code')
             player_name = data.get('player_name')
             page_url = data.get('page_url')
             page_title = data.get('page_title')
             
-            print(f"PROGRESS DEBUG: Progress data - room: {room_code}, player: {player_name}, page: {page_title}")
             
             if not room_code or not player_name or not page_url or not page_title:
-                print(f"ERROR DEBUG: Invalid progress data - missing fields")
                 await sio.emit('error', {'message': 'Invalid progress data - missing required fields'}, room=sid)
                 return
             
@@ -897,10 +843,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
             player = room.get_player_by_name(player_name)
             if player:
                 # DEBUG: Log before adding entry
-                print(f"PROGRESS DEBUG: Before adding entry for {player_name}:")
-                print(f"PROGRESS DEBUG:   - Current navigation_history length: {len(player.navigation_history)}")
-                print(f"PROGRESS DEBUG:   - Current links_clicked: {player.links_clicked}")
-                print(f"PROGRESS DEBUG:   - Adding: {page_title} ({page_url})")
                 
                 # Check if this is a duplicate of the last navigation entry
                 should_add_entry = True
@@ -911,7 +853,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     current_url_base = page_url.split('?')[0]
                     if last_url_base == current_url_base and last_entry.page_title == page_title:
                         should_add_entry = False  # Skip duplicate entry
-                        print(f"PROGRESS DEBUG: Skipping duplicate entry for {player_name}")
                 
                 # Add navigation entry only if it's not a duplicate
                 if should_add_entry:
@@ -921,12 +862,7 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     navigation_entry = player.navigation_history[-1]
                 
                 # DEBUG: Log after adding entry
-                print(f"PROGRESS DEBUG: After adding entry for {player_name}:")
-                print(f"PROGRESS DEBUG:   - New navigation_history length: {len(player.navigation_history)}")
-                print(f"PROGRESS DEBUG:   - New links_clicked: {player.links_clicked}")
-                print(f"PROGRESS DEBUG:   - Navigation entries:")
                 for i, entry in enumerate(player.navigation_history):
-                    print(f"PROGRESS DEBUG:     {i}: {entry.page_title} (link #{entry.link_number})")
                 
                 # Broadcast progress to OTHER players only (exclude sender to prevent feedback loop)
                 await sio.emit('player_progress', {
@@ -937,8 +873,6 @@ def register_socket_handlers(sio, room_manager: RoomManager):
                     'time_elapsed': navigation_entry.time_elapsed
                 }, room=room_code, skip_sid=sid)
                 
-                print(f"PROGRESS DEBUG: Broadcasting progress for {player_name}: {page_title} (links: {player.links_clicked})")
-                print(f"PROGRESS DEBUG: Room has {len(room.players)} players, broadcasting to room {room_code}")
                 
                 # Also send updated progress to all players for sync (exclude sender to prevent feedback)
                 await broadcast_room_progress(sio, room, skip_sid=sid)

@@ -556,19 +556,15 @@ class MultiplayerResultsDialog(QDialog):
     def on_exit_to_home(self):
         """Handle exit to home button click - leave room and go to home page"""
         # CRITICAL FIX: Close dialog immediately, then handle cleanup
-        print(f"🏠 PlayerResultsDialog: Exit to home requested")
         
         # CRITICAL FIX: Stop any WebView loading in the parent game page to prevent stutter
         try:
             if hasattr(self.parent(), 'solo_game') and self.parent().solo_game:
                 if hasattr(self.parent().solo_game, 'webView') and self.parent().solo_game.webView:
-                    print("🛑 CRITICAL: Stopping WebView loading before exit to prevent stutter")
                     self.parent().solo_game.webView.stop()
                     self.parent().solo_game.webView.setHtml("")
                     self.parent().solo_game.webView.setEnabled(False)
-                    print("✅ WebView stopped before exit")
         except Exception as e:
-            print(f"⚠️ Error stopping WebView before exit: {e}")
         
         self.accept()  # Close the dialog immediately
         self.exit_to_home_requested.emit()  # Emit signal after closing

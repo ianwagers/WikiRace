@@ -268,38 +268,24 @@ async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[st
                 detail=f"Player {player_name} not found in room {room_code}"
             )
         
-        # SHOTGUN FIX 3: Check if player is host BEFORE removing them
+        # Check if player is host BEFORE removing them
         was_host = player_to_remove.is_host
-        print(f"SHOTGUN: REST API removing player {player_name} from room {room_code} (was_host: {was_host})")
         updated_room = await room_manager.leave_room(player_to_remove.socket_id)
         
         # CRITICAL FIX: REST API must broadcast player_left event to remaining players
         if updated_room:
-            print(f"SHOTGUN: Successfully removed player {player_name} from room {room_code}")
-            print(f"SHOTGUN: Room now has {updated_room.player_count} remaining players")
-            
             # Use the Socket.IO instance to broadcast the event
             if sio:
-                # CRITICAL FIX: Also emit host_transferred event if the removed player was the host
-                print(f"REST API: DEBUG - was_host: {was_host}")
-                print(f"REST API: DEBUG - updated_room.host_id: {updated_room.host_id}")
+                # Also emit host_transferred event if the removed player was the host
                 if was_host and updated_room.host_id:
                     new_host = updated_room.get_player(updated_room.host_id)
-                    print(f"REST API: DEBUG - new_host: {new_host}")
                     if new_host:
-                        print(f"REST API: Broadcasting host_transferred event - {new_host.display_name} is now the room leader")
                         await sio.emit('host_transferred', {
                             'new_host_id': updated_room.host_id,
                             'new_host_name': new_host.display_name,
                             'message': f"{new_host.display_name} is now the room leader"
                         }, room=room_code, skip_sid=player_to_remove.socket_id)
-                        print(f"REST API: host_transferred event broadcasted successfully")
-                    else:
-                        print(f"REST API: DEBUG - new_host is None, cannot emit host_transferred event")
-                else:
-                    print(f"REST API: DEBUG - Not emitting host_transferred event - was_host: {was_host}, host_id: {updated_room.host_id}")
-                
-                print(f"REST API: Broadcasting player_left event to room {room_code}")
+
                 remaining_players = [{
                     'socket_id': p.socket_id,
                     'display_name': p.display_name,
@@ -312,10 +298,8 @@ async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[st
                     'player_name': player_name,
                     'players': remaining_players
                 }, room=room_code)
-                print(f"REST API: player_left event broadcasted successfully")
             
             else:
-                print(f"WARNING: REST API: Socket.IO instance not available, cannot broadcast player_left event")
         
         if not updated_room:
             return {

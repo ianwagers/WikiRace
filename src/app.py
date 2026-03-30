@@ -142,7 +142,6 @@ class MainApplication(QMainWindow):
     
     def on_theme_changed(self, theme):
         """Handle theme changes"""
-        print(f"🎨 WikiRace: Main application - Theme changed to: {theme}")
         self.apply_theme()
 
 def main():

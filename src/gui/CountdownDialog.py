@@ -92,7 +92,6 @@ class CountdownDialog(QDialog):
         # Add unique identifier for debugging
         import time
         self.dialog_id = f"CD_{int(time.time() * 1000) % 10000}"
-        print(f"🎬 DEBUG: Created CountdownDialog {self.dialog_id}")
         
         # Calculate responsive size based on parent window
         self.calculate_responsive_size()
@@ -131,7 +130,6 @@ class CountdownDialog(QDialog):
         self.status_font_size = max(10, int(width / 35))
         self.light_size = max(30, min(int(width / 12), 60))
         
-        print(f"🎬 Countdown sizing: {width}x{height}, fonts: {self.message_font_size}/{self.countdown_font_size}/{self.status_font_size}")
     
     def initUI(self):
         """Initialize the responsive countdown dialog UI with drag race lights"""
@@ -240,7 +238,6 @@ class CountdownDialog(QDialog):
         x = max(screen_geometry.left(), min(x, screen_geometry.right() - dialog_size.width()))
         y = max(screen_geometry.top(), min(y, screen_geometry.bottom() - dialog_size.height()))
         
-        print(f"🎬 DEBUG: Positioning CountdownDialog {self.dialog_id} at ({x}, {y})")
         self.move(x, y)
         
         # Force update to ensure positioning works
@@ -291,7 +288,6 @@ class CountdownDialog(QDialog):
     def update_countdown(self):
         """Update the countdown display with drag race lights"""
         self.current_count -= 1
-        print(f"🎬 DEBUG: CountdownDialog {self.dialog_id} updating: {self.current_count}")
         
         if self.current_count > 0:
             self.countdown_label.setText(str(self.current_count))
@@ -341,7 +337,6 @@ class CountdownDialog(QDialog):
     
     def finish_countdown(self):
         """Finish the countdown and close dialog"""
-        print(f"🎬 DEBUG: CountdownDialog {self.dialog_id} finishing countdown")
         self.timer.stop()
         self.countdown_finished.emit()
         self.accept()  # Close the dialog

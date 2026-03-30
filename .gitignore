@@ -17,6 +17,12 @@ __pycache__/
 /dist/
 /Python313/
 
+# Build artifacts
+wikirace.egg-info/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
 # Other files
 wikirace_server.log
 dns_info.txt

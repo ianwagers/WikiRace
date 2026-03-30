@@ -149,12 +149,10 @@ class MultiplayerConfig(QObject):
                 return True
                 
         except Exception as e:
-            print(f"Failed to load multiplayer config: {e}")
             # Keep default values and try to save them
             try:
                 self.save_config()
             except Exception as save_error:
-                print(f"Failed to save default config: {save_error}")
             return False
     
     def save_config(self) -> bool:
@@ -173,7 +171,6 @@ class MultiplayerConfig(QObject):
             return True
             
         except Exception as e:
-            print(f"Failed to save multiplayer config: {e}")
             return False
     
     def reset_to_defaults(self) -> None:
@@ -284,7 +281,6 @@ class MultiplayerConfig(QObject):
                 json.dump(data, f, indent=2)
             return True
         except Exception as e:
-            print(f"Failed to export config: {e}")
             return False
     
     def import_config(self, file_path: str) -> bool:
@@ -302,7 +298,6 @@ class MultiplayerConfig(QObject):
             return True
             
         except Exception as e:
-            print(f"Failed to import config: {e}")
             return False
     
     def validate_config(self) -> Dict[str, list]:
