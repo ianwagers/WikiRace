@@ -43,11 +43,7 @@ class ThemeManager(QObject):
                 with open(self.settings_file, 'r', encoding='utf-8') as f:
                     settings = json.load(f)
                     self.current_theme = settings.get('theme', 'dark')
-                    print(f"🎨 WikiRace: Loaded theme setting: {self.current_theme}")
-            else:
-                print("🎨 WikiRace: No settings file found, using default theme: dark")
         except Exception as e:
-            print(f"❌ WikiRace: Error loading settings: {e}")
             self.current_theme = "dark"
     
     def _save_settings(self):
@@ -60,21 +56,18 @@ class ThemeManager(QObject):
             with open(self.settings_file, 'w', encoding='utf-8') as f:
                 json.dump(settings, f, indent=2)
             
-            print(f"💾 WikiRace: Saved theme setting: {self.current_theme}")
-        except Exception as e:
-            print(f"❌ WikiRace: Error saving settings: {e}")
-    
+        except Exception:
+            pass
+
     def set_theme(self, theme: str):
         """Set the current theme and save to settings"""
         if theme not in ['dark', 'light']:
-            print(f"⚠️ WikiRace: Invalid theme '{theme}', using 'dark'")
             theme = 'dark'
         
         if self.current_theme != theme:
             self.current_theme = theme
             self._save_settings()
             self.theme_changed.emit(theme)
-            print(f"🎨 WikiRace: Theme changed to: {theme}")
     
     def get_theme(self) -> str:
         """Get the current theme"""

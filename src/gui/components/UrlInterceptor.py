@@ -20,7 +20,6 @@ class WikipediaUrlInterceptor(QWebEngineUrlRequestInterceptor):
         nav_type = info.navigationType()
         
         # Debug: Log all requests to understand what's happening
-        print(f"🔍 WikiRace: Interceptor called - URL: {url_str}, NavType: {nav_type}")
         
         # Handle resource blocking for performance (from WikipediaTheme)
         if nav_type != info.NavigationType.NavigationTypeLink:
@@ -43,24 +42,19 @@ class WikipediaUrlInterceptor(QWebEngineUrlRequestInterceptor):
             # Block external analytics/tracking services
             for pattern in blocked_patterns:
                 if pattern in url_str.lower():
-                    print(f"🚫 WikiRace: Blocking external resource: {url_str}")
                     info.block(True)
                     return
             
-            print(f"🔍 WikiRace: Non-link navigation: {url_str} (type: {nav_type})")
             return
         
         # Handle link navigation
-        print(f"🔗 WikiRace: Link navigation detected: {url_str}")
         
         # Handle external links (non-Wikipedia domains)
         if not self._is_wikipedia_url(url_str):
-            print(f"🚫 WikiRace: External link detected, blocking: {url_str}")
             info.block(True)
             
             # Navigate back to previous page if WebView is available
             if self.webview and hasattr(self.webview, 'back'):
-                print(f"⬅️ WikiRace: Navigating back from external link")
                 self.webview.back()
             
             return
@@ -78,7 +72,6 @@ class WikipediaUrlInterceptor(QWebEngineUrlRequestInterceptor):
             # Redirect to the new URL with the skin parameter
             new_url = QUrl(new_url_str)
             info.redirect(new_url)
-            print(f"🔄 WikiRace: URL interceptor redirecting to: {new_url_str}")
     
     def _is_wikipedia_url(self, url_str):
         """Check if the URL is a Wikipedia domain"""

@@ -60,7 +60,6 @@ class MainApplication(QMainWindow):
             self.tabWidget.addTab(self.soloGamePage, "Solo Game")
 
     def addMultiplayerTab(self):
-        # CRITICAL FIX: Always create a new multiplayer tab to ensure clean state
         # Remove any existing multiplayer tab first
         if hasattr(self, 'multiplayerPage'):
             try:
@@ -68,7 +67,7 @@ class MainApplication(QMainWindow):
                 if existing_index >= 0:
                     self.tabWidget.removeTab(existing_index)
                 delattr(self, 'multiplayerPage')
-            except:
+            except Exception:
                 pass  # Ignore errors if tab doesn't exist
         
         # Create new multiplayer tab
@@ -142,7 +141,6 @@ class MainApplication(QMainWindow):
     
     def on_theme_changed(self, theme):
         """Handle theme changes"""
-        print(f"🎨 WikiRace: Main application - Theme changed to: {theme}")
         self.apply_theme()
 
 def main():

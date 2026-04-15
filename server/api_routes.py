@@ -42,6 +42,16 @@ def set_socketio(socketio_instance):
     sio = socketio_instance
 
 
+def _validate_room_code(room_code: str) -> str:
+    """Validate and normalize room code. Returns uppercased code or raises HTTPException."""
+    if len(room_code) != 4 or not room_code.isalpha():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid room code format"
+        )
+    return room_code.upper()
+
+
 @router.post("/rooms", response_model=Dict[str, Any])
 async def create_room(request: RoomCreateRequest) -> Dict[str, Any]:
     """Create a new game room"""
@@ -85,14 +95,7 @@ async def get_room(room_code: str) -> Dict[str, Any]:
             detail="Room manager not available"
         )
     
-    # Validate room code format
-    if len(room_code) != 4 or not room_code.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid room code format"
-        )
-    
-    room_code = room_code.upper()
+    room_code = _validate_room_code(room_code)
     room = room_manager.get_room(room_code)
     
     if not room:
@@ -101,7 +104,6 @@ async def get_room(room_code: str) -> Dict[str, Any]:
             detail=f"Room {room_code} not found"
         )
     
-    # CRITICAL FIX: Handle case where host_id doesn't exist in players dict
     host_name = "Unknown"
     if room.host_id and room.host_id in room.players:
         host_name = room.players[room.host_id].display_name
@@ -138,14 +140,7 @@ async def join_room(room_code: str, request: RoomJoinRequest) -> Dict[str, Any]:
             detail="Room manager not available"
         )
     
-    # Validate room code format
-    if len(room_code) != 4 or not room_code.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid room code format"
-        )
-    
-    room_code = room_code.upper()
+    room_code = _validate_room_code(room_code)
     
     try:
         # For REST API, we need a temporary socket ID
@@ -182,21 +177,14 @@ async def join_room(room_code: str, request: RoomJoinRequest) -> Dict[str, Any]:
 
 @router.delete("/rooms/{room_code}/leave", response_model=Dict[str, Any])
 async def leave_room(room_code: str, socket_id: str) -> Dict[str, Any]:
-    """Leave a room (for testing purposes)"""
+    """Leave a room"""
     if not room_manager:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Room manager not available"
         )
     
-    # Validate room code format
-    if len(room_code) != 4 or not room_code.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid room code format"
-        )
-    
-    room_code = room_code.upper()
+    room_code = _validate_room_code(room_code)
     
     try:
         room = room_manager.leave_room(socket_id)
@@ -230,14 +218,7 @@ async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[st
             detail="Room manager not available"
         )
     
-    # Validate room code format
-    if len(room_code) != 4 or not room_code.isalpha():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid room code format"
-        )
-    
-    room_code = room_code.upper()
+    room_code = _validate_room_code(room_code)
     player_name = request.get("player_name")
     
     if not player_name:
@@ -268,38 +249,23 @@ async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[st
                 detail=f"Player {player_name} not found in room {room_code}"
             )
         
-        # SHOTGUN FIX 3: Check if player is host BEFORE removing them
+        # Check if player is host BEFORE removing them
         was_host = player_to_remove.is_host
-        print(f"SHOTGUN: REST API removing player {player_name} from room {room_code} (was_host: {was_host})")
         updated_room = await room_manager.leave_room(player_to_remove.socket_id)
         
-        # CRITICAL FIX: REST API must broadcast player_left event to remaining players
         if updated_room:
-            print(f"SHOTGUN: Successfully removed player {player_name} from room {room_code}")
-            print(f"SHOTGUN: Room now has {updated_room.player_count} remaining players")
-            
             # Use the Socket.IO instance to broadcast the event
             if sio:
-                # CRITICAL FIX: Also emit host_transferred event if the removed player was the host
-                print(f"REST API: DEBUG - was_host: {was_host}")
-                print(f"REST API: DEBUG - updated_room.host_id: {updated_room.host_id}")
+                # Also emit host_transferred event if the removed player was the host
                 if was_host and updated_room.host_id:
                     new_host = updated_room.get_player(updated_room.host_id)
-                    print(f"REST API: DEBUG - new_host: {new_host}")
                     if new_host:
-                        print(f"REST API: Broadcasting host_transferred event - {new_host.display_name} is now the room leader")
                         await sio.emit('host_transferred', {
                             'new_host_id': updated_room.host_id,
                             'new_host_name': new_host.display_name,
                             'message': f"{new_host.display_name} is now the room leader"
                         }, room=room_code, skip_sid=player_to_remove.socket_id)
-                        print(f"REST API: host_transferred event broadcasted successfully")
-                    else:
-                        print(f"REST API: DEBUG - new_host is None, cannot emit host_transferred event")
-                else:
-                    print(f"REST API: DEBUG - Not emitting host_transferred event - was_host: {was_host}, host_id: {updated_room.host_id}")
-                
-                print(f"REST API: Broadcasting player_left event to room {room_code}")
+
                 remaining_players = [{
                     'socket_id': p.socket_id,
                     'display_name': p.display_name,
@@ -312,11 +278,7 @@ async def leave_room_by_name(room_code: str, request: Dict[str, Any]) -> Dict[st
                     'player_name': player_name,
                     'players': remaining_players
                 }, room=room_code)
-                print(f"REST API: player_left event broadcasted successfully")
             
-            else:
-                print(f"WARNING: REST API: Socket.IO instance not available, cannot broadcast player_left event")
-        
         if not updated_room:
             return {
                 "success": True,

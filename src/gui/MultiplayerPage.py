@@ -149,7 +149,7 @@ class MultiplayerPage(QWidget):
         try:
             self.network_manager.player_color_updated.disconnect()
             self.network_manager.player_color_updated.connect(self.on_player_color_updated)
-        except:
+        except Exception:
             pass
     
     def test_server_connection(self):
@@ -793,30 +793,18 @@ class MultiplayerPage(QWidget):
     def _send_start_game_request(self, game_config):
         """Send the actual start game request (with delay for stability)"""
         try:
-            print(f"🚀 DEBUG: About to send start_game request")
-            print(f"🚀 DEBUG: Connection state - connected_to_server: {self.network_manager.connected_to_server}")
-            print(f"🚀 DEBUG: Connection state - sio.connected: {getattr(self.network_manager.sio, 'connected', 'N/A')}")
-            print(f"🚀 DEBUG: Connection state - current_room: {self.network_manager.current_room}")
-            print(f"🚀 DEBUG: Connection state - is_healthy: {self.network_manager._is_connection_healthy()}")
-            print(f"🚀 DEBUG: Game config being sent: {game_config}")
             
             # FIRST: Test if Socket.IO is working at all
-            print("🧪 TESTING: Sending test_event first...")
             try:
                 self.network_manager.sio.emit('test_event', {'test': 'data', 'from': 'client'})
-                print("🧪 Test event sent successfully")
             except Exception as test_e:
-                print(f"🧪 CRITICAL: Test event failed: {test_e}")
+                pass
             
             # THEN: Send the actual start_game event
             self.network_manager.sio.emit('start_game', game_config)
-            print(f"✅ Game start request sent successfully: {game_config}")
             
         except Exception as e:
-            print(f"❌ CRITICAL: Failed to send start game request: {e}")
-            print(f"❌ DEBUG: Exception type: {type(e).__name__}")
             import traceback
-            print(f"❌ DEBUG: Full traceback: {traceback.format_exc()}")
             
             QMessageBox.critical(self, "Error", f"Failed to start game: {e}")
             # Re-enable button on error
@@ -845,8 +833,8 @@ class MultiplayerPage(QWidget):
         # Use Socket.IO to create room
         result = self.network_manager.create_room(player_name)
         if result:
+            pass
             # Room creation request sent, wait for room_created event
-            print(f"Room creation request sent for {player_name}")
         else:
             QMessageBox.critical(self, "Error", "Failed to create room. Please check server connection.")
             self.hostGameButton.setEnabled(True)
@@ -879,8 +867,8 @@ class MultiplayerPage(QWidget):
         # Use Socket.IO to join room
         result = self.network_manager.join_room(room_code, player_name)
         if result:
+            pass
             # Join request sent, wait for player_joined event
-            print(f"Join room request sent for {player_name} to room {room_code}")
         else:
             QMessageBox.critical(self, "Error", "Failed to join room. Please check server connection.")
             self.joinGameButton.setEnabled(True)
@@ -888,42 +876,32 @@ class MultiplayerPage(QWidget):
     
     def on_leave_room_clicked(self):
         """Handle leave room button click"""
-        # CRITICAL FIX: Properly clean up state when leaving room to prevent rejoin bugs
-        print(f"🔄 WikiRace: [{time.time():.3f}] Leaving room - cleaning up state")
         
-        # CRITICAL FIX: Clean up countdown dialogs before leaving room
         self.cleanup_countdown_dialogs()
         
         # Leave the room via network manager first
         if hasattr(self.network_manager, 'leave_room') and self.current_room_code:
             try:
                 self.network_manager.leave_room()
-                print(f"🔄 WikiRace: [{time.time():.3f}] Sent leave room request to server")
             except Exception as e:
-                print(f"⚠️ WikiRace: [{time.time():.3f}] Error leaving room via network: {e}")
+                pass
         
-        # CRITICAL FIX: Reset UI state but keep network connection for rejoining
         self.reset_for_leave_room()
         
-        print(f"✅ WikiRace: [{time.time():.3f}] Room state completely reset - ready for rejoin")
         QMessageBox.information(self, "Left Room", "You have left the room.")
     
     def reset_for_new_game(self):
         """Reset the multiplayer page state to allow starting new games after play again"""
-        print("🔄 Resetting multiplayer page for new game...")
-        print(f"🔍 DEBUG: current_room_code = {self.current_room_code}")
-        print(f"🔍 DEBUG: network_manager exists = {hasattr(self, 'network_manager')}")
         if hasattr(self, 'network_manager'):
-            print(f"🔍 DEBUG: network_manager.current_room = {getattr(self.network_manager, 'current_room', 'None')}")
+            pass
         
         # SIMPLIFIED FIX: Just ensure signal connections are active for real-time updates
         # The existing player_left event handling should work automatically
         if hasattr(self, 'network_manager') and self.network_manager.connected_to_server:
-            print("🔄 Ensuring real-time event listeners are active after play again")
             # Force a refresh of the player list to catch any missed events
             self._refresh_player_list_if_needed()
         else:
-            print("⚠️ Cannot ensure event listeners - network manager not available")
+            pass
         
         # Reset game configuration to defaults
         if hasattr(self, 'startPageCombo'):
@@ -954,25 +932,21 @@ class MultiplayerPage(QWidget):
             # Send the reset configuration to other players
             self._send_config_update()
         
-        print("✅ Multiplayer page reset for new game")
     
     def _refresh_player_list_if_needed(self):
         """Simple refresh to catch any missed player_left events"""
         try:
-            print("🔄 Checking if player list refresh is needed...")
             
             # Request fresh room state from server to ensure we have the latest player list
             if self.current_room_code and hasattr(self, 'network_manager'):
-                print(f"🔄 Requesting fresh room state for room {self.current_room_code}")
                 self._refresh_room_state_from_server()
             
             # The existing player_left event handling should work automatically
             # This is just a safety check to ensure we're in sync
             if hasattr(self, 'update_start_game_button_state'):
                 self.update_start_game_button_state()
-            print("✅ Player list refresh check completed")
         except Exception as e:
-            print(f"⚠️ Error refreshing player list: {e}")
+            pass
     
     def _refresh_room_state_from_server(self):
         """Refresh room state from server to get updated player list"""
@@ -980,7 +954,6 @@ class MultiplayerPage(QWidget):
             return
         
         try:
-            print(f"🔄 Fetching fresh room state from server for {self.current_room_code}")
             # Use the network manager to get fresh room info via REST API
             import requests
             server_url = getattr(self.network_manager, 'server_url', 'http://wikirace.duckdns.org:8001')
@@ -990,16 +963,15 @@ class MultiplayerPage(QWidget):
                 response = requests.get(url, timeout=5)
                 if response.status_code == 200:
                     room_info = response.json()
-                    print(f"📡 Received fresh room state: {room_info}")
                     # Update our local state with fresh data
                     self._update_room_state_from_server_data(room_info)
                 else:
-                    print(f"⚠️ Room info request failed with status {response.status_code}")
+                    pass
             except Exception as e:
-                print(f"⚠️ Error fetching room info via REST API: {e}")
+                pass
                 
         except Exception as e:
-            print(f"⚠️ Error refreshing room state from server: {e}")
+            pass
     
     def _update_room_state_from_server_data(self, room_data):
         """Update UI state based on fresh server room data"""
@@ -1007,7 +979,6 @@ class MultiplayerPage(QWidget):
             if 'players' in room_data:
                 # Update player list with fresh data
                 players = room_data['players']
-                print(f"👥 Updating player list with {len(players)} players from server")
                 
                 # Update the player list display
                 if hasattr(self, 'update_player_list'):
@@ -1022,11 +993,10 @@ class MultiplayerPage(QWidget):
                     self.update_start_game_button_state()
                     
         except Exception as e:
-            print(f"⚠️ Error updating room state from server data: {e}")
+            pass
     
     def reset_for_leave_room(self):
         """Reset UI state when leaving room but keep network connection for rejoining"""
-        print("🔄 Resetting multiplayer page state for leave room...")
         
         # Reset all state variables to initial values
         self.current_room_code = None
@@ -1087,19 +1057,16 @@ class MultiplayerPage(QWidget):
         # Update server status
         self.update_server_status()
         
-        print("✅ Multiplayer page state reset for leave room - network connection preserved")
     
     def reset_for_exit(self):
-        """CRITICAL FIX: Complete state reset when exiting multiplayer games"""
-        print("🔄 CRITICAL: Resetting multiplayer page state for exit...")
+        """Complete state reset when exiting multiplayer games"""
         
         # Disconnect from network and clean up connections
         if hasattr(self, 'network_manager') and self.network_manager:
             try:
                 self.network_manager.disconnect_from_server()
-                print("🔌 Disconnected from network manager")
             except Exception as e:
-                print(f"⚠️ Error disconnecting network manager: {e}")
+                pass
         
         # Reset all state variables to initial values
         self.current_room_code = None
@@ -1154,7 +1121,7 @@ class MultiplayerPage(QWidget):
             for dialog in self.countdown_dialogs:
                 try:
                     dialog.close()
-                except:
+                except Exception:
                     pass
             self.countdown_dialogs.clear()
         
@@ -1164,30 +1131,25 @@ class MultiplayerPage(QWidget):
         if hasattr(self, 'color_scroll'):
             self.color_scroll.hide()
         
-        print("✅ CRITICAL: Multiplayer page state completely reset for exit")
     
     def on_kicked_for_inactivity(self, reason):
         """Handle being kicked for inactivity"""
-        print(f"⏰ Kicked for inactivity: {reason}")
         QMessageBox.warning(self, "Disconnected", f"You were disconnected due to inactivity.\nReason: {reason}")
         self.reset_for_exit()
     
     def on_room_closed(self, reason):
         """Handle room being closed"""
-        print(f"🚪 Room closed: {reason}")
         QMessageBox.information(self, "Room Closed", f"The room was closed.\nReason: {reason}")
         self.reset_for_exit()
     
     def on_player_disconnected(self, player_name, message):
         """Handle another player disconnecting"""
-        print(f"🔌 Player disconnected: {player_name} - {message}")
         # Show a brief notification
         from PyQt6.QtWidgets import QMessageBox
         QMessageBox.information(self, "Player Disconnected", f"{player_name} has disconnected from the game.\n{message}")
     
     def on_player_reconnected(self, player_name, message):
         """Handle another player reconnecting"""
-        print(f"🔄 Player reconnected: {player_name} - {message}")
         # Show a brief notification
         from PyQt6.QtWidgets import QMessageBox
         QMessageBox.information(self, "Player Reconnected", f"{player_name} has reconnected to the game.\n{message}")
@@ -1212,7 +1174,6 @@ class MultiplayerPage(QWidget):
                 return True
                 
         except Exception as e:
-            print(f"❌ Error validating room existence: {e}")
             # If validation fails, assume room exists and let server handle it
             return True
     
@@ -1220,7 +1181,6 @@ class MultiplayerPage(QWidget):
         """Clear the waiting for players flag to allow starting new games"""
         if hasattr(self, '_waiting_for_players_ready'):
             self._waiting_for_players_ready = False
-            print("🔄 Cleared waiting for players flag - can now start new games")
             # Update button state
             self.update_start_game_button_state()
     
@@ -1228,14 +1188,10 @@ class MultiplayerPage(QWidget):
         """Handle when a player hits 'Play Again' - clear waiting flag for leader"""
         if self.is_leader and hasattr(self, '_waiting_for_players_ready') and self._waiting_for_players_ready:
             self._waiting_for_players_ready = False
-            print("🔄 Player hit 'Play Again' - clearing waiting flag for leader")
             self.update_start_game_button_state()
     
     def update_players_grid(self, players):
         """Update the players grid display"""
-        print(f"🎨 DEBUG: update_players_grid called with players: {players}")
-        print(f"🎨 DEBUG: Current player_colors: {self.player_colors}")
-        print(f"🎨 DEBUG: Number of player labels: {len(self.playerLabels)}")
         
         # Clear all labels first
         for label in self.playerLabels:
@@ -1252,7 +1208,6 @@ class MultiplayerPage(QWidget):
                 
                 # Get player color if available, use default gray if not set
                 player_color = self.player_colors.get(clean_name, "#CCCCCC")  # Default gray
-                print(f"🎨 DEBUG: Player {clean_name} -> color {player_color}")
                 
                 # Update label text and styling
                 label.setText(player)
@@ -1273,9 +1228,7 @@ class MultiplayerPage(QWidget):
                     }}
                 """)
                 label.show()
-                print(f"🎨 DEBUG: Updated label {i} with player: {player}")
         
-        print(f"🎨 DEBUG: Grid update completed. Showing {len(players)} players")
         # Don't show any empty slots - only show boxes when players actually join
     
     def show_room_info(self, title, players):
@@ -1287,7 +1240,6 @@ class MultiplayerPage(QWidget):
         self.roomAndColorFrame.show()
         self.color_scroll.show()  # Explicitly show the color picker scroll area
         
-        # CRITICAL FIX: Ensure color picker is visible and properly initialized
         if hasattr(self, 'color_picker'):
             self.color_picker.show()
             # Reset color picker state to ensure it's ready for selection
@@ -1300,20 +1252,16 @@ class MultiplayerPage(QWidget):
         
         if self.is_leader:
             # Leader can modify settings
-            print(f"🏆 LEADERSHIP: Enabling leader controls - is_leader={self.is_leader}")
             self.gameSelectionDisplay.hide()
             self.startGameButton.show()
             self.startPageCombo.setEnabled(True)
             self.endPageCombo.setEnabled(True)
-            # CRITICAL FIX: Also enable custom edit boxes for leader
             self.customStartPageEdit.setEnabled(True)
             self.customEndPageEdit.setEnabled(True)
-            print(f"🏆 LEADERSHIP: Custom edit boxes enabled: start={self.customStartPageEdit.isEnabled()}, end={self.customEndPageEdit.isEnabled()}")
             # Update start game button state based on players and configuration
             self.update_start_game_button_state()
         else:
             # Non-leader can see but not modify settings
-            print(f"🏆 LEADERSHIP: Disabling non-leader controls - is_leader={self.is_leader}")
             self.gameSelectionDisplay.show()
             self.startGameButton.hide()
             self.startPageCombo.setEnabled(False)  # Disabled but visible
@@ -1334,7 +1282,6 @@ class MultiplayerPage(QWidget):
     
     def on_room_created(self, room_code, player_name):
         """Handle room creation event"""
-        print(f"🎉 Room created: {room_code} by {player_name}")
         self.current_room_code = room_code
         self.is_leader = True
         self.players_in_room = [player_name]
@@ -1352,7 +1299,6 @@ class MultiplayerPage(QWidget):
     
     def on_room_joined(self, room_code, player_name, players_list):
         """Handle successful room join event"""
-        print(f"🎉 Successfully joined room: {room_code}")
         self.current_room_code = room_code
         self.is_leader = False
         self.players_in_room = [p['display_name'] for p in players_list]
@@ -1365,7 +1311,6 @@ class MultiplayerPage(QWidget):
                 player_color = player_data.get('player_color')
                 if player_color:
                     self.player_colors[player_name_data] = player_color
-                    print(f"🎨 Loaded existing color for {player_name_data}: {player_color}")
         
         # Update used colors tracking
         self._update_used_colors()
@@ -1390,7 +1335,6 @@ class MultiplayerPage(QWidget):
     
     def on_player_joined(self, player_name, players_list):
         """Handle player join event"""
-        print(f"🎨 UI RECEIVED: Player {player_name} joined with players list: {players_list}")
         
         # Update our local player list with the server's authoritative list
         self.players_in_room = [p['display_name'] for p in players_list]
@@ -1401,15 +1345,11 @@ class MultiplayerPage(QWidget):
             player_color = player_data.get('player_color')
             if player_color:  # Only update if player has a color
                 self.player_colors[player_name_from_data] = player_color
-                print(f"🎨 UI RECEIVED: Updated color for {player_name_from_data}: {player_color}")
             else:
                 # Remove color for players who don't have one (like newly joined players)
                 if player_name_from_data in self.player_colors:
                     del self.player_colors[player_name_from_data]
-                    print(f"🎨 UI RECEIVED: Removed color for {player_name_from_data} (no color assigned)")
         
-        print(f"🎨 UI RECEIVED: Current players_in_room: {self.players_in_room}")
-        print(f"🎨 UI RECEIVED: Current player_colors: {self.player_colors}")
         
         # Update the grid display
         if hasattr(self, 'update_players_grid'):
@@ -1431,17 +1371,12 @@ class MultiplayerPage(QWidget):
     
     def on_player_left(self, player_name, players_list):
         """Handle player leave event"""
-        print(f"🔄 CRITICAL: on_player_left called - Player {player_name} left the room")
-        print(f"🔄 CRITICAL: Remaining players: {[p['display_name'] for p in players_list]}")
-        print(f"🔄 CRITICAL: Current players_in_room before update: {self.players_in_room}")
         
         # Update our local player list with the server's authoritative list
         self.players_in_room = [p['display_name'] for p in players_list]
-        print(f"🔄 CRITICAL: Updated players_in_room to: {self.players_in_room}")
         
         # Update the players grid display
         if hasattr(self, 'update_players_grid'):
-            print(f"🔄 CRITICAL: Calling update_players_grid with {len(players_list)} players")
             # Format players list with leader tag
             formatted_players = []
             for p in players_list:
@@ -1450,10 +1385,9 @@ class MultiplayerPage(QWidget):
                 else:
                     formatted_players.append(p['display_name'])
             
-            print(f"🔄 CRITICAL: Formatted players for grid: {formatted_players}")
             self.update_players_grid(formatted_players)
         else:
-            print(f"🔄 CRITICAL: update_players_grid method not found!")
+            pass
         
         # Update start game button state
         self.update_start_game_button_state()
@@ -1464,8 +1398,6 @@ class MultiplayerPage(QWidget):
     
     def on_host_transferred(self, new_host_id, new_host_name):
         """Handle host transfer event"""
-        print(f"🏆 LEADERSHIP: MultiplayerPage received host_transferred - new_host_id: {new_host_id}, new_host_name: {new_host_name}")
-        print(f"🏆 LEADERSHIP: Current player_name: {self.player_name}")
         
         # Update our leadership status
         if hasattr(self, 'network_manager') and hasattr(self.network_manager, 'sio'):
@@ -1473,16 +1405,14 @@ class MultiplayerPage(QWidget):
             # you'd want to track socket IDs properly)
             if new_host_name == self.player_name:
                 self.is_leader = True
-                print(f"🏆 LEADERSHIP: Player {self.player_name} is now the leader")
                 QMessageBox.information(self, "Leadership Transferred", 
                                       "You are now the room leader!")
             else:
                 self.is_leader = False
-                print(f"🏆 LEADERSHIP: Player {new_host_name} is now the leader, {self.player_name} is not leader")
                 QMessageBox.information(self, "Leadership Transferred", 
                                       f"{new_host_name} is now the room leader.")
         else:
-            print(f"🏆 LEADERSHIP: No network manager available for leadership transfer")
+            pass
         
         # Update the players list to reflect the new leader
         if hasattr(self, 'players_in_room') and self.players_in_room:
@@ -1496,24 +1426,19 @@ class MultiplayerPage(QWidget):
                     updated_players.append(player_name)
             
             self.players_in_room = updated_players
-            print(f"🎯 DEBUG: Refreshing room info after host transfer - is_leader={self.is_leader}")
             self.show_room_info(f"Room Code: {self.current_room_code}", self.players_in_room)
             
-            # CRITICAL FIX: Update custom edit boxes based on current combo selections and leadership
             if self.is_leader:
                 self.on_game_config_changed()
     
     def on_room_deleted(self):
         """Handle room deletion event"""
-        print(f"🗑️ WikiRace: [{time.time():.3f}] Room deleted - performing complete cleanup")
         QMessageBox.information(self, "Room Closed", 
                               "The room has been closed because all players have left.")
-        # CRITICAL FIX: Reset to initial state with complete cleanup to prevent rejoin bugs
         self.on_leave_room_clicked()
     
     def cleanup_countdown_dialogs(self):
         """Clean up any existing countdown dialogs"""
-        print(f"🎬 DEBUG: Cleaning up {len(self.countdown_dialogs)} countdown dialogs")
         
         # Close and remove all countdown dialogs from the list
         for dialog in self.countdown_dialogs:
@@ -1522,7 +1447,7 @@ class MultiplayerPage(QWidget):
                     dialog.close()
                 if hasattr(dialog, 'deleteLater'):
                     dialog.deleteLater()
-            except:
+            except Exception:
                 pass
         self.countdown_dialogs.clear()
         
@@ -1530,78 +1455,64 @@ class MultiplayerPage(QWidget):
         if hasattr(self, 'countdown_dialog'):
             try:
                 if self.countdown_dialog and hasattr(self.countdown_dialog, 'close'):
-                    print(f"🎬 DEBUG: Closing single countdown dialog reference")
                     self.countdown_dialog.close()
                     self.countdown_dialog.deleteLater()
-            except:
+            except Exception:
                 pass
             self.countdown_dialog = None
         
-        print(f"🎬 DEBUG: Cleaned up all countdown dialogs")
     
     def hideEvent(self, event):
         """Handle page hide event - clean up countdown dialogs"""
         super().hideEvent(event)
-        # CRITICAL FIX: Clean up any active countdown dialogs when page is hidden
         self.cleanup_countdown_dialogs()
     
     def try_auto_discovery(self):
         """Try to auto-discover and connect to the best available server"""
         try:
-            print("🔍 Attempting auto-discovery of WikiRace servers...")
             
             # Try auto-discovery
             success = self.network_manager.auto_connect_to_best_server()
             
             if success:
-                print("✅ Auto-discovery successful! Connected to best available server.")
                 # Update server config with the discovered server
                 from urllib.parse import urlparse
                 parsed = urlparse(self.network_manager.server_url)
                 self.server_config['server_host'] = parsed.hostname
                 self.server_config['server_port'] = parsed.port
-                print(f"📡 Updated server config to: {parsed.hostname}:{parsed.port}")
             else:
-                print("⚠️ Auto-discovery failed, using configured server")
+                pass
                 
         except Exception as e:
-            print(f"❌ Auto-discovery error: {e}")
-            print("⚠️ Falling back to configured server")
+            pass
     
     def showEvent(self, event):
         """Handle page show event - clean up any lingering countdown dialogs"""
         super().showEvent(event)
-        # CRITICAL FIX: Clean up any lingering countdown dialogs when page is shown
         self.cleanup_countdown_dialogs()
     
     def show_debug_countdown_info(self):
         """Debug method to show information about active countdown dialogs"""
-        print(f"🎬 DEBUG: Active countdown dialogs: {len(self.countdown_dialogs)}")
         for i, dialog in enumerate(self.countdown_dialogs):
             if hasattr(dialog, 'dialog_id'):
-                print(f"  Dialog {i}: {dialog.dialog_id} (count: {dialog.current_count})")
+                pass
             else:
-                print(f"  Dialog {i}: No ID available")
+                pass
     
     def on_game_starting(self, countdown_data):
         """Handle game starting countdown event"""
-        print(f"🎬 DEBUG: Received game_starting event with data: {countdown_data}")
         
         # Lock colors during game
         self.lock_colors()
         
-        # CRITICAL FIX: Clean up any existing countdown dialogs first
         self.cleanup_countdown_dialogs()
         
-        # CRITICAL FIX: Check if we already have a countdown dialog active
         if hasattr(self, 'countdown_dialog') and self.countdown_dialog and not self.countdown_dialog.isHidden():
-            print(f"🎬 DEBUG: Countdown dialog already active, skipping duplicate")
             return
         
         try:
             from src.gui.CountdownDialog import CountdownDialog
             
-            print(f"🎬 DEBUG: Creating countdown dialog... (Total dialogs: {len(self.countdown_dialogs)})")
             # Create new countdown dialog
             countdown_dialog = CountdownDialog(
                 countdown_data.get('countdown_seconds', 5),
@@ -1611,7 +1522,6 @@ class MultiplayerPage(QWidget):
             
             # Add to list for debugging
             self.countdown_dialogs.append(countdown_dialog)
-            print(f"🎬 DEBUG: Added dialog to list. Total dialogs: {len(self.countdown_dialogs)}")
             
             # Show debug info about all dialogs
             self.show_debug_countdown_info()
@@ -1619,14 +1529,11 @@ class MultiplayerPage(QWidget):
             # Store reference to prevent garbage collection
             self.countdown_dialog = countdown_dialog
             
-            print(f"🎬 DEBUG: Showing countdown dialog...")
             # Show the countdown dialog
             countdown_dialog.exec()  # Use exec() to make it modal and blocking
             
-            print(f"✅ Countdown completed: {countdown_data.get('message', 'Game starting...')}")
             
         except ImportError as e:
-            print(f"❌ DEBUG: CountdownDialog import failed: {e}")
             # Fallback to simple message box if CountdownDialog doesn't exist yet
             from PyQt6.QtWidgets import QMessageBox
             msg = QMessageBox(self)
@@ -1638,13 +1545,10 @@ class MultiplayerPage(QWidget):
             # Auto-close after countdown
             QTimer.singleShot(countdown_data.get('countdown_seconds', 5) * 1000, msg.close)
         except Exception as e:
-            print(f"❌ DEBUG: Error in countdown dialog: {e}")
             import traceback
-            print(f"❌ DEBUG: Countdown traceback: {traceback.format_exc()}")
     
     def on_game_started(self, game_data):
         """Handle game start event"""
-        print(f"🎮 DEBUG: Received game_started event with data: {game_data}")
         
         room_code = game_data.get('room_code', self.current_room_code)
         start_url = game_data.get('start_url')
@@ -1652,7 +1556,6 @@ class MultiplayerPage(QWidget):
         start_title = game_data.get('start_title')
         end_title = game_data.get('end_title')
         
-        print(f"🎮 DEBUG: Extracted game data - room: {room_code}, start: {start_title}, end: {end_title}")
         
         # Use server's player data if available (includes colors), otherwise build from local data
         if 'players' not in game_data or not game_data['players']:
@@ -1670,17 +1573,14 @@ class MultiplayerPage(QWidget):
                 })
         # Server provided player data - use it as is (includes colors)
         
-        print(f"🎮 DEBUG: Players in game: {game_data['players']}")
         
         # CRITICAL: Clean up ALL existing game tabs first to prevent multiple instances
-        print(f"🧹 DEBUG: Cleaning up ALL existing game tabs before creating new one...")
         game_tabs_to_remove = []
         
         for i in range(self.tabWidget.count()):
             widget = self.tabWidget.widget(i)
             if hasattr(widget, '__class__') and 'MultiplayerGamePage' in str(widget.__class__):
                 game_tabs_to_remove.append(i)
-                print(f"🧹 DEBUG: Found existing game tab at index {i} - marking for removal")
         
         # Remove all existing game tabs (in reverse order to maintain indices)
         for i in reversed(game_tabs_to_remove):
@@ -1688,17 +1588,13 @@ class MultiplayerPage(QWidget):
             # Disconnect signals from old instances before removing
             if hasattr(widget, 'disconnect_network_signals'):
                 widget.disconnect_network_signals()
-            print(f"🧹 DEBUG: Removing existing game tab at index {i}")
             self.tabWidget.removeTab(i)
         
-        print(f"🧹 DEBUG: Cleaned up {len(game_tabs_to_remove)} existing game tabs")
         
         # Create new multiplayer game tab if no existing one or reuse failed
         try:
-            print(f"🎮 DEBUG: Importing MultiplayerGamePage...")
             from src.gui.MultiplayerGamePage import MultiplayerGamePage
             
-            print(f"🎮 DEBUG: Creating new multiplayer game page...")
             # Create the multiplayer game page
             multiplayer_game = MultiplayerGamePage(
                 self.tabWidget,
@@ -1707,22 +1603,16 @@ class MultiplayerPage(QWidget):
                 parent=self
             )
             
-            print(f"🎮 DEBUG: Adding game tab to tab widget...")
             # Add to tab widget
             tab_index = self.tabWidget.addTab(multiplayer_game, f"🏁 Race: {room_code}")
             self.tabWidget.setCurrentIndex(tab_index)
             
-            print(f"🎮 DEBUG: Starting the actual game...")
             # Start the game immediately
             multiplayer_game.start_game()
             
-            print(f"✅ Multiplayer game started successfully: {start_url} -> {end_url}")
             
         except Exception as e:
-            print(f"❌ CRITICAL: Failed to create multiplayer game: {e}")
-            print(f"❌ DEBUG: Exception type: {type(e).__name__}")
             import traceback
-            print(f"❌ DEBUG: Full traceback: {traceback.format_exc()}")
             
             # Only show error dialog for actual failures, not for normal operation
             QMessageBox.critical(self, "Game Start Error", 
@@ -1752,9 +1642,7 @@ class MultiplayerPage(QWidget):
         """Handle failed reconnection"""
         self.show_server_status("❌ Connection Lost", "Could not reconnect to server", "error")
         
-        # CRITICAL FIX: If we were in a room, perform complete cleanup to prevent rejoin bugs
         if self.current_room_code:
-            print(f"🔌 WikiRace: [{time.time():.3f}] Reconnection failed - cleaning up room state")
             self.on_leave_room_clicked()
         
         QMessageBox.warning(self, "Connection Lost", 
@@ -1780,7 +1668,6 @@ class MultiplayerPage(QWidget):
                 'auto_discovery': True  # Enable auto-discovery by default
             }
         except Exception as e:
-            print(f"Failed to load server config: {e}")
             # Use default configuration
             self.server_config = {
                 'server_host': 'wikirace.duckdns.org',  # Default to your DDNS domain
@@ -1904,19 +1791,13 @@ class MultiplayerPage(QWidget):
             self.customStartPageEdit.blockSignals(False)
             self.customEndPageEdit.blockSignals(False)
             
-            print(f"🔄 Non-leader UI updated: {start_category} -> {end_category} (start: '{custom_start}', end: '{custom_end}')")
         
-        print(f"📝 Game configuration updated by {host_name}: {start_text} -> {end_text}")
     
     def on_player_color_updated(self, player_name, color_hex, color_name):
         """Handle player color update from server"""
-        print(f"🎨 UI RECEIVED: Player {player_name} updated color to {color_name} ({color_hex})")
-        print(f"🎨 UI RECEIVED: Current players_in_room: {self.players_in_room}")
-        print(f"🎨 UI RECEIVED: Current player_colors: {self.player_colors}")
         
         # Update local color mapping
         self.player_colors[player_name] = color_hex
-        print(f"🎨 Updated player_colors: {self.player_colors}")
         
         # Update used colors tracking
         self._update_used_colors()
@@ -1968,7 +1849,6 @@ class MultiplayerPage(QWidget):
             # Check if search results are present
             return bool(data.get("query", {}).get("search", []))
         except Exception as e:
-            print(f"❌ Error validating Wikipedia page '{page_title}': {e}")
             return False  # If we can't validate, assume it's invalid
     
     def _validate_and_start_game(self, game_config):
@@ -2025,7 +1905,6 @@ class MultiplayerPage(QWidget):
                 self.startGameButton.setEnabled(True)
                 self.update_start_game_button_state()
         except Exception as e:
-            print(f"❌ Error starting game: {e}")
             QMessageBox.critical(self, "Error", f"Failed to start game: {e}")
             # Re-enable button on error
             self.startGameButton.setEnabled(True)
@@ -2039,18 +1918,14 @@ class MultiplayerPage(QWidget):
         if not self.player_name or not self.current_room_code:
             return
         
-        print(f"🎨 Player {self.player_name} selected color: {color_name} ({color_hex})")
         
         # Check for color conflicts
         if color_hex in self.used_colors:
-            print(f"⚠️ Color {color_name} is already used by another player")
             # Find an available color
             available_colors = self._get_available_colors()
             if available_colors:
                 color_hex, color_name = available_colors[0]
-                print(f"🔄 Auto-selecting available color: {color_name} ({color_hex})")
             else:
-                print(f"❌ No available colors, keeping current selection")
                 return
         
         # Store the color locally
@@ -2084,7 +1959,6 @@ class MultiplayerPage(QWidget):
         """Update the used colors set and notify color picker"""
         self.used_colors = set(self.player_colors.values())
         self.color_picker.update_used_colors(list(self.used_colors))
-        print(f"🎨 Updated used colors: {self.used_colors}")
     
     def _get_available_colors(self):
         """Get list of available colors that aren't used"""
@@ -2106,14 +1980,11 @@ class MultiplayerPage(QWidget):
     def lock_colors(self):
         """Lock color selection during game"""
         self.color_picker.setEnabled(False)
-        print("🔒 Colors locked during game")
     
     def unlock_colors(self):
         """Unlock color selection between games"""
         self.color_picker.setEnabled(True)
-        print("🔓 Colors unlocked between games")
     
     def on_game_ended(self, results):
         """Handle game end event - unlock colors for next game"""
-        print("🏁 Game ended - unlocking colors for next game")
         self.unlock_colors()

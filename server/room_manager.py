@@ -31,7 +31,6 @@ class RoomManager:
         self.player_to_room: Dict[str, str] = {}  # socket_id -> room_code mapping
         self.use_redis = False  # Will be set to True when Redis is available
         
-        # CRITICAL FIX: Add locks for atomic operations
         self._room_locks: Dict[str, asyncio.Lock] = {}  # room_code -> lock
         self._player_locks: Dict[str, asyncio.Lock] = {}  # socket_id -> lock
         self._global_lock = asyncio.Lock()  # Global lock for cross-room operations
@@ -198,7 +197,6 @@ class RoomManager:
             logger.warning(f"Room {room_code} is full, cannot join")
             return None
         
-        # CRITICAL FIX: Allow joining rooms in LOBBY or COMPLETED state for rejoins
         if room.game_state not in [GameState.LOBBY, GameState.COMPLETED]:
             logger.warning(f"Room {room_code} is in {room.game_state.value} state, cannot join")
             return None
@@ -206,7 +204,6 @@ class RoomManager:
         # Check if player name already exists in room
         existing_player = room.get_player_by_name(display_name)
         if existing_player:
-            # CRITICAL FIX: Handle rejoin scenario - allow rejoin if same socket ID or if player was disconnected
             if existing_player.socket_id == player_socket_id:
                 logger.info(f"Player {display_name} rejoining room {room_code} with same socket ID")
                 # Update the player mapping in case it was lost
@@ -229,7 +226,6 @@ class RoomManager:
                 return None
         
         # Create player
-        # CRITICAL FIX: If room is empty, make the first player the host
         is_host = room.player_count == 0
         player = Player(
             socket_id=player_socket_id,
@@ -288,26 +284,21 @@ class RoomManager:
                 
                 logger.info(f"Player {player_name} leaving room {room_code} (host: {was_host}, state: {game_state.value})")
                 
-                # CRITICAL FIX: Handle host transfer BEFORE removing the player
                 if was_host:
-                    logger.info(f"LEADERSHIP: Host {player_name} is leaving room {room_code}")
-                    logger.info(f"LEADERSHIP: Current players before transfer: {[p.display_name for p in room.players.values()]}")
+                    logger.info(f"Host {player_name} is leaving room {room_code}")
                     
-                    # CRITICAL FIX: Transfer host BEFORE removing the player
                     new_host_id = room.transfer_host()
                     if new_host_id:
                         new_host = room.get_player(new_host_id)
                         if new_host:
-                            logger.info(f"LEADERSHIP: Successfully transferred host to {new_host.display_name} in room {room_code}")
-                            logger.info(f"LEADERSHIP: New host socket_id: {new_host_id}, is_host: {new_host.is_host}")
+                            logger.info(f"Successfully transferred host to {new_host.display_name} in room {room_code}")
                         else:
-                            logger.error(f"LEADERSHIP: Failed to get new host player object for socket_id {new_host_id}")
+                            logger.error(f"Failed to get new host player object for socket_id {new_host_id}")
                     else:
                         # No other players, clear host_id but keep room open
                         room.host_id = None
-                        logger.info(f"LEADERSHIP: Room {room_code} has no host but kept open for potential rejoin")
+                        logger.info(f"Room {room_code} has no host but kept open for potential rejoin")
                 
-                # CRITICAL FIX: Handle different scenarios based on game state
                 if game_state == GameState.IN_PROGRESS:
                     # During active game, mark as disconnected but keep in room for potential rejoin
                     player.disconnected = True
@@ -368,7 +359,6 @@ class RoomManager:
         
         room = self.rooms[room_code]
         
-        # CRITICAL FIX: Ensure complete cleanup of all persistent data
         # Remove all player mappings
         for socket_id in list(room.players.keys()):
             self.player_to_room.pop(socket_id, None)

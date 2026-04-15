@@ -34,11 +34,9 @@ class GameLogic(QObject):
                 return random_page_url
             else:
                 # Handle unsuccessful request
-                print(f"Error fetching random Wikipedia page: {response.status_code}")
                 return None
         except requests.RequestException as e:
             # Handle request exception
-            print(f"Request failed: {e}")
             return None
         
     # Currently supported categories:
@@ -115,14 +113,14 @@ class GameLogic(QObject):
             # This is a custom page from search, try to get the title
             try:
                 start_title = self._getTitleFromSearchUrl(start_url)
-            except:
+            except Exception:
                 pass
         
         if end_url and ("curid=" in end_url):
             # This is a custom page from search, try to get the title
             try:
                 end_title = self._getTitleFromSearchUrl(end_url)
-            except:
+            except Exception:
                 pass
         
         # Notify the UI to open a new game tab with the start and end URLs and titles
@@ -153,7 +151,7 @@ class GameLogic(QObject):
                 pages = data.get("query", {}).get("pages", {})
                 for page_data in pages.values():
                     return page_data.get("title", None)
-            except:
+            except Exception:
                 pass
         
         return None
@@ -234,19 +232,13 @@ class GameLogic(QObject):
                 # Construct the URL to the Wikipedia page
                 wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
 
-                print(f"Found Wikipedia page: {wiki_url} (Title: {page_title})")
                 return wiki_url
             else:
                 # Handle the case where no results are found
-                print(f"No results found for '{search_text}'. Using fallback.")
                 return None  # Return None to indicate no page found
         except requests.exceptions.RequestException as e:
-            print(f"Error searching for '{search_text}': {e}")
-            print("Using fallback random page...")
             return self.getRandomWikiLink()
         except Exception as e:
-            print(f"Unexpected error searching for '{search_text}': {e}")
-            print("Using fallback random page...")
             return self.getRandomWikiLink()
     
     def findWikiPageWithTitle(self, search_text):
@@ -276,13 +268,10 @@ class GameLogic(QObject):
                 page_title = data["query"]["search"][0]["title"]
                 wiki_url = f"https://en.wikipedia.org/?curid={page_id}"
 
-                print(f"Found Wikipedia page: {wiki_url} (Title: {page_title})")
                 return wiki_url, page_title
             else:
-                print(f"No results found for '{search_text}'.")
                 return None, None
         except Exception as e:
-            print(f"Error searching for '{search_text}': {e}")
             return None, None
         
     # In the future this will be saved in some kind of external doc/database

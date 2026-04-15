@@ -10,9 +10,7 @@ from src.gui.components.WikipediaTheme import WikipediaTheme
 from src.gui.components.ConfettiEffect import ConfettiWidget
 from src.gui.components.UrlInterceptor import WikipediaUrlInterceptor
 from src.logic.ThemeManager import theme_manager
-
-# PERFORMANCE: Disable debug DOM manipulation in production
-DEBUG_THEME = False
+from src.gui.utils import set_window_icon, configure_web_profile
 
 class SoloGamePage(QWidget):
     
@@ -22,30 +20,20 @@ class SoloGamePage(QWidget):
     gameCompleted = pyqtSignal()  # Emitted when game is completed
 
     def __init__(self, tabWidget, start_url, end_url, start_title=None, end_title=None, parent=None, is_multiplayer=False):
-        init_start = time.time()
-        print(f"🏁 WikiRace: [{init_start:.3f}] SoloGamePage initialization starting...")
-        
         super(SoloGamePage, self).__init__(parent)
-        self.tabWidget = tabWidget  # Assuming you need to use tabWidget as well
+        self.tabWidget = tabWidget
         self.start_url = start_url
         self.end_url = end_url
         self.start_title = start_title
         self.end_title = end_title
-        self.startTime = time.time()  # Set start time immediately for solo games
-        self.linksUsed = 0  # Start at 0, will increment on first link click
-        self.darkModeApplied = False  # Track if dark mode has been applied
-        self.is_multiplayer = is_multiplayer  # Flag to indicate multiplayer mode
-        
-        # Track page loading phases
+        self.startTime = time.time()
+        self.linksUsed = 0
+        self.darkModeApplied = False
+        self.is_multiplayer = is_multiplayer
         self.page_load_start_time = None
         self.url_change_time = None
         self.page_load_finish_time = None
-        
-        ui_start = time.time()
-        self.initUI()  # Initialize the UI components
-        ui_time = (time.time() - ui_start) * 1000
-        total_init_time = (time.time() - init_start) * 1000
-        print(f"🏁 WikiRace: [{time.time():.3f}] SoloGamePage initialization completed (UI: {ui_time:.1f}ms, TOTAL: {total_init_time:.1f}ms)")
+        self.initUI()
 
     def getTitleFromUrlPath(self, url):
         """Extract page title from Wikipedia URL path - fast, no network calls"""
@@ -84,7 +72,6 @@ class SoloGamePage(QWidget):
             return "Unknown Page"
             
         except Exception as e:
-            print(f"Error parsing title from URL {url}: {e}")
             return "Unknown Page"
     
     def getExactTitleFromJavaScript(self, callback):
@@ -133,18 +120,13 @@ class SoloGamePage(QWidget):
         # DO NOT REMOVE: This ensures clean state for theme switching
         self.webView = QWebEngineView()
         
-        # OPTIMIZED: Set up persistent profile with disk cache for better performance
-        profile = QWebEngineProfile.defaultProfile()
-        profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
-        profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
-        profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
-        
+        profile = configure_web_profile()
+
         # Set up URL interceptor to handle useskin=vector-2022 and external links
         self.url_interceptor = WikipediaUrlInterceptor(self.webView)
         profile.setUrlRequestInterceptor(self.url_interceptor)
         
         # Use default profile but clear its state aggressively
-        print(f"🔧 WikiRace: [{time.time():.3f}] Using default profile but will clear all theme state")
         
         # Hide the webview initially to prevent flash of light content
         self.webView.setVisible(False)
@@ -163,8 +145,6 @@ class SoloGamePage(QWidget):
         
         # AGGRESSIVE: Force clear and setup theme regardless of profile state
         current_theme = theme_manager.get_theme()
-        print(f"🎨 WikiRace: [{time.time():.3f}] SoloGamePage AGGRESSIVE theme setup with theme: {current_theme}")
-        print(f"🔍 WikiRace: [{time.time():.3f}] Theme manager current state: {theme_manager.get_theme()}")
         
         # Ensure Vector 2022 skin is used for theme support
         start_url_with_skin = WikipediaTheme.ensureVector2022Skin(self.start_url)
@@ -176,16 +156,13 @@ class SoloGamePage(QWidget):
         
         # STEP 1: Use the optimized theme setup method BEFORE loading
         # This ensures theme is applied before page content loads
-        print(f"🔧 WikiRace: [{time.time():.3f}] Setting up {current_theme} theme using optimized method...")
         WikipediaTheme.setupThemeWithNavigation(self.webView, current_theme)
         
         # VERIFICATION: Double-check theme was applied
-        print(f"✅ WikiRace: [{time.time():.3f}] Theme setup completed with theme: {current_theme}")
         
         # Start loading the page
         self.webView.load(QUrl(self.start_url))
         
-        # OPTIMIZED: No delay needed - theme is applied instantly at DocumentCreation
         self.webView.setVisible(True)
         
         self.mainContentLayout.addWidget(self.webView, 3)
@@ -284,11 +261,8 @@ class SoloGamePage(QWidget):
         """Handle page load started - theme is already set via cookies"""
         self.page_load_start_time = time.time()
         current_theme = theme_manager.get_theme()
-        print(f"🚀 WikiRace: [{self.page_load_start_time:.3f}] SoloGamePage - Page load started - Wikipedia {current_theme} theme should be active via mwclientpreferences cookie")
-        print(f"🚀 WikiRace: [{self.page_load_start_time:.3f}] SoloGamePage - Loading URL: {self.webView.url().toString()}")
         
         # Theme should already be properly set up during initialization
-        print(f"✅ WikiRace: [{time.time():.3f}] Page load started - {current_theme} theme already configured")
 
     def onPageLoaded(self, success):
         """Handle page load finished - verify theme was applied"""
@@ -297,17 +271,12 @@ class SoloGamePage(QWidget):
         if success:
             current_theme = theme_manager.get_theme()
             load_duration = (self.page_load_finish_time - self.page_load_start_time) * 1000 if self.page_load_start_time else 0
-            print(f"✅ WikiRace: [{self.page_load_finish_time:.3f}] SoloGamePage - Page loaded successfully with Wikipedia {current_theme} theme (load time: {load_duration:.1f}ms)")
-            print(f"✅ WikiRace: [{self.page_load_finish_time:.3f}] SoloGamePage - Final URL: {self.webView.url().toString()}")
             
             # CRITICAL: Force theme application after page load to ensure it's applied
-            print(f"🔧 WikiRace: SoloGamePage - Force applying {current_theme} theme after page load...")
             WikipediaTheme.forceTheme(self.webView, current_theme)
             
             # Skip verification for performance - theme should be working via cookies
-            print(f"✅ WikiRace: [{time.time():.3f}] SoloGamePage - Page loaded - {current_theme} theme should be active")
             
-            # OPTIMIZED: Scroll to top after page load to fix CSS injection scroll issues
             # This runs asynchronously to not slow down page loading
             scroll_to_top_script = """
             try {
@@ -325,89 +294,16 @@ class SoloGamePage(QWidget):
             # Run scroll-to-top asynchronously after a minimal delay
             QTimer.singleShot(50, lambda: self.webView.page().runJavaScript(scroll_to_top_script))
             
-            # PRODUCTION: Skip post-load DOM manipulation to prevent late reflows
-            if DEBUG_THEME:
-                # OPTIMIZED: Navigation elements should be hidden automatically by DocumentReady script
-                # Only add fallback if DocumentReady script fails (minimal stutter)
-                def check_and_inject_if_needed():
-                    # Quick check if navigation is still visible, only inject if needed
-                    check_script = """
-                    (function() {
-                        var header = document.querySelector('#mw-head, .vector-header');
-                        return header && getComputedStyle(header).display !== 'none';
-                    })();
-                    """
-                    def handle_check(visible):
-                        if visible:
-                            print(f"🔧 WikiRace: [{time.time():.3f}] Navigation still visible, applying fallback CSS...")
-                            WikipediaTheme.setupThemeWithNavigation(self.webView, current_theme)
-                        else:
-                            print(f"✅ WikiRace: [{time.time():.3f}] Navigation already hidden by DocumentReady script")
-                    
-                    self.webView.page().runJavaScript(check_script, handle_check)
-                
-                # Only check after a brief delay to avoid stutter
-                QTimer.singleShot(300, check_and_inject_if_needed)
-                
-                # DEBUGGING: Verify what theme is actually active in the browser
-                def verify_actual_theme():
-                    verify_script = f"""
-                    (function() {{
-                        var actualTheme = 'unknown';
-                        var cookie = document.cookie.match(/mwclientpreferences=([^;]+)/);
-                        if (cookie) {{
-                            actualTheme = cookie[1].includes('night') ? 'dark' : cookie[1].includes('day') ? 'light' : cookie[1];
-                        }}
-                        var bgColor = getComputedStyle(document.documentElement).backgroundColor;
-                        var classes = document.documentElement.className;
-                        
-                        console.log('WikiRace: THEME VERIFICATION - Expected: {current_theme}, Cookie: ' + actualTheme + ', BG: ' + bgColor);
-                        console.log('WikiRace: THEME VERIFICATION - Classes: ' + classes);
-                        
-                        return {{
-                            expectedTheme: '{current_theme}',
-                            cookieTheme: actualTheme,
-                            backgroundColor: bgColor,
-                            classes: classes,
-                            matches: actualTheme === '{current_theme}'
-                        }};
-                    }})();
-                    """
-                    
-                    def handle_verification(result):
-                        if result:
-                            expected = result.get('expectedTheme', 'unknown')
-                            actual = result.get('cookieTheme', 'unknown')
-                            matches = result.get('matches', False)
-                            bg = result.get('backgroundColor', 'unknown')
-                            
-                            print(f"🔍 WikiRace: [{time.time():.3f}] THEME VERIFICATION - Expected: {expected}, Actual: {actual}, Matches: {matches}")
-                            print(f"🔍 WikiRace: [{time.time():.3f}] THEME VERIFICATION - Background: {bg}")
-                            
-                            if not matches:
-                                print(f"❌ WikiRace: [{time.time():.3f}] THEME MISMATCH DETECTED! Forcing correct theme...")
-                                WikipediaTheme.setupThemeWithNavigation(self.webView, current_theme)
-                    
-                    self.webView.page().runJavaScript(verify_script, handle_verification)
-                
-                QTimer.singleShot(1000, verify_actual_theme)
-            else:
-                print(f"⚡ WikiRace: [{time.time():.3f}] PRODUCTION MODE - Skipping post-load DOM manipulation for optimal performance")
-            
             self.darkModeApplied = True
-        else:
-            print("❌ WikiRace: Page load failed")
 
     def onUrlChanged(self, url):
         """Handle URL changes - URL interceptor handles useskin parameter automatically"""
         self.url_change_time = time.time()
         url_str = url.toString()
-        print(f"🔄 WikiRace: [{self.url_change_time:.3f}] URL changed to: {url_str}")
         
         # Emit signal for multiplayer integration
         self.urlChanged.emit(url_str)
         
-        # OPTIMIZED: URL interceptor handles useskin=vector-2022 automatically
         # No need to reload - prevents redirect loops and double loading
         self.darkModeApplied = False  # Reset flag for new page
         
@@ -417,19 +313,16 @@ class SoloGamePage(QWidget):
             if url_str != self.start_url and "wikipedia.org" in url_str:
                 self.linksUsed += 1
                 self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
-                print(f"🔗 WikiRace: [{time.time():.3f}] Link navigation detected - Links used: {self.linksUsed}")
                 
                 # Emit link clicked signal for multiplayer integration
                 self.linkClicked.emit(url_str, self.linksUsed)
                 
-                # OPTIMIZED: Use fast URL path parser to get page title
                 titleString = self.getTitleFromUrlPath(url_str)
                 
                 # Add the title to previous links if it's not already there
                 existing_titles = [self.previousLinksList.item(i).text() for i in range(self.previousLinksList.count())]
                 if titleString not in existing_titles:
                     self.previousLinksList.addItem(titleString)
-                    print(f"📄 WikiRace: [{time.time():.3f}] Added page title to list: {titleString}")
                     
                     # Optionally get exact title after page loads (non-blocking)
                     def update_exact_title(exact_title):
@@ -438,7 +331,6 @@ class SoloGamePage(QWidget):
                             last_item = self.previousLinksList.item(self.previousLinksList.count() - 1)
                             if last_item and last_item.text() == titleString:
                                 last_item.setText(exact_title)
-                                print(f"✏️ WikiRace: [{time.time():.3f}] Updated title from '{titleString}' to '{exact_title}'")
                     
                     # Get exact title after page loads (non-blocking)
                     QTimer.singleShot(1000, lambda: self.getExactTitleFromJavaScript(update_exact_title))
@@ -452,7 +344,6 @@ class SoloGamePage(QWidget):
             # Add starting page to the list (without incrementing counter)
             starting_title = self.getTitleFromUrlPath(url_str)
             self.previousLinksList.addItem(f"🏁 {starting_title}")
-            print(f"🏁 WikiRace: [{time.time():.3f}] Added starting page to list: {starting_title}")
             
             # Get exact title for starting page (non-blocking)
             def update_starting_title(exact_title):
@@ -461,13 +352,9 @@ class SoloGamePage(QWidget):
                     first_item = self.previousLinksList.item(0)
                     if first_item and first_item.text() == f"🏁 {starting_title}":
                         first_item.setText(f"🏁 {exact_title}")
-                        print(f"✏️ WikiRace: [{time.time():.3f}] Updated starting page title to: {exact_title}")
             
             QTimer.singleShot(1000, lambda: self.getExactTitleFromJavaScript(update_starting_title))
-            print(f"🏁 WikiRace: [{time.time():.3f}] Initial page load complete - future navigations will be counted")
         
-        # OPTIMIZED: Navigation hiding should be handled by DocumentReady script
-        print(f"✅ WikiRace: [{time.time():.3f}] New page loading - DocumentReady script will handle navigation hiding")
 
     def showWebView(self):
         """Show the webview after theme has been applied"""
@@ -493,17 +380,13 @@ class SoloGamePage(QWidget):
             current_url = self.webView.url().toString()
             if current_url and "wikipedia.org" in current_url:
                 current_theme = theme_manager.get_theme()
-                print(f"🔄 WikiRace: SoloGamePage - Refreshing Wikipedia page to apply {current_theme} theme")
-                print(f"🔍 WikiRace: SoloGamePage - Current URL: {current_url}")
                 
                 # CRITICAL: Re-setup theme with navigation hiding for new theme
                 # DO NOT REMOVE: This cleans up old theme scripts and applies new ones
-                print(f"🔧 WikiRace: SoloGamePage - Calling setupThemeWithNavigation with theme: {current_theme}")
                 WikipediaTheme.setupThemeWithNavigation(self.webView, current_theme)
                 
                 # CRITICAL: Reload page to apply new theme scripts
                 # DO NOT REMOVE: Theme scripts only take effect after page reload
-                print(f"🔄 WikiRace: SoloGamePage - Reloading page to apply {current_theme} theme")
                 self.webView.reload()
     
     def on_theme_changed(self, theme):
@@ -524,23 +407,18 @@ class SoloGamePage(QWidget):
         - WebView background MUST be updated to match new theme
         - apply_theme() MUST be called to update UI components
         """
-        print(f"🎨 WikiRace: SoloGamePage - Theme changed to: {theme}")
-        print(f"🔍 WikiRace: SoloGamePage - Current theme manager state: {theme_manager.get_theme()}")
         
         # CRITICAL: Apply theme to all UI components first
         # DO NOT REMOVE: This updates labels, lists, and other UI elements
         self.apply_theme()
-        print(f"🎨 WikiRace: SoloGamePage - Applied theme to UI components")
         
         # CRITICAL: Update webview background to prevent visual flash
         # DO NOT REMOVE: This prevents white/dark flash during theme transition
         styles = theme_manager.get_theme_styles()
         self.webView.setStyleSheet(f"background-color: {styles['background_color']};")
-        print(f"🎨 WikiRace: SoloGamePage - Updated webview background to: {styles['background_color']}")
         
         # CRITICAL: Refresh Wikipedia page to apply new theme
         # DO NOT REMOVE: This re-applies theme scripts for the new theme
-        print(f"🔄 WikiRace: SoloGamePage - About to refresh page for theme: {theme}")
         self.refreshWikipediaPage()
 
     # REMOVED: Old blocking network methods getTitleFromUrl and getTitleFromPageId
@@ -579,18 +457,12 @@ class SoloGamePage(QWidget):
         else:
             destinationPage = self.getTitleFromUrlPath(self.end_url)
         
-        print(f"🎯 WikiRace: [{time.time():.3f}] Checking end game - Current: '{currentPage}' vs Destination: '{destinationPage}'")
-        print(f"🔍 WikiRace: [{time.time():.3f}] URL comparison - Current URL: '{newUrl.toString()}' vs Destination URL: '{self.end_url}'")
-        print(f"🔍 WikiRace: [{time.time():.3f}] Title comparison (lower): '{currentPage.lower().strip()}' == '{destinationPage.lower().strip()}' ? {currentPage.lower().strip() == destinationPage.lower().strip()}")
         
         # Check for exact match (case-insensitive to handle minor differences)
         if currentPage.lower().strip() == destinationPage.lower().strip():
-            print(f"🏆 WikiRace: [{time.time():.3f}] GAME COMPLETED! Player reached destination page!")
             
-            # CRITICAL FIX: Stop the timer immediately and store game end time
             self.timer.stop()
             self.game_end_time = time.time()
-            print(f"⏰ WikiRace: [{self.game_end_time:.3f}] Timer stopped for game completion - confetti time excluded from total")
             
             # Emit game completed signal for multiplayer integration
             self.gameCompleted.emit()
@@ -598,7 +470,6 @@ class SoloGamePage(QWidget):
             # Wait for page to load, then show confetti, then dialog
             QTimer.singleShot(500, self.showConfettiAndDialog)  # Wait 500ms for page load
         else:
-            print(f"🎯 WikiRace: [{time.time():.3f}] Game continues - pages don't match")
             
             # Also try getting exact current page title via JavaScript for more accuracy
             def check_with_exact_title(exact_current_title):
@@ -607,15 +478,11 @@ class SoloGamePage(QWidget):
                     exact_current_normalized = exact_current_title.lower().strip().replace('_', ' ')
                     destination_normalized = destinationPage.lower().strip().replace('_', ' ')
                     
-                    print(f"🔍 WikiRace: [{time.time():.3f}] Exact title comparison: '{exact_current_normalized}' == '{destination_normalized}' ? {exact_current_normalized == destination_normalized}")
                     
                     if exact_current_normalized == destination_normalized:
-                        print(f"🏆 WikiRace: [{time.time():.3f}] GAME COMPLETED! (via exact title check) Player reached destination page!")
                         
-                        # CRITICAL FIX: Stop the timer immediately and store game end time
                         self.timer.stop()
                         self.game_end_time = time.time()
-                        print(f"⏰ WikiRace: [{self.game_end_time:.3f}] Timer stopped for game completion (exact title) - confetti time excluded from total")
                         
                         # Emit game completed signal for multiplayer integration
                         self.gameCompleted.emit()
@@ -627,9 +494,7 @@ class SoloGamePage(QWidget):
     
     def startGame(self):
         """Start the game - for multiplayer integration"""
-        print(f"🔄 WikiRace: [{time.time():.3f}] Starting new game - resetting all progress")
         
-        # CRITICAL FIX: Reset game state for new game - ensure links reset to 0 between multiple games
         self.linksUsed = 0
         self.linksUsedLabel.setText("Links Used: " + str(self.linksUsed))
         self.startTime = time.time()  # Reset start time for multiplayer games
@@ -643,7 +508,6 @@ class SoloGamePage(QWidget):
             self.timer.stop()
             self.timer.start()
         
-        print(f"✅ WikiRace: [{time.time():.3f}] Game state reset - Links: {self.linksUsed}, Timer: {'running' if self.timer.isActive() else 'stopped'}")
         
         # Load the starting page
         if self.start_url:
@@ -651,12 +515,10 @@ class SoloGamePage(QWidget):
     
     def showConfettiAndDialog(self):
         """Show confetti first, then dialog after confetti finishes"""
-        # CRITICAL FIX: Stop the timer immediately when confetti starts to exclude confetti time from total
         if hasattr(self, 'timer') and self.timer.isActive():
             self.timer.stop()
             # Store the exact time when the timer stopped to use in dialog calculation
             self.game_end_time = time.time()
-            print(f"⏰ WikiRace: [{self.game_end_time:.3f}] Timer stopped for confetti effect - confetti time excluded from total")
         
         # Show confetti on the current game page
         self.triggerConfetti()
@@ -695,13 +557,7 @@ class EndGameDialog(QDialog):
         self.homePageIndex = homePageIndex
         self.setWindowTitle("Game Over")
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         self.apply_theme()
         self.setFixedSize(400, 280)  # Further increased size to prevent text cutoff
@@ -795,18 +651,14 @@ class EndGameDialog(QDialog):
         layout.addWidget(closeButton)
 
     def returnToHomePage(self):
-        # CRITICAL FIX: Close the Solo Game tab after "Continue" button clicked
         try:
             # Find the current game tab index
             current_index = self.tabWidget.indexOf(self.gamePage)
             if current_index >= 0:
-                print(f"🗑️ WikiRace: [{time.time():.3f}] Closing Solo Game tab at index {current_index}")
                 self.tabWidget.removeTab(current_index)
-            else:
-                print(f"⚠️ WikiRace: [{time.time():.3f}] Could not find Solo Game tab to close")
-        except Exception as e:
-            print(f"❌ WikiRace: [{time.time():.3f}] Error closing Solo Game tab: {e}")
-        
+        except Exception:
+            pass
+
         # Switch to home page
         self.tabWidget.setCurrentIndex(self.homePageIndex)
         self.close()

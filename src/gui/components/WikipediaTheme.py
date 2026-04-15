@@ -63,27 +63,14 @@ class WikipediaTheme:
         h2[id*="Further"] ~ *, h2[id*="ootnote"] ~ * { display:none !important; }
     """
     
-    # Pre-compiled CSS specifically for Wikipedia main page customization
-    _MAIN_PAGE_CUSTOMIZATION_CSS = """
-        /* Note: Main page customization is now handled via JavaScript in applyMainPageCustomization() */
-        /* CSS :contains() selectors are not supported in Chromium/QWebEngine */
-        /* All main page styling is done via JavaScript for better compatibility */
-    """
-    
-    
-    
-    
-    
     @staticmethod
     def ensureVector2022Skin(url: str) -> str:
         """
         Ensure Wikipedia URLs use the Vector 2022 skin for dark mode support
         Also adds performance optimizations to the URL
         """
-        print(f"🔗 WikiRace: Ensuring Vector 2022 skin for URL: {url}")
         
         if not url or "wikipedia.org" not in url:
-            print(f"⚠️ WikiRace: URL is not a Wikipedia URL, skipping skin modification")
             return url
             
         original_url = url
@@ -95,22 +82,14 @@ class WikipediaTheme:
                 # Replace existing useskin parameter
                 import re
                 url = re.sub(r'useskin=[^&]*', 'useskin=vector-2022', url)
-                print(f"🔄 WikiRace: Replaced existing useskin parameter")
             else:
                 # Add useskin parameter
                 url += "&useskin=vector-2022"
-                print(f"➕ WikiRace: Added useskin parameter to existing query string")
             
             # Could add performance parameters here if needed
         else:
             # No query parameters, add useskin only
             url += "?useskin=vector-2022"
-            print(f"➕ WikiRace: Added useskin parameter as new query string")
-            
-        if url != original_url:
-            print(f"✅ WikiRace: URL updated from {original_url} to {url}")
-        else:
-            print(f"ℹ️ WikiRace: URL unchanged (already has correct skin)")
             
         return url
     
@@ -137,16 +116,13 @@ class WikipediaTheme:
         
         THREAD-SAFE: Prevents race conditions when multiple WebViews share the same profile
         """
-        print(f"🔄 WikiRace: [{time.time():.3f}] setupThemeWithNavigation called with theme: {theme}")
         
         # THREAD-SAFE: Prevent race conditions when multiple pages try to setup theme simultaneously
         if WikipediaTheme._setup_in_progress:
-            print(f"⏳ WikiRace: [{time.time():.3f}] Theme setup already in progress, waiting...")
             # Wait a bit and try again
             import time as time_module
             time_module.sleep(0.1)
             if WikipediaTheme._setup_in_progress:
-                print(f"⏳ WikiRace: [{time.time():.3f}] Theme setup still in progress, skipping duplicate setup")
                 return
         
         # PREVENT REDUNDANT CALLS: Check if we already have the correct theme set up
@@ -154,7 +130,6 @@ class WikipediaTheme:
         if (WikipediaTheme._last_setup_theme == theme and 
             WikipediaTheme._setup_in_progress == False and
             hasattr(webView, '_theme_setup_completed')):
-            print(f"⏳ WikiRace: [{time.time():.3f}] Theme {theme} already set up for this WebView, skipping redundant setup")
             return
         
         # Always setup theme to ensure proper switching between dark/light modes
@@ -171,7 +146,6 @@ class WikipediaTheme:
             WikipediaTheme._setupInitialTheme(webView, theme)
             WikipediaTheme._setupNavigationScripts(webView, theme)
             
-            print(f"✅ WikiRace: [{time.time():.3f}] Theme setup completed successfully for {theme}")
             
             # Update the last setup theme to prevent redundant calls
             WikipediaTheme._last_setup_theme = theme
@@ -188,10 +162,8 @@ class WikipediaTheme:
         Set up initial theme and DocumentCreation script
         """
         start_time = time.time()
-        print(f"🚀 WikiRace: [{start_time:.3f}] Setting up initial {theme} theme with navigation hiding...")
         
         if not webView:
-            print(f"❌ WikiRace: [{time.time():.3f}] WebView is None, cannot setup {theme} theme")
             return
             
         try:
@@ -333,7 +305,6 @@ class WikipediaTheme:
             
             # Insert the new optimized script
             profile.scripts().insert(script)
-            print(f"📜 WikiRace: [{time.time():.3f}] Inserted optimized-{theme}-setup script")
             
             # Configure WebEngine settings for optimal performance and security
             settings = webView.settings()
@@ -355,11 +326,9 @@ class WikipediaTheme:
             profile.setHttpUserAgent(f"WikiRace/1.0 (Optimized {theme.title()} Mode)")
             
             total_time = (time.time() - start_time) * 1000
-            print(f"✅ WikiRace: Optimized {theme} theme setup completed")
             
         except Exception as e:
             error_time = time.time()
-            print(f"❌ WikiRace: [{error_time:.3f}] Error in initial theme setup: {e}")
             import traceback
             traceback.print_exc()
     
@@ -368,7 +337,6 @@ class WikipediaTheme:
         """
         Set up scripts that run on every page load to ensure navigation elements are hidden
         """
-        print(f"📜 WikiRace: [{time.time():.3f}] Setting up navigation scripts for {theme} theme")
         if not webView:
             return
             
@@ -434,7 +402,6 @@ class WikipediaTheme:
                     if (script_name.startswith('navigation-hider-') or 
                         script_name.startswith('fallback-')):
                         scripts_to_remove.append(existing_script)
-                        print(f"🧹 WikiRace: [{time.time():.3f}] Removing old script: {script_name}")
             
             for script_to_remove in scripts_to_remove:
                 existing_scripts.remove(script_to_remove)
@@ -442,7 +409,6 @@ class WikipediaTheme:
             
             # Insert the navigation script
             profile.scripts().insert(nav_script)
-            print(f"📜 WikiRace: [{time.time():.3f}] Inserted navigation-hider-{theme} script")
             
             # CRITICAL: Add a fallback DocumentReady script to ensure theme is applied
             # This runs if the DocumentCreation script doesn't execute
@@ -501,10 +467,8 @@ class WikipediaTheme:
             """)
             
             profile.scripts().insert(fallback_script)
-            print(f"📜 WikiRace: [{time.time():.3f}] Inserted fallback-{theme}-theme script")
             
         except Exception as e:
-            print(f"❌ WikiRace: [{time.time():.3f}] Error setting up navigation scripts: {e}")
             import traceback
             traceback.print_exc()
     
@@ -536,26 +500,21 @@ class WikipediaTheme:
                     # Allow Wikipedia's own modules even if they contain "analytics"
                     if 'wikipedia.org' in url.lower():
                         # Debug: Log if this is an analytics-related module
-                        if 'analytics' in url.lower() or 'xlab' in url.lower():
-                            print(f"✅ WikiRace: Allowing Wikipedia module: {url}")
                         return  # Don't block Wikipedia's own resources
                     
                     # Block external analytics/tracking services
                     for pattern in blocked_patterns:
                         if pattern in url.lower():
-                            print(f"🚫 WikiRace: Blocking external resource: {url}")
                             info.block(True)
                             return
             
             # Create and set the interceptor
             interceptor = FastLoadingInterceptor()
             profile.setUrlRequestInterceptor(interceptor)
-            print("🚫 WikiRace: Request interceptor set up to block unnecessary resources")
             
-        except Exception as e:
-            print(f"⚠️ WikiRace: Could not set up request interceptor: {e}")
-            # Continue without interceptor - not critical
-    
+        except Exception:
+            pass  # Continue without interceptor - not critical
+
     @staticmethod
     def _clearThemeState(webView: QWebEngineView):
         """
@@ -579,7 +538,6 @@ class WikipediaTheme:
             return
             
         try:
-            print(f"🧹 WikiRace: [{time.time():.3f}] Clearing all existing theme state...")
             
             profile = webView.page().profile()
             store = profile.cookieStore()
@@ -604,7 +562,6 @@ class WikipediaTheme:
             for domain in domains:
                 store.setCookie(clear_cookie, QUrl(domain))
             
-            print(f"🍪 WikiRace: [{time.time():.3f}] Cleared mwclientpreferences cookies from all domains")
             
             # CRITICAL: Remove ALL existing theme scripts
             # DO NOT REMOVE: Old scripts will continue running and override new theme
@@ -625,10 +582,7 @@ class WikipediaTheme:
             for script_to_remove in scripts_to_remove:
                 existing_scripts.remove(script_to_remove)
             
-            if scripts_to_remove:
-                print(f"🧹 WikiRace: [{time.time():.3f}] Removed {len(scripts_to_remove)} old theme scripts")
-            
-            # CRITICAL: Force clear any cached theme state via JavaScript
+            # Force clear any cached theme state via JavaScript
             # DO NOT REMOVE: Browser may cache theme state that needs clearing
             clear_js = """
             try {
@@ -649,7 +603,6 @@ class WikipediaTheme:
             
             webView.page().runJavaScript(clear_js)
             
-            print(f"✅ WikiRace: [{time.time():.3f}] Theme state cleared successfully")
             
             # Reset the last setup theme when clearing state
             WikipediaTheme._last_setup_theme = None
@@ -659,7 +612,6 @@ class WikipediaTheme:
                 delattr(webView, '_theme_setup_completed')
             
         except Exception as e:
-            print(f"❌ WikiRace: [{time.time():.3f}] Error clearing theme state: {e}")
             import traceback
             traceback.print_exc()
 
@@ -669,17 +621,14 @@ class WikipediaTheme:
         Set up Wikipedia theme for a QWebEngineView
         This should be called before any Wikipedia navigation
         """
-        print(f"🔧 WikiRace: Setting up Wikipedia {theme} theme...")
         
         if not webView:
-            print(f"❌ WikiRace: WebView is None, cannot setup {theme} theme")
             return
             
         try:
             # Get the profile and cookie store
             profile = webView.page().profile()
             store = profile.cookieStore()
-            print(f"✅ WikiRace: Got WebEngine profile and cookie store")
             
             # Set the mwclientpreferences cookie for the specified theme
             if theme == 'light':
@@ -691,16 +640,13 @@ class WikipediaTheme:
             cookie.setPath("/")
             cookie.setExpirationDate(QDateTime.currentDateTimeUtc().addYears(5))
             
-            print(f"🍪 WikiRace: Created cookie - Name: mwclientpreferences, Value: {cookie_val.decode()}")
-            print(f"🍪 WikiRace: Cookie domain: {cookie.domain()}, path: {cookie.path()}")
             
             # Set SameSite policy if supported
             try:
                 cookie.setSameSitePolicy(QNetworkCookie.SameSite.Lax)
-                print("🍪 WikiRace: Set SameSite=Lax policy")
-            except Exception as e:
-                print(f"⚠️ WikiRace: Could not set SameSite policy: {e}")
-            
+            except Exception:
+                pass
+
             # Set the cookie for all Wikipedia domains
             domains = [
                 "https://en.wikipedia.org/",
@@ -715,13 +661,10 @@ class WikipediaTheme:
                 "https://ar.wikipedia.org/"
             ]
         
-            print(f"🌐 WikiRace: Setting cookies for {len(domains)} Wikipedia domains...")
             for domain in domains:
                 store.setCookie(cookie, QUrl(domain))
-                print(f"🍪 WikiRace: Set cookie for {domain}")
             
             # Also try setting the cookie with a more specific path and domain
-            print("🍪 WikiRace: Setting additional cookies with specific paths...")
             for domain in domains:
                 # Try with root domain
                 cookie_root = QNetworkCookie(b"mwclientpreferences", cookie_val)
@@ -733,7 +676,6 @@ class WikipediaTheme:
                 except Exception:
                     pass
                 store.setCookie(cookie_root, QUrl(domain))
-                print(f"🍪 WikiRace: Set root domain cookie for {domain}")
                 
                 # Try with www subdomain
                 www_domain = domain.replace("://", "://www.")
@@ -746,29 +688,22 @@ class WikipediaTheme:
                 except Exception:
                     pass
                 store.setCookie(cookie_www, QUrl(www_domain))
-                print(f"🍪 WikiRace: Set www domain cookie for {www_domain}")
             
             # Add document-creation micro-fallback to prevent any residual flash
-            print("📜 WikiRace: Adding document creation fallback script...")
             WikipediaTheme._addDocumentCreationScript(profile, theme)
             
             # Configure WebEngine settings for optimal theme support
-            print("⚙️ WikiRace: Configuring WebEngine settings...")
             settings = webView.settings()
             settings.setAttribute(QWebEngineSettings.WebAttribute.JavascriptEnabled, True)
             settings.setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessRemoteUrls, True)
             settings.setAttribute(QWebEngineSettings.WebAttribute.AllowRunningInsecureContent, True)
-            print("✅ WikiRace: WebEngine settings configured")
             
             # Set user agent to indicate theme support
             user_agent = f"WikiRace/1.0 ({theme.title()} Mode Optimized)"
             profile.setHttpUserAgent(user_agent)
-            print(f"🌐 WikiRace: Set user agent: {user_agent}")
             
-            print(f"✅ WikiRace: Wikipedia {theme} theme setup completed successfully")
             
         except Exception as e:
-            print(f"❌ WikiRace: Error setting up {theme} theme: {e}")
             import traceback
             traceback.print_exc()
     
@@ -826,7 +761,6 @@ class WikipediaTheme:
         Add a document-creation script to prevent any residual flash
         This runs before the page paints and sets the appropriate backdrop instantly
         """
-        print(f"📜 WikiRace: Creating document creation fallback script for {theme} theme...")
         
         script = QWebEngineScript()
         script.setName(f"prepaint-{theme}-fallback")
@@ -880,9 +814,8 @@ class WikipediaTheme:
         
         try:
             profile.scripts().insert(script)
-            print("✅ WikiRace: Document creation script added successfully")
         except Exception as e:
-            print(f"❌ WikiRace: Error adding document creation script: {e}")
+            pass
     
     @staticmethod
     def setupDarkTheme(webView: QWebEngineView):
@@ -897,10 +830,8 @@ class WikipediaTheme:
         Verify that dark mode was properly applied by checking for the dark theme class
         This is for debugging purposes
         """
-        print("🔍 WikiRace: Verifying dark mode application...")
         
         if not webView:
-            print("❌ WikiRace: WebView is None, cannot verify dark mode")
             return
             
         verification_js = """
@@ -956,18 +887,10 @@ class WikipediaTheme:
         """
         
         def handleResult(result):
-            print("🔍 WikiRace: Dark mode verification completed")
             if result and 'error' not in result:
-                print(f"✅ WikiRace: Dark mode verification results:")
-                print(f"  - Has dark class: {result.get('hasDarkClass', False)}")
-                print(f"  - Is dark background: {result.get('isDarkBackground', False)}")
-                print(f"  - HTML classes: {result.get('className', 'N/A')}")
-                print(f"  - Body background: {result.get('bodyBackground', 'N/A')}")
-                print(f"  - Has mwclientpreferences cookie: {result.get('hasMwCookie', False)}")
-                print(f"  - Cookie value: {result.get('mwCookieValue', 'N/A')}")
-                print(f"  - Meta color-scheme: {result.get('colorSchemeValue', 'N/A')}")
+                pass
             else:
-                print(f"❌ WikiRace: Dark mode verification failed: {result}")
+                pass
             
             if callback:
                 callback(result)
@@ -975,7 +898,7 @@ class WikipediaTheme:
         try:
             webView.page().runJavaScript(verification_js, handleResult)
         except Exception as e:
-            print(f"❌ WikiRace: Error running verification JavaScript: {e}")
+            pass
     
     @staticmethod
     def checkCookiesInBrowser(webView: QWebEngineView):
@@ -983,10 +906,8 @@ class WikipediaTheme:
         Check what cookies are actually stored in the browser
         This helps debug if cookies are being set correctly
         """
-        print("🍪 WikiRace: Checking cookies in browser...")
         
         if not webView:
-            print("❌ WikiRace: WebView is None, cannot check cookies")
             return
             
         cookie_check_js = """
@@ -1016,18 +937,15 @@ class WikipediaTheme:
         """
         
         def handleCookieResult(result):
-            print("🍪 WikiRace: Cookie check completed")
             if result and 'error' not in result:
-                print(f"🍪 WikiRace: All cookies: {result.get('allCookies', 'N/A')}")
-                print(f"🍪 WikiRace: mwclientpreferences cookie: {result.get('mwclientpreferences', 'N/A')}")
-                print(f"🍪 WikiRace: Has mwclientpreferences: {result.get('hasMwCookie', False)}")
+                pass
             else:
-                print(f"❌ WikiRace: Cookie check failed: {result}")
+                pass
         
         try:
             webView.page().runJavaScript(cookie_check_js, handleCookieResult)
         except Exception as e:
-            print(f"❌ WikiRace: Error checking cookies: {e}")
+            pass
     
     @staticmethod
     def forceTheme(webView: QWebEngineView, theme: str = 'dark'):
@@ -1035,10 +953,8 @@ class WikipediaTheme:
         Force theme using JavaScript if the cookie approach doesn't work
         This is a fallback method that directly manipulates the DOM
         """
-        print(f"🔧 WikiRace: Forcing {theme} theme via JavaScript...")
         
         if not webView:
-            print(f"❌ WikiRace: WebView is None, cannot force {theme} theme")
             return
             
         # Set theme-specific values
@@ -1125,18 +1041,15 @@ class WikipediaTheme:
         """
         
         def handleForceResult(result):
-            print(f"🔧 WikiRace: Force {theme} theme completed")
             if result and 'error' not in result:
-                print(f"✅ WikiRace: {theme.title()} theme forced successfully")
-                print(f"✅ WikiRace: HTML classes: {result.get('classes', 'N/A')}")
-                print(f"✅ WikiRace: Cookies: {result.get('cookie', 'N/A')}")
+                pass
             else:
-                print(f"❌ WikiRace: Force {theme} theme failed: {result}")
+                pass
         
         try:
             webView.page().runJavaScript(force_theme_js, handleForceResult)
         except Exception as e:
-            print(f"❌ WikiRace: Error forcing {theme} theme: {e}")
+            pass
     
     @staticmethod
     def forceDarkTheme(webView: QWebEngineView):
@@ -1190,7 +1103,6 @@ class WikipediaTheme:
         if not webView:
             return
             
-        print("🏠 WikiRace: Applying main page customization...")
         
         # Use JavaScript to precisely target and modify elements
         inject_js = """
@@ -1338,8 +1250,7 @@ class WikipediaTheme:
         
         try:
             webView.page().runJavaScript(inject_js)
-            print("✅ WikiRace: Main page customization applied successfully")
         except Exception as e:
-            print(f"❌ WikiRace: Error applying main page customization: {e}")
+            pass
     
     

@@ -11,6 +11,7 @@ from src.logic.ThemeManager import theme_manager
 
 # Import the URL interceptor
 from src.gui.components.UrlInterceptor import WikipediaUrlInterceptor
+from src.gui.utils import set_window_icon, configure_web_profile
 
 
 class HomePage(QWidget):
@@ -123,12 +124,8 @@ class HomePage(QWidget):
         self.webView = QWebEngineView()
         self.webView.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         
-        # OPTIMIZED: Set up persistent profile with disk cache for better performance
-        profile = QWebEngineProfile.defaultProfile()
-        profile.setPersistentCookiesPolicy(QWebEngineProfile.PersistentCookiesPolicy.ForcePersistentCookies)
-        profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
-        profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50MB cache
-        
+        profile = configure_web_profile()
+
         # Set up URL interceptor to handle useskin=vector-2022 and external links
         self.url_interceptor = WikipediaUrlInterceptor(self.webView)
         profile.setUrlRequestInterceptor(self.url_interceptor)
@@ -141,7 +138,6 @@ class HomePage(QWidget):
         self.webView.page().loadFinished.connect(self.onPageLoaded)
         self.webView.urlChanged.connect(self.onUrlChanged)
         
-        # OPTIMIZED: Set up Wikipedia theme with navigation hiding BEFORE loading
         # This ensures theme is applied before page content loads
         WikipediaTheme.setupThemeWithNavigation(self.webView, theme_manager.get_theme())
         
@@ -154,7 +150,6 @@ class HomePage(QWidget):
         
         self.layout.addWidget(self.contentFrame)
         
-        # OPTIMIZED: No delay needed - theme is applied instantly at DocumentCreation
         self.webView.setVisible(True)
         
         # Apply initial styling after all widgets are created
@@ -186,50 +181,35 @@ class HomePage(QWidget):
     def onLoadStarted(self):
         """Handle page load started - theme is already set via cookies"""
         current_theme = theme_manager.get_theme()
-        print(f"🚀 WikiRace: HomePage - Page load started - Wikipedia {current_theme} theme should be active via mwclientpreferences cookie")
-        print(f"🚀 WikiRace: HomePage - Loading URL: {self.webView.url().toString()}")
 
     def onPageLoaded(self, success):
         """Handle page load finished - verify theme was applied"""
         if success:
             current_theme = theme_manager.get_theme()
-            print(f"✅ WikiRace: HomePage - Page loaded successfully with Wikipedia {current_theme} theme")
-            print(f"✅ WikiRace: HomePage - Final URL: {self.webView.url().toString()}")
             
             # CRITICAL: Force theme application after page load to ensure it's applied
-            print(f"🔧 WikiRace: HomePage - Force applying {current_theme} theme after page load...")
             WikipediaTheme.forceTheme(self.webView, current_theme)
             
             # Check if this is the Wikipedia main page and apply customization
             current_url = self.webView.url().toString()
             if "en.wikipedia.org/wiki/Main_Page" in current_url:
-                print("🏠 WikiRace: HomePage - Detected Wikipedia main page, applying customization...")
                 WikipediaTheme.applyMainPageCustomization(self.webView)
             
             # Verify theme was applied (for debugging)
-            print(f"🔍 WikiRace: HomePage - Running {current_theme} mode verification...")
             # Theme verification is now handled automatically by setupThemeWithNavigation
             
             # Also check what cookies are actually in the browser
-            print("🍪 WikiRace: HomePage - Checking cookies in browser...")
             # Cookie checking is now handled automatically by setupThemeWithNavigation
             
-            # OPTIMIZED: Theme setup is already handled by setupThemeWithNavigation during initialization
             # No need to force it again here as the DocumentCreation script should handle it
             
-            # OPTIMIZED: Navigation elements are hidden automatically by DOMContentLoaded script
-            print(f"✅ WikiRace: [{time.time():.3f}] HomePage - Navigation elements handled by automatic script")
             
             self.darkModeApplied = True
-        else:
-            print("❌ WikiRace: HomePage - Page load failed")
 
     def onUrlChanged(self, url):
         """Handle URL changes - URL interceptor handles useskin parameter automatically"""
         url_str = url.toString()
-        print(f"🔄 WikiRace: HomePage - URL changed to: {url_str}")
         
-        # OPTIMIZED: URL interceptor handles useskin=vector-2022 automatically
         # No need to reload - prevents redirect loops and double loading
         self.darkModeApplied = False  # Reset flag for new page
         
@@ -238,11 +218,9 @@ class HomePage(QWidget):
         
         # Check if this is the Wikipedia main page and apply customization
         if "en.wikipedia.org/wiki/Main_Page" in url_str:
-            print("🏠 WikiRace: HomePage - Detected Wikipedia main page in URL change, applying customization...")
             from PyQt6.QtCore import QTimer
             QTimer.singleShot(500, lambda: WikipediaTheme.applyMainPageCustomization(self.webView))
         
-        # OPTIMIZED: Theme setup is already handled by setupThemeWithNavigation during initialization
         # No need to call it again here as it will be handled automatically by the DocumentReady script
 
     def showWebView(self):
@@ -297,19 +275,14 @@ class HomePage(QWidget):
         # Uncheck the button immediately after click
         self.multiplayerButton.setChecked(False)
         
-        # CRITICAL FIX: Always create a new multiplayer tab to ensure clean state
         # The previous tab may have been closed and the attribute deleted
-        print("🔄 HomePage: Creating new multiplayer tab")
         self.mainApplication.addMultiplayerTab()
         
         # Switch to the newly created tab
         index = self.tabWidget.indexOf(self.mainApplication.multiplayerPage)
         if index >= 0:
             self.tabWidget.setCurrentIndex(index)
-            print("✅ HomePage: Switched to multiplayer tab")
-        else:
-            print("❌ HomePage: Failed to find multiplayer tab")
-    
+
     def onSettingsClicked(self):
         # Uncheck the button immediately after click
         self.settingsButton.setChecked(False)
@@ -453,15 +426,12 @@ class HomePage(QWidget):
         if hasattr(self, 'webView') and self.webView:
             current_url = self.webView.url().toString()
             if current_url and "wikipedia.org" in current_url:
-                print(f"🔄 WikiRace: Refreshing Wikipedia page to apply {theme_manager.get_theme()} theme")
-                # OPTIMIZED: Re-setup theme with navigation hiding in one go
                 WikipediaTheme.setupThemeWithNavigation(self.webView, theme_manager.get_theme())
                 # Reload the page
                 self.webView.reload()
     
     def on_theme_changed(self, theme):
         """Handle theme changes"""
-        print(f"🎨 WikiRace: HomePage - Theme changed to: {theme}")
         
         # Update all styling
         self.updateTitleStyling()
@@ -546,13 +516,7 @@ class CustomGameDialog(QDialog):
         self.homePage = homePage
         self.setWindowTitle('Race Setup')
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         self.apply_theme()
         self.layout = QVBoxLayout(self)
@@ -759,13 +723,7 @@ class UnderConstructionDialog(QDialog):
         super(UnderConstructionDialog, self).__init__(parent)
         self.setWindowTitle("Under Construction")
         
-        # Set window icon
-        from pathlib import Path
-        project_root = Path(__file__).parent.parent.parent
-        icon_path = project_root / 'src' / 'resources' / 'icons' / 'favicon.ico'
-        if icon_path.exists():
-            from PyQt6.QtGui import QIcon
-            self.setWindowIcon(QIcon(str(icon_path)))
+        set_window_icon(self)
         
         self.apply_theme()
         self.setFixedSize(300, 180)
