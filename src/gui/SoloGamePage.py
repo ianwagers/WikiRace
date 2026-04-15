@@ -120,8 +120,8 @@ class SoloGamePage(QWidget):
         # DO NOT REMOVE: This ensures clean state for theme switching
         self.webView = QWebEngineView()
         
-        configure_web_profile()
-        
+        profile = configure_web_profile()
+
         # Set up URL interceptor to handle useskin=vector-2022 and external links
         self.url_interceptor = WikipediaUrlInterceptor(self.webView)
         profile.setUrlRequestInterceptor(self.url_interceptor)

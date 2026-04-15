@@ -13,8 +13,12 @@ def set_window_icon(widget) -> None:
         widget.setWindowIcon(QIcon(str(_ICON_PATH)))
 
 
-def configure_web_profile() -> None:
-    """Apply standard persistent-cache settings to the default WebEngine profile."""
+def configure_web_profile():
+    """Apply standard persistent-cache settings to the default WebEngine profile.
+
+    Returns the profile so callers that need to attach interceptors can do so
+    without fetching it a second time.
+    """
     from PyQt6.QtWebEngineCore import QWebEngineProfile
     profile = QWebEngineProfile.defaultProfile()
     profile.setPersistentCookiesPolicy(
@@ -22,3 +26,4 @@ def configure_web_profile() -> None:
     )
     profile.setHttpCacheType(QWebEngineProfile.HttpCacheType.DiskHttpCache)
     profile.setHttpCacheMaximumSize(50 * 1024 * 1024)  # 50 MB
+    return profile
